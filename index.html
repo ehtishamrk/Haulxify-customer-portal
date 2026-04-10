@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Haulxify — Customer Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="CSS/portal.css">
+</head>
+<body>
+
+  <!-- ── SIDEBAR ───────────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="portal-logo">Haul<span>xify</span></a>
+      <button class="sidebar-close" id="sidebar-close" aria-label="Close menu">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-profile-mini">
+      <div class="avatar-ring">
+        <div class="avatar">JD</div>
+        <span class="status-dot"></span>
+      </div>
+      <div>
+        <p class="profile-name">John D. Transport</p>
+        <p class="profile-tier"><i class="fa-solid fa-circle-check"></i> Pro Client</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <span class="nav-label">Main</span>
+      <a href="#" class="nav-item active" data-tab="dashboard">
+        <i class="fa-solid fa-house-chimney"></i><span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="loads">
+        <i class="fa-solid fa-truck-fast"></i><span>Loads / Dispatch</span>
+        <span class="badge">3</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="tools">
+        <i class="fa-solid fa-wrench"></i><span>Tools</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="invoices">
+        <i class="fa-solid fa-file-invoice-dollar"></i><span>Invoices</span>
+        <span class="badge badge-red">2</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="billing">
+        <i class="fa-solid fa-credit-card"></i><span>Billing</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="statements">
+        <i class="fa-solid fa-chart-line"></i><span>Account Statements</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="paperwork">
+        <i class="fa-solid fa-folder-open"></i><span>Paperwork</span>
+      </a>
+
+      <span class="nav-label">Support</span>
+      <a href="#" class="nav-item" data-tab="help">
+        <i class="fa-solid fa-circle-question"></i><span>Help Center</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="settings">
+        <i class="fa-solid fa-gear"></i><span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a href="#" class="nav-item" data-tab="profile">
+        <i class="fa-solid fa-circle-user"></i><span>My Profile</span>
+      </a>
+      <a href="#" class="sidebar-signout" onclick="signOut()">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i><span>Sign Out</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── OVERLAY for mobile ────────────────────────────────── -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ── MAIN CONTENT ──────────────────────────────────────── -->
+  <main class="main-content">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburger" aria-label="Open menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="breadcrumb">
+          <span id="page-title">Dashboard</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search anything…" aria-label="Search">
+        </div>
+        <button class="icon-btn notif-btn" aria-label="Notifications">
+          <i class="fa-solid fa-bell"></i>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="topbar-avatar" onclick="switchTab('profile')">
+          <div class="avatar sm">JD</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── TAB PANELS ─────────────────────────────────────── -->
+
+    <!-- DASHBOARD -->
+    <section class="tab-panel active" id="tab-dashboard">
+      <div class="welcome-band">
+        <div class="welcome-text">
+          <p class="welcome-greeting">Good morning,</p>
+          <h1 class="welcome-name">John <span class="highlight">D. Transport</span> 👋</h1>
+          <p class="welcome-sub">Here's what's moving in your account today.</p>
+        </div>
+        <div class="welcome-badge">
+          <i class="fa-solid fa-truck-ramp-box"></i>
+          <div>
+            <p class="wb-value">14</p>
+            <p class="wb-label">Active Loads</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI CARDS -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon orange"><i class="fa-solid fa-truck-fast"></i></div>
+          <div class="kpi-info">
+            <p class="kpi-label">Loads This Month</p>
+            <p class="kpi-value">47</p>
+            <p class="kpi-delta up"><i class="fa-solid fa-arrow-trend-up"></i> +12% vs last month</p>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon green"><i class="fa-solid fa-dollar-sign"></i></div>
+          <div class="kpi-info">
+            <p class="kpi-label">Revenue Dispatched</p>
+            <p class="kpi-value">$84,200</p>
+            <p class="kpi-delta up"><i class="fa-solid fa-arrow-trend-up"></i> +8% vs last month</p>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon red"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+          <div class="kpi-info">
+            <p class="kpi-label">Pending Invoices</p>
+            <p class="kpi-value">$12,450</p>
+            <p class="kpi-delta down"><i class="fa-solid fa-arrow-trend-down"></i> 2 invoices due</p>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon blue"><i class="fa-solid fa-users"></i></div>
+          <div class="kpi-info">
+            <p class="kpi-label">Drivers Managed</p>
+            <p class="kpi-value">9</p>
+            <p class="kpi-delta up"><i class="fa-solid fa-circle-check"></i> All compliant</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MIDDLE ROW: Activity + Map-placeholder -->
+      <div class="mid-row">
+        <!-- Recent Activity -->
+        <div class="card activity-card">
+          <div class="card-head">
+            <h3>Recent Activity</h3>
+            <button class="text-btn">View all</button>
+          </div>
+          <ul class="activity-list">
+            <li class="activity-item">
+              <span class="act-dot green"></span>
+              <div class="act-body">
+                <p class="act-title">Load #TX-9841 delivered</p>
+                <p class="act-sub">Dallas → Chicago · 2h ago</p>
+              </div>
+              <span class="act-tag success">Delivered</span>
+            </li>
+            <li class="activity-item">
+              <span class="act-dot orange"></span>
+              <div class="act-body">
+                <p class="act-title">Invoice INV-0047 sent</p>
+                <p class="act-sub">$3,200.00 · 5h ago</p>
+              </div>
+              <span class="act-tag pending">Pending</span>
+            </li>
+            <li class="activity-item">
+              <span class="act-dot blue"></span>
+              <div class="act-body">
+                <p class="act-title">New load dispatched #TX-9842</p>
+                <p class="act-sub">Houston → Memphis · 6h ago</p>
+              </div>
+              <span class="act-tag active">In Transit</span>
+            </li>
+            <li class="activity-item">
+              <span class="act-dot green"></span>
+              <div class="act-body">
+                <p class="act-title">Driver docs renewed — Mike R.</p>
+                <p class="act-sub">CDL + Medical · Yesterday</p>
+              </div>
+              <span class="act-tag success">Done</span>
+            </li>
+            <li class="activity-item">
+              <span class="act-dot red"></span>
+              <div class="act-body">
+                <p class="act-title">Invoice INV-0043 overdue</p>
+                <p class="act-sub">$4,800.00 · 3 days ago</p>
+              </div>
+              <span class="act-tag danger">Overdue</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Fleet Status -->
+        <div class="card fleet-card">
+          <div class="card-head">
+            <h3>Fleet Status</h3>
+            <button class="text-btn">Manage</button>
+          </div>
+          <div class="fleet-chart-wrap">
+            <canvas id="fleet-donut"></canvas>
+            <div class="fleet-center-text">
+              <span class="fleet-num">9</span>
+              <span class="fleet-lbl">Trucks</span>
+            </div>
+          </div>
+          <div class="fleet-legend">
+            <div class="legend-item"><span class="legend-dot" style="background:#f97316;"></span>In Transit <strong>5</strong></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#22c55e;"></span>Available <strong>3</strong></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#ef4444;"></span>Down <strong>1</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW: Revenue Sparkline + Quick Actions -->
+      <div class="bottom-row">
+        <div class="card revenue-card">
+          <div class="card-head">
+            <h3>Revenue — Last 6 Months</h3>
+          </div>
+          <canvas id="revenue-bar" height="120"></canvas>
+        </div>
+
+        <div class="quick-actions-card">
+          <h3 class="qa-title">Quick Actions</h3>
+          <div class="qa-grid">
+            <button class="qa-btn" onclick="switchTab('loads')"><i class="fa-solid fa-plus"></i><span>New Load</span></button>
+            <button class="qa-btn" onclick="switchTab('invoices')"><i class="fa-solid fa-file-invoice"></i><span>New Invoice</span></button>
+            <button class="qa-btn" onclick="switchTab('paperwork')"><i class="fa-solid fa-upload"></i><span>Upload Doc</span></button>
+            <button class="qa-btn" onclick="switchTab('help')"><i class="fa-solid fa-headset"></i><span>Get Help</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOADS / DISPATCH -->
+    <section class="tab-panel" id="tab-loads">
+      <div class="panel-header">
+        <h2>Loads & Dispatch</h2>
+        <button class="btn-primary"><i class="fa-solid fa-plus"></i> New Load</button>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-pill active">All (47)</button>
+        <button class="filter-pill">In Transit (14)</button>
+        <button class="filter-pill">Delivered (30)</button>
+        <button class="filter-pill">Cancelled (3)</button>
+      </div>
+      <div class="table-wrap">
+        <table class="portal-table">
+          <thead>
+            <tr><th>Load #</th><th>Route</th><th>Driver</th><th>Date</th><th>Rate</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="mono">#TX-9842</td><td>Houston → Memphis</td><td>Mike R.</td><td>Apr 10</td><td>$2,800</td><td><span class="tag active">In Transit</span></td></tr>
+            <tr><td class="mono">#TX-9841</td><td>Dallas → Chicago</td><td>Sam K.</td><td>Apr 10</td><td>$3,100</td><td><span class="tag success">Delivered</span></td></tr>
+            <tr><td class="mono">#TX-9840</td><td>LA → Phoenix</td><td>Tony M.</td><td>Apr 9</td><td>$1,950</td><td><span class="tag active">In Transit</span></td></tr>
+            <tr><td class="mono">#TX-9839</td><td>Atlanta → Nashville</td><td>Ray J.</td><td>Apr 9</td><td>$1,400</td><td><span class="tag success">Delivered</span></td></tr>
+            <tr><td class="mono">#TX-9838</td><td>Denver → SLC</td><td>Mike R.</td><td>Apr 8</td><td>$2,200</td><td><span class="tag success">Delivered</span></td></tr>
+            <tr><td class="mono">#TX-9837</td><td>Miami → Jacksonville</td><td>Sam K.</td><td>Apr 7</td><td>$890</td><td><span class="tag danger">Cancelled</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TOOLS -->
+    <section class="tab-panel" id="tab-tools">
+      <div class="panel-header"><h2>Tools</h2></div>
+      <div class="tools-grid">
+        <div class="tool-card" onclick="showToast('Rate Calculator coming soon!')">
+          <div class="tool-icon"><i class="fa-solid fa-calculator"></i></div>
+          <h4>Rate Calculator</h4>
+          <p>Estimate load rates instantly based on lane, weight, and miles.</p>
+        </div>
+        <div class="tool-card" onclick="showToast('IFTA Tracker coming soon!')">
+          <div class="tool-icon"><i class="fa-solid fa-gas-pump"></i></div>
+          <h4>IFTA Tracker</h4>
+          <p>Track fuel consumption and mileage per jurisdiction.</p>
+        </div>
+        <div class="tool-card" onclick="showToast('Document Generator coming soon!')">
+          <div class="tool-icon"><i class="fa-solid fa-file-signature"></i></div>
+          <h4>Document Generator</h4>
+          <p>Auto-generate BOLs, rate confirmations, and carrier packets.</p>
+        </div>
+        <div class="tool-card" onclick="showToast('Driver Compliance coming soon!')">
+          <div class="tool-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <h4>Driver Compliance</h4>
+          <p>Track CDL renewals, medicals, and HOS violations.</p>
+        </div>
+        <div class="tool-card" onclick="showToast('Route Optimizer coming soon!')">
+          <div class="tool-icon"><i class="fa-solid fa-route"></i></div>
+          <h4>Route Optimizer</h4>
+          <p>Find the most efficient routes and reduce deadhead miles.</p>
+        </div>
+        <div class="tool-card" onclick="showToast('Load Board coming soon!')">
+          <div class="tool-icon"><i class="fa-solid fa-table-list"></i></div>
+          <h4>Load Board Access</h4>
+          <p>Search and post loads directly from your dashboard.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- INVOICES -->
+    <section class="tab-panel" id="tab-invoices">
+      <div class="panel-header">
+        <h2>Invoices</h2>
+        <button class="btn-primary"><i class="fa-solid fa-plus"></i> New Invoice</button>
+      </div>
+      <div class="stats-row">
+        <div class="stat-chip"><span class="chip-label">Total Outstanding</span><span class="chip-val orange">$12,450</span></div>
+        <div class="stat-chip"><span class="chip-label">Overdue</span><span class="chip-val red">$4,800</span></div>
+        <div class="stat-chip"><span class="chip-label">Paid This Month</span><span class="chip-val green">$38,200</span></div>
+      </div>
+      <div class="table-wrap">
+        <table class="portal-table">
+          <thead>
+            <tr><th>Invoice #</th><th>Client</th><th>Amount</th><th>Issued</th><th>Due</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="mono">INV-0047</td><td>Apex Freight LLC</td><td>$3,200</td><td>Apr 10</td><td>Apr 25</td><td><span class="tag pending">Pending</span></td></tr>
+            <tr><td class="mono">INV-0046</td><td>Midland Logistics</td><td>$4,650</td><td>Apr 8</td><td>Apr 23</td><td><span class="tag pending">Pending</span></td></tr>
+            <tr><td class="mono">INV-0043</td><td>SunBelt Carriers</td><td>$4,800</td><td>Mar 28</td><td>Apr 7</td><td><span class="tag danger">Overdue</span></td></tr>
+            <tr><td class="mono">INV-0042</td><td>Tri-State Haulers</td><td>$2,100</td><td>Mar 25</td><td>Apr 4</td><td><span class="tag success">Paid</span></td></tr>
+            <tr><td class="mono">INV-0041</td><td>Apex Freight LLC</td><td>$3,900</td><td>Mar 20</td><td>Mar 30</td><td><span class="tag success">Paid</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BILLING -->
+    <section class="tab-panel" id="tab-billing">
+      <div class="panel-header"><h2>Billing</h2></div>
+      <div class="billing-layout">
+        <div class="card">
+          <h3 class="section-title">Current Plan</h3>
+          <div class="plan-display">
+            <div class="plan-badge">PRO</div>
+            <div>
+              <p class="plan-name">Pro Back Office</p>
+              <p class="plan-price">$799<span>/month</span></p>
+              <p class="plan-renew">Renews May 1, 2025</p>
+            </div>
+          </div>
+          <button class="btn-outline" onclick="showToast('Plan management coming soon!')">Manage Plan</button>
+        </div>
+        <div class="card">
+          <h3 class="section-title">Payment Method</h3>
+          <div class="payment-method">
+            <i class="fa-brands fa-cc-visa" style="font-size:2rem;color:#1a1f71;"></i>
+            <div>
+              <p class="card-num">Visa ending in •••• 4821</p>
+              <p class="card-exp">Expires 09/2026</p>
+            </div>
+          </div>
+          <button class="btn-outline" onclick="showToast('Payment update coming soon!')">Update Card</button>
+        </div>
+        <div class="card billing-history-card">
+          <h3 class="section-title">Billing History</h3>
+          <ul class="billing-list">
+            <li><span>Apr 1, 2025</span><span class="mono">$799.00</span><span class="tag success">Paid</span></li>
+            <li><span>Mar 1, 2025</span><span class="mono">$799.00</span><span class="tag success">Paid</span></li>
+            <li><span>Feb 1, 2025</span><span class="mono">$799.00</span><span class="tag success">Paid</span></li>
+            <li><span>Jan 1, 2025</span><span class="mono">$799.00</span><span class="tag success">Paid</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCOUNT STATEMENTS -->
+    <section class="tab-panel" id="tab-statements">
+      <div class="panel-header">
+        <h2>Account Statements</h2>
+        <button class="btn-outline"><i class="fa-solid fa-download"></i> Export CSV</button>
+      </div>
+      <div class="stats-row">
+        <div class="stat-chip"><span class="chip-label">YTD Revenue</span><span class="chip-val green">$218,400</span></div>
+        <div class="stat-chip"><span class="chip-label">YTD Loads</span><span class="chip-val orange">187</span></div>
+        <div class="stat-chip"><span class="chip-label">Avg Rate/Load</span><span class="chip-val blue">$2,340</span></div>
+      </div>
+      <div class="table-wrap">
+        <table class="portal-table">
+          <thead><tr><th>Date</th><th>Description</th><th>Load #</th><th>Credit</th><th>Debit</th><th>Balance</th></tr></thead>
+          <tbody>
+            <tr><td>Apr 10</td><td>Load dispatched</td><td class="mono">#TX-9842</td><td class="green mono">+$2,800</td><td>—</td><td class="mono">$84,200</td></tr>
+            <tr><td>Apr 10</td><td>Invoice sent</td><td class="mono">INV-0047</td><td>—</td><td class="red mono">−$3,200</td><td class="mono">$81,400</td></tr>
+            <tr><td>Apr 9</td><td>Payment received</td><td class="mono">INV-0042</td><td class="green mono">+$2,100</td><td>—</td><td class="mono">$84,600</td></tr>
+            <tr><td>Apr 8</td><td>Haulxify fee</td><td>—</td><td>—</td><td class="red mono">−$799</td><td class="mono">$82,500</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PAPERWORK -->
+    <section class="tab-panel" id="tab-paperwork">
+      <div class="panel-header">
+        <h2>Paperwork</h2>
+        <button class="btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Document</button>
+      </div>
+      <div class="doc-categories">
+        <div class="doc-cat">
+          <div class="doc-cat-head"><i class="fa-solid fa-file-contract"></i> Carrier Packets</div>
+          <ul class="doc-list">
+            <li class="doc-item"><i class="fa-solid fa-file-pdf red"></i><span>Carrier_Packet_2025.pdf</span><button class="icon-btn-sm"><i class="fa-solid fa-download"></i></button></li>
+            <li class="doc-item"><i class="fa-solid fa-file-pdf red"></i><span>MC_Authority.pdf</span><button class="icon-btn-sm"><i class="fa-solid fa-download"></i></button></li>
+          </ul>
+        </div>
+        <div class="doc-cat">
+          <div class="doc-cat-head"><i class="fa-solid fa-id-card"></i> Driver Documents</div>
+          <ul class="doc-list">
+            <li class="doc-item"><i class="fa-solid fa-file-pdf red"></i><span>CDL_MikeR_2025.pdf</span><button class="icon-btn-sm"><i class="fa-solid fa-download"></i></button></li>
+            <li class="doc-item"><i class="fa-solid fa-file-pdf red"></i><span>Medical_SamK_2025.pdf</span><button class="icon-btn-sm"><i class="fa-solid fa-download"></i></button></li>
+          </ul>
+        </div>
+        <div class="doc-cat">
+          <div class="doc-cat-head"><i class="fa-solid fa-clipboard-list"></i> BOLs & Confirmations</div>
+          <ul class="doc-list">
+            <li class="doc-item"><i class="fa-solid fa-file-pdf red"></i><span>BOL_TX9841.pdf</span><button class="icon-btn-sm"><i class="fa-solid fa-download"></i></button></li>
+            <li class="doc-item"><i class="fa-solid fa-file-pdf red"></i><span>RateConf_TX9840.pdf</span><button class="icon-btn-sm"><i class="fa-solid fa-download"></i></button></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- HELP -->
+    <section class="tab-panel" id="tab-help">
+      <div class="panel-header"><h2>Help Center</h2></div>
+      <div class="help-grid">
+        <div class="help-hero">
+          <i class="fa-solid fa-headset"></i>
+          <h3>Need help? We're here 24/7.</h3>
+          <p>Our team is standing by to support your operations around the clock.</p>
+          <div class="help-actions">
+            <a href="https://wa.me/1234567890" class="btn-wa" target="_blank"><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp</a>
+            <a href="mailto:support@haulxify.com" class="btn-email"><i class="fa-solid fa-envelope"></i> Email Support</a>
+          </div>
+        </div>
+        <div class="faq-list">
+          <h4>Frequently Asked Questions</h4>
+          <details class="faq-item"><summary>How do I add a new driver?</summary><p>Go to Tools → Driver Compliance. Click "Add Driver" and upload their CDL and medical certificate.</p></details>
+          <details class="faq-item"><summary>How are invoices generated?</summary><p>Invoices are auto-generated per load dispatched. You can also create custom invoices from the Invoices tab.</p></details>
+          <details class="faq-item"><summary>What's the billing cycle?</summary><p>Your plan is billed monthly on the 1st. You can view all past transactions under Billing → Billing History.</p></details>
+          <details class="faq-item"><summary>How do I upgrade my plan?</summary><p>Go to Billing → Manage Plan. Our team will contact you within one business day to facilitate your upgrade.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section class="tab-panel" id="tab-profile">
+      <div class="panel-header"><h2>My Profile</h2></div>
+      <div class="profile-layout">
+        <div class="profile-card card">
+          <div class="profile-avatar-wrap">
+            <div class="avatar xl">JD</div>
+            <button class="avatar-edit-btn" onclick="showToast('Photo upload coming soon!')"><i class="fa-solid fa-camera"></i></button>
+          </div>
+          <h3 class="profile-fullname">John D. Transport LLC</h3>
+          <p class="profile-email">john@jdtransport.com</p>
+          <span class="plan-chip">Pro Client</span>
+        </div>
+        <div class="card profile-form-card">
+          <h3 class="section-title">Company Information</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>Company Name</label><input type="text" value="John D. Transport LLC"></div>
+            <div class="form-group"><label>MC Number</label><input type="text" value="MC-284920"></div>
+            <div class="form-group"><label>DOT Number</label><input type="text" value="DOT-1948302"></div>
+            <div class="form-group"><label>Phone</label><input type="text" value="+1 (214) 555-0198"></div>
+            <div class="form-group full"><label>Email Address</label><input type="email" value="john@jdtransport.com"></div>
+            <div class="form-group full"><label>Business Address</label><input type="text" value="2401 Industrial Blvd, Dallas, TX 75201"></div>
+          </div>
+          <button class="btn-primary" onclick="showToast('Profile saved!')">Save Changes</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="tab-panel" id="tab-settings">
+      <div class="panel-header"><h2>Settings</h2></div>
+      <div class="settings-grid">
+        <div class="card">
+          <h3 class="section-title"><i class="fa-solid fa-bell"></i> Notifications</h3>
+          <div class="toggle-list">
+            <div class="toggle-item"><span>Load status updates</span><label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+            <div class="toggle-item"><span>Invoice reminders</span><label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+            <div class="toggle-item"><span>Driver compliance alerts</span><label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+            <div class="toggle-item"><span>Weekly summary email</span><label class="toggle-switch"><input type="checkbox"><span class="slider"></span></label></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="section-title"><i class="fa-solid fa-shield-halved"></i> Security</h3>
+          <div class="security-items">
+            <div class="security-item"><div><p>Password</p><p class="sec-sub">Last changed 3 months ago</p></div><button class="btn-outline-sm" onclick="showToast('Password change coming soon!')">Change</button></div>
+            <div class="security-item"><div><p>Two-Factor Auth</p><p class="sec-sub">Currently disabled</p></div><button class="btn-outline-sm" onclick="showToast('2FA setup coming soon!')">Enable</button></div>
+            <div class="security-item"><div><p>Active Sessions</p><p class="sec-sub">1 active session</p></div><button class="btn-outline-sm danger" onclick="showToast('Sessions cleared!')">Revoke All</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="section-title"><i class="fa-solid fa-palette"></i> Appearance</h3>
+          <div class="theme-options">
+            <button class="theme-btn active" onclick="setTheme('dark',this)"><i class="fa-solid fa-moon"></i> Dark</button>
+            <button class="theme-btn" onclick="setTheme('light',this)"><i class="fa-solid fa-sun"></i> Light</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Chart.js -->
+  <script>
+    if (!localStorage.getItem('hx_logged_in') && !sessionStorage.getItem('hx_logged_in')) {
+      window.location.href = 'login.html';
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="JS/nav.js"></script>
+  <script src="JS/portal.js"></script>
+</body>
+</html>
