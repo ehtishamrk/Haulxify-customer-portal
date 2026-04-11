@@ -532,8 +532,21 @@
   <div class="toast" id="toast"></div>
 
   <!-- Chart.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <script src="JS/nav.js"></script>
-  <script src="JS/portal.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyBaRMQBLfDyufJkC4E8XCvzOIMEawOQObw",
+    authDomain: "haulxify-app.firebaseapp.com",
+    projectId: "haulxify-app",
+    storageBucket: "haulxify-app.firebasestorage.app",
+    messagingSenderId: "453228026261",
+    appId: "1:453228026261:web:1d66ab1d47418906807e9c"
+  });
+</script>
+<script src="JS/nav.js"></script>
+<script src="JS/portal.js"></script>
 </body>
 </html>
