@@ -1,44 +1,231 @@
-/* ─────────────────────────────────────────────────────────────
-   HAULXIFY CUSTOMER PORTAL — JavaScript
-   ───────────────────────────────────────────────────────────── */
+/* =================================================================
+   HAULXIFY CUSTOMER PORTAL — portal.js
+   Firebase-powered — all data loaded from Firestore
+   ================================================================= */
 
-// ── TAB NAVIGATION ─────────────────────────────────────────
+const db   = firebase.firestore();
+const auth = firebase.auth();
+
+let currentUser = null;
+let customerData = null;
+
+// ── AUTH GUARD ──────────────────────────────────────────────
+auth.onAuthStateChanged(function(user) {
+  if (!user) {
+    window.location.href = 'https://www.haulxify.com';
+    return;
+  }
+  currentUser = user;
+  loadCustomerData(user.uid);
+});
+
+// ── LOAD ALL CUSTOMER DATA ──────────────────────────────────
+async function loadCustomerData(uid) {
+  try {
+    const doc = await db.collection('customers').doc(uid).get();
+    if (!doc.exists) {
+      showToast('Account data not found. Contact support.');
+      return;
+    }
+    customerData = doc.data();
+    renderProfile(customerData);
+    renderDashboard(customerData);
+    await loadLoads(uid);
+    await loadInvoices(uid);
+    await loadBilling(uid);
+    await loadStatements(uid);
+  } catch(err) {
+    console.error('Error loading data:', err);
+    showToast('Error loading your data. Please refresh.');
+  }
+}
+
+// ── RENDER PROFILE ──────────────────────────────────────────
+function renderProfile(data) {
+  setText('profile-name-display', data.name || '');
+  setText('profile-email-display', data.email || '');
+  setVal('profile-company', data.company || '');
+  setVal('profile-mc', data.mc || '');
+  setVal('profile-dot', data.dot || '');
+  setVal('profile-phone', data.phone || '');
+  setVal('profile-email-input', data.email || '');
+  setVal('profile-address', data.address || '');
+
+  // Avatar initials
+  const initials = (data.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+  document.querySelectorAll('.avatar').forEach(el => el.textContent = initials);
+
+  // Sidebar name
+  setText('sidebar-profile-name', data.name || '');
+}
+
+// ── RENDER DASHBOARD ────────────────────────────────────────
+function renderDashboard(data) {
+  setText('welcome-name-first', (data.name || 'there').split(' ')[0]);
+  setText('kpi-active-loads', data.activeLoads || 0);
+
+  const hour = new Date().getHours();
+  const greeting = document.querySelector('.welcome-greeting');
+  if (greeting) {
+    if (hour < 12)      greeting.textContent = 'Good morning,';
+    else if (hour < 17) greeting.textContent = 'Good afternoon,';
+    else                greeting.textContent = 'Good evening,';
+  }
+}
+
+// ── LOAD LOADS ──────────────────────────────────────────────
+async function loadLoads(uid) {
+  const snap = await db.collection('customers').doc(uid).collection('loads').get();
+  const tbody = document.getElementById('loads-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  snap.forEach(doc => {
+    const d = doc.data();
+    tbody.innerHTML += `
+      <tr>
+        <td class="mono">#${d.loadNumber}</td>
+        <td>${d.route}</td>
+        <td>${d.driver}</td>
+        <td>${d.date}</td>
+        <td>${d.rate}</td>
+        <td><span class="tag ${statusClass(d.status)}">${d.status}</span></td>
+      </tr>`;
+  });
+}
+
+// ── LOAD INVOICES ────────────────────────────────────────────
+async function loadInvoices(uid) {
+  const snap = await db.collection('customers').doc(uid).collection('invoices').get();
+  const tbody = document.getElementById('invoices-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  let totalOutstanding = 0;
+  let totalOverdue = 0;
+  let totalPaid = 0;
+
+  snap.forEach(doc => {
+    const d = doc.data();
+    const amount = parseFloat((d.amount || '0').replace(/[$,]/g, ''));
+    if (d.status === 'Pending')  totalOutstanding += amount;
+    if (d.status === 'Overdue')  { totalOverdue += amount; totalOutstanding += amount; }
+    if (d.status === 'Paid')     totalPaid += amount;
+
+    tbody.innerHTML += `
+      <tr>
+        <td class="mono">${d.invoiceNumber}</td>
+        <td>${d.client}</td>
+        <td>${d.amount}</td>
+        <td>${d.issued}</td>
+        <td>${d.due}</td>
+        <td><span class="tag ${statusClass(d.status)}">${d.status}</span></td>
+      </tr>`;
+  });
+
+  setText('inv-outstanding', '$' + totalOutstanding.toLocaleString());
+  setText('inv-overdue', '$' + totalOverdue.toLocaleString());
+  setText('inv-paid', '$' + totalPaid.toLocaleString());
+}
+
+// ── LOAD BILLING ─────────────────────────────────────────────
+async function loadBilling(uid) {
+  const doc = await db.collection('customers').doc(uid).collection('billing').doc('current').get();
+  if (!doc.exists) return;
+  const d = doc.data();
+  setText('billing-plan-name', d.plan || '');
+  setText('billing-plan-price', d.price || '');
+  setText('billing-renews', 'Renews ' + (d.renews || ''));
+  setText('billing-card-brand', d.cardBrand || '');
+  setText('billing-card-last4', (d.cardBrand || '') + ' ending in •••• ' + (d.cardLast4 || ''));
+  setText('billing-card-expiry', 'Expires ' + (d.cardExpiry || ''));
+
+  // Billing history
+  const histSnap = await db.collection('customers').doc(uid).collection('billing').get();
+  const histEl = document.getElementById('billing-history-list');
+  if (!histEl) return;
+  histEl.innerHTML = '';
+  histSnap.forEach(hdoc => {
+    if (hdoc.id === 'current') return;
+    const h = hdoc.data();
+    histEl.innerHTML += `
+      <li>
+        <span>${h.date}</span>
+        <span class="mono">${h.amount}</span>
+        <span class="tag ${statusClass(h.status)}">${h.status}</span>
+      </li>`;
+  });
+}
+
+// ── LOAD STATEMENTS ──────────────────────────────────────────
+async function loadStatements(uid) {
+  const snap = await db.collection('customers').doc(uid).collection('statements').get();
+  const tbody = document.getElementById('statements-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  snap.forEach(doc => {
+    const d = doc.data();
+    tbody.innerHTML += `
+      <tr>
+        <td>${d.date}</td>
+        <td>${d.description}</td>
+        <td class="mono">${d.loadNumber}</td>
+        <td class="${d.credit !== '—' ? 'green mono' : ''}">${d.credit}</td>
+        <td class="${d.debit !== '—' ? 'red mono' : ''}">${d.debit}</td>
+        <td class="mono">${d.balance}</td>
+      </tr>`;
+  });
+}
+
+// ── HELPERS ──────────────────────────────────────────────────
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val;
+}
+function statusClass(status) {
+  const map = {
+    'In Transit': 'active',
+    'Delivered':  'success',
+    'Cancelled':  'danger',
+    'Pending':    'pending',
+    'Paid':       'success',
+    'Overdue':    'danger',
+  };
+  return map[status] || '';
+}
+
+// ── SIGN OUT ─────────────────────────────────────────────────
+function signOut() {
+  showToast('Signing out…');
+  auth.signOut().then(() => {
+    setTimeout(() => {
+      window.location.href = 'https://www.haulxify.com';
+    }, 1200);
+  });
+}
+
+// ── TAB NAVIGATION ───────────────────────────────────────────
 function switchTab(tabId) {
-  // Deactivate all panels
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-  // Activate target
   const panel = document.getElementById('tab-' + tabId);
   if (panel) panel.classList.add('active');
-
   const navItem = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
   if (navItem) navItem.classList.add('active');
-
-  // Update breadcrumb
   const labels = {
-    dashboard:  'Dashboard',
-    loads:      'Loads & Dispatch',
-    tools:      'Tools',
-    invoices:   'Invoices',
-    billing:    'Billing',
-    statements: 'Account Statements',
-    paperwork:  'Paperwork',
-    help:       'Help Center',
-    settings:   'Settings',
-    profile:    'My Profile',
+    dashboard: 'Dashboard', loads: 'Loads & Dispatch', tools: 'Tools',
+    invoices: 'Invoices', billing: 'Billing', statements: 'Account Statements',
+    paperwork: 'Paperwork', help: 'Help Center', settings: 'Settings', profile: 'My Profile',
   };
   const bc = document.getElementById('page-title');
   if (bc) bc.textContent = labels[tabId] || tabId;
-
-  // Close sidebar on mobile
   closeSidebar();
-
-  // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Nav item clicks
 document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
   item.addEventListener('click', e => {
     e.preventDefault();
@@ -46,36 +233,20 @@ document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
   });
 });
 
-// ── SIDEBAR MOBILE ──────────────────────────────────────────
-const sidebar  = document.getElementById('sidebar');
-const overlay  = document.getElementById('sidebar-overlay');
+// ── SIDEBAR ──────────────────────────────────────────────────
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebar-overlay');
 const hamburger = document.getElementById('hamburger');
 const sidebarClose = document.getElementById('sidebar-close');
 
-function openSidebar() {
-  sidebar.classList.add('open');
-  overlay.classList.add('show');
-  document.body.style.overflow = 'hidden';
-}
-function closeSidebar() {
-  sidebar.classList.remove('open');
-  overlay.classList.remove('show');
-  document.body.style.overflow = '';
-}
+function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('show'); document.body.style.overflow = 'hidden'; }
+function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('show'); document.body.style.overflow = ''; }
 
 hamburger?.addEventListener('click', openSidebar);
 sidebarClose?.addEventListener('click', closeSidebar);
 overlay?.addEventListener('click', closeSidebar);
 
-// ── FILTER PILLS ────────────────────────────────────────────
-document.querySelectorAll('.filter-pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    pill.closest('.filter-bar').querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-  });
-});
-
-// ── TOAST ───────────────────────────────────────────────────
+// ── TOAST ────────────────────────────────────────────────────
 let toastTimer;
 function showToast(msg) {
   const toast = document.getElementById('toast');
@@ -85,138 +256,51 @@ function showToast(msg) {
   toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// ── SIGN OUT ────────────────────────────────────────────────
-function signOut() {
-  showToast('Signing out…');
-  setTimeout(() => {
-    localStorage.removeItem('hx_logged_in');
-    sessionStorage.removeItem('hx_logged_in');
-    window.location.href = 'login.html';
-  }, 1200);
-}
-
-// ── THEME ───────────────────────────────────────────────────
+// ── THEME ────────────────────────────────────────────────────
 function setTheme(theme, btn) {
   document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  if (theme === 'light') {
-    document.body.classList.add('light');
-  } else {
-    document.body.classList.remove('light');
-  }
+  document.body.classList.toggle('light', theme === 'light');
   localStorage.setItem('hx-theme', theme);
 }
-
-// Load saved theme
 (function() {
-  const saved = localStorage.getItem('hx-theme');
-  if (saved === 'light') {
+  if (localStorage.getItem('hx-theme') === 'light') {
     document.body.classList.add('light');
     const btn = document.querySelector('.theme-btn:last-child');
-    if (btn) {
-      document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
+    if (btn) { document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
   }
 })();
 
-// ── CHARTS ──────────────────────────────────────────────────
+// ── CHARTS ───────────────────────────────────────────────────
 function initCharts() {
   const isDark = !document.body.classList.contains('light');
-  const gridColor   = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-  const labelColor  = isDark ? 'rgba(240,244,255,0.4)'  : 'rgba(0,0,0,0.4)';
+  const gridColor  = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+  const labelColor = isDark ? 'rgba(240,244,255,0.4)'  : 'rgba(0,0,0,0.4)';
   Chart.defaults.color = labelColor;
 
-  // Fleet Donut
   const donutCtx = document.getElementById('fleet-donut');
   if (donutCtx && !donutCtx._chartInstance) {
     donutCtx._chartInstance = new Chart(donutCtx, {
       type: 'doughnut',
-      data: {
-        labels: ['In Transit', 'Available', 'Down'],
-        datasets: [{
-          data: [5, 3, 1],
-          backgroundColor: ['#f97316', '#22c55e', '#ef4444'],
-          borderColor: isDark ? '#162033' : '#ffffff',
-          borderWidth: 3,
-          hoverOffset: 6,
-        }]
-      },
-      options: {
-        cutout: '72%',
-        plugins: { legend: { display: false }, tooltip: { callbacks: {
-          label: ctx => ` ${ctx.label}: ${ctx.raw} truck${ctx.raw !== 1 ? 's' : ''}`
-        }}},
-        animation: { animateScale: true, animateRotate: true, duration: 900, easing: 'easeInOutQuart' }
-      }
+      data: { labels: ['In Transit','Available','Down'], datasets: [{ data: [5,3,1], backgroundColor: ['#f97316','#22c55e','#ef4444'], borderColor: isDark ? '#162033' : '#ffffff', borderWidth: 3, hoverOffset: 6 }] },
+      options: { cutout: '72%', plugins: { legend: { display: false } }, animation: { animateScale: true, duration: 900 } }
     });
   }
 
-  // Revenue Bar
   const barCtx = document.getElementById('revenue-bar');
   if (barCtx && !barCtx._chartInstance) {
     barCtx._chartInstance = new Chart(barCtx, {
       type: 'bar',
-      data: {
-        labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'],
-        datasets: [{
-          label: 'Revenue ($)',
-          data: [52000, 68000, 61000, 74000, 79000, 84200],
-          backgroundColor: (ctx) => {
-            const chart = ctx.chart;
-            const { ctx: c, chartArea } = chart;
-            if (!chartArea) return '#f97316';
-            const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            gradient.addColorStop(0, '#f97316');
-            gradient.addColorStop(1, 'rgba(249,115,22,0.1)');
-            return gradient;
-          },
-          borderColor: '#f97316',
-          borderWidth: 0,
-          borderRadius: 6,
-          borderSkipped: false,
-          hoverBackgroundColor: '#fb923c',
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: ctx => ` $${ctx.raw.toLocaleString()}` } }
-        },
-        scales: {
-          x: { grid: { display: false }, ticks: { color: labelColor } },
-          y: {
-            grid: { color: gridColor },
-            ticks: {
-              color: labelColor,
-              callback: v => '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : v)
-            }
-          }
-        },
-        animation: { duration: 1000, easing: 'easeInOutQuart' }
-      }
+      data: { labels: ['Nov','Dec','Jan','Feb','Mar','Apr'], datasets: [{ label: 'Revenue ($)', data: [52000,68000,61000,74000,79000,84200], backgroundColor: '#f97316', borderRadius: 6 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: gridColor }, ticks: { callback: v => '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : v) } } } }
     });
   }
 }
 
-// Init when DOM ready
 document.addEventListener('DOMContentLoaded', () => {
-  // Small delay so Chart.js CDN is loaded
   setTimeout(initCharts, 200);
-
-  // Update greeting based on time
-  const hour = new Date().getHours();
-  const greeting = document.querySelector('.welcome-greeting');
-  if (greeting) {
-    if (hour < 12)      greeting.textContent = 'Good morning,';
-    else if (hour < 17) greeting.textContent = 'Good afternoon,';
-    else                greeting.textContent = 'Good evening,';
-  }
 });
 
-// ── KEYBOARD SHORTCUTS ──────────────────────────────────────
 document.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
     e.preventDefault();
