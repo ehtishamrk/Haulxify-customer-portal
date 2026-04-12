@@ -202,7 +202,7 @@ function signOut() {
   showToast('Signing out…');
   auth.signOut().then(() => {
     setTimeout(() => {
-      window.location.href = 'https://www.haulxify.com';
+      window.location.href = 'https://app.haulxify.com/login.html';
     }, 1200);
   });
 }
