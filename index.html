@@ -27,7 +27,7 @@
         <span class="status-dot"></span>
       </div>
       <div>
-        <p class="profile-name">John D. Transport</p>
+        <p class="profile-name" id="sidebar-profile-name">John D. Transport</p>
         <p class="profile-tier"><i class="fa-solid fa-circle-check"></i> Pro Client</p>
       </div>
     </div>
@@ -115,13 +115,13 @@
       <div class="welcome-band">
         <div class="welcome-text">
           <p class="welcome-greeting">Good morning,</p>
-          <h1 class="welcome-name">John <span class="highlight">D. Transport</span> 👋</h1>
+          <h1 class="welcome-name"><span id="welcome-name-first">John</span> 👋</h1>
           <p class="welcome-sub">Here's what's moving in your account today.</p>
         </div>
         <div class="welcome-badge">
           <i class="fa-solid fa-truck-ramp-box"></i>
           <div>
-            <p class="wb-value">14</p>
+            <p class="wb-value" id="kpi-active-loads">14</p>
             <p class="wb-label">Active Loads</p>
           </div>
         </div>
@@ -274,14 +274,7 @@
           <thead>
             <tr><th>Load #</th><th>Route</th><th>Driver</th><th>Date</th><th>Rate</th><th>Status</th></tr>
           </thead>
-          <tbody>
-            <tr><td class="mono">#TX-9842</td><td>Houston → Memphis</td><td>Mike R.</td><td>Apr 10</td><td>$2,800</td><td><span class="tag active">In Transit</span></td></tr>
-            <tr><td class="mono">#TX-9841</td><td>Dallas → Chicago</td><td>Sam K.</td><td>Apr 10</td><td>$3,100</td><td><span class="tag success">Delivered</span></td></tr>
-            <tr><td class="mono">#TX-9840</td><td>LA → Phoenix</td><td>Tony M.</td><td>Apr 9</td><td>$1,950</td><td><span class="tag active">In Transit</span></td></tr>
-            <tr><td class="mono">#TX-9839</td><td>Atlanta → Nashville</td><td>Ray J.</td><td>Apr 9</td><td>$1,400</td><td><span class="tag success">Delivered</span></td></tr>
-            <tr><td class="mono">#TX-9838</td><td>Denver → SLC</td><td>Mike R.</td><td>Apr 8</td><td>$2,200</td><td><span class="tag success">Delivered</span></td></tr>
-            <tr><td class="mono">#TX-9837</td><td>Miami → Jacksonville</td><td>Sam K.</td><td>Apr 7</td><td>$890</td><td><span class="tag danger">Cancelled</span></td></tr>
-          </tbody>
+<tbody id="loads-tbody"></tbody>
         </table>
       </div>
     </section>
@@ -330,22 +323,16 @@
         <button class="btn-primary"><i class="fa-solid fa-plus"></i> New Invoice</button>
       </div>
       <div class="stats-row">
-        <div class="stat-chip"><span class="chip-label">Total Outstanding</span><span class="chip-val orange">$12,450</span></div>
-        <div class="stat-chip"><span class="chip-label">Overdue</span><span class="chip-val red">$4,800</span></div>
-        <div class="stat-chip"><span class="chip-label">Paid This Month</span><span class="chip-val green">$38,200</span></div>
+     <div class="stat-chip"><span class="chip-label">Total Outstanding</span><span class="chip-val orange" id="inv-outstanding">$0</span></div>
+<div class="stat-chip"><span class="chip-label">Overdue</span><span class="chip-val red" id="inv-overdue">$0</span></div>
+<div class="stat-chip"><span class="chip-label">Paid This Month</span><span class="chip-val green" id="inv-paid">$0</span></div>
       </div>
       <div class="table-wrap">
         <table class="portal-table">
           <thead>
             <tr><th>Invoice #</th><th>Client</th><th>Amount</th><th>Issued</th><th>Due</th><th>Status</th></tr>
           </thead>
-          <tbody>
-            <tr><td class="mono">INV-0047</td><td>Apex Freight LLC</td><td>$3,200</td><td>Apr 10</td><td>Apr 25</td><td><span class="tag pending">Pending</span></td></tr>
-            <tr><td class="mono">INV-0046</td><td>Midland Logistics</td><td>$4,650</td><td>Apr 8</td><td>Apr 23</td><td><span class="tag pending">Pending</span></td></tr>
-            <tr><td class="mono">INV-0043</td><td>SunBelt Carriers</td><td>$4,800</td><td>Mar 28</td><td>Apr 7</td><td><span class="tag danger">Overdue</span></td></tr>
-            <tr><td class="mono">INV-0042</td><td>Tri-State Haulers</td><td>$2,100</td><td>Mar 25</td><td>Apr 4</td><td><span class="tag success">Paid</span></td></tr>
-            <tr><td class="mono">INV-0041</td><td>Apex Freight LLC</td><td>$3,900</td><td>Mar 20</td><td>Mar 30</td><td><span class="tag success">Paid</span></td></tr>
-          </tbody>
+<tbody id="invoices-tbody"></tbody>
         </table>
       </div>
     </section>
@@ -359,9 +346,9 @@
           <div class="plan-display">
             <div class="plan-badge">PRO</div>
             <div>
-              <p class="plan-name">Pro Back Office</p>
-              <p class="plan-price">$799<span>/month</span></p>
-              <p class="plan-renew">Renews May 1, 2025</p>
+<p class="plan-name" id="billing-plan-name">Pro Back Office</p>
+<p class="plan-price" id="billing-plan-price">$799</p>
+<p class="plan-renew" id="billing-renews">Renews May 1, 2025</p>
             </div>
           </div>
           <button class="btn-outline" onclick="showToast('Plan management coming soon!')">Manage Plan</button>
@@ -371,20 +358,15 @@
           <div class="payment-method">
             <i class="fa-brands fa-cc-visa" style="font-size:2rem;color:#1a1f71;"></i>
             <div>
-              <p class="card-num">Visa ending in •••• 4821</p>
-              <p class="card-exp">Expires 09/2026</p>
+<p class="card-num" id="billing-card-last4">Visa ending in •••• 4821</p>
+<p class="card-exp" id="billing-card-expiry">Expires 09/2026</p>
             </div>
           </div>
           <button class="btn-outline" onclick="showToast('Payment update coming soon!')">Update Card</button>
         </div>
         <div class="card billing-history-card">
           <h3 class="section-title">Billing History</h3>
-          <ul class="billing-list">
-            <li><span>Apr 1, 2025</span><span class="mono">$799.00</span><span class="tag success">Paid</span></li>
-            <li><span>Mar 1, 2025</span><span class="mono">$799.00</span><span class="tag success">Paid</span></li>
-            <li><span>Feb 1, 2025</span><span class="mono">$799.00</span><span class="tag success">Paid</span></li>
-            <li><span>Jan 1, 2025</span><span class="mono">$799.00</span><span class="tag success">Paid</span></li>
-          </ul>
+<ul class="billing-list" id="billing-history-list"></ul>
         </div>
       </div>
     </section>
@@ -403,12 +385,7 @@
       <div class="table-wrap">
         <table class="portal-table">
           <thead><tr><th>Date</th><th>Description</th><th>Load #</th><th>Credit</th><th>Debit</th><th>Balance</th></tr></thead>
-          <tbody>
-            <tr><td>Apr 10</td><td>Load dispatched</td><td class="mono">#TX-9842</td><td class="green mono">+$2,800</td><td>—</td><td class="mono">$84,200</td></tr>
-            <tr><td>Apr 10</td><td>Invoice sent</td><td class="mono">INV-0047</td><td>—</td><td class="red mono">−$3,200</td><td class="mono">$81,400</td></tr>
-            <tr><td>Apr 9</td><td>Payment received</td><td class="mono">INV-0042</td><td class="green mono">+$2,100</td><td>—</td><td class="mono">$84,600</td></tr>
-            <tr><td>Apr 8</td><td>Haulxify fee</td><td>—</td><td>—</td><td class="red mono">−$799</td><td class="mono">$82,500</td></tr>
-          </tbody>
+<tbody id="statements-tbody"></tbody>
         </table>
       </div>
     </section>
@@ -476,19 +453,19 @@
             <div class="avatar xl">JD</div>
             <button class="avatar-edit-btn" onclick="showToast('Photo upload coming soon!')"><i class="fa-solid fa-camera"></i></button>
           </div>
-          <h3 class="profile-fullname">John D. Transport LLC</h3>
-          <p class="profile-email">john@jdtransport.com</p>
+<h3 class="profile-fullname" id="profile-name-display">John D. Transport LLC</h3>
+<p class="profile-email" id="profile-email-display">john@jdtransport.com</p>
           <span class="plan-chip">Pro Client</span>
         </div>
         <div class="card profile-form-card">
           <h3 class="section-title">Company Information</h3>
           <div class="form-grid">
-            <div class="form-group"><label>Company Name</label><input type="text" value="John D. Transport LLC"></div>
-            <div class="form-group"><label>MC Number</label><input type="text" value="MC-284920"></div>
-            <div class="form-group"><label>DOT Number</label><input type="text" value="DOT-1948302"></div>
-            <div class="form-group"><label>Phone</label><input type="text" value="+1 (214) 555-0198"></div>
-            <div class="form-group full"><label>Email Address</label><input type="email" value="john@jdtransport.com"></div>
-            <div class="form-group full"><label>Business Address</label><input type="text" value="2401 Industrial Blvd, Dallas, TX 75201"></div>
+          <div class="form-group"><label>Company Name</label><input type="text" id="profile-company"></div>
+<div class="form-group"><label>MC Number</label><input type="text" id="profile-mc"></div>
+<div class="form-group"><label>DOT Number</label><input type="text" id="profile-dot"></div>
+<div class="form-group"><label>Phone</label><input type="text" id="profile-phone"></div>
+<div class="form-group full"><label>Email Address</label><input type="email" id="profile-email-input"></div>
+<div class="form-group full"><label>Business Address</label><input type="text" id="profile-address"></div>
           </div>
           <button class="btn-primary" onclick="showToast('Profile saved!')">Save Changes</button>
         </div>
