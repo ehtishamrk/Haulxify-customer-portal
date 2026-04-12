@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Haulxify — Admin Panel</title>
+  <link rel="icon" type="image/webp" href="images/logo.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --navy:    #0D1929;
+      --navy2:   #162033;
+      --navy3:   #1e2d45;
+      --orange:  #E87722;
+      --orange2: #F0924A;
+      --text:    #f0f4ff;
+      --muted:   rgba(240,244,255,0.45);
+      --border:  rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.12);
+      --success: #22c55e;
+      --danger:  #ef4444;
+      --warn:    #f97316;
+      --font-d:  'Syne', sans-serif;
+      --font-b:  'DM Sans', sans-serif;
+    }
+
+    html, body { height: 100%; font-family: var(--font-b); background: var(--navy); color: var(--text); }
+
+    /* ── LOADING SCREEN ── */
+    #loading-screen {
+      position: fixed; inset: 0; background: var(--navy);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; flex-direction: column; gap: 16px;
+    }
+    .loading-logo { font-family: var(--font-d); font-size: 1.8rem; font-weight: 800; color: var(--text); }
+    .loading-logo span { color: var(--orange); }
+    .loading-bar { width: 200px; height: 2px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+    .loading-bar-fill { height: 100%; background: var(--orange); width: 0; animation: loadBar 1.2s ease forwards; }
+    @keyframes loadBar { to { width: 100%; } }
+
+    /* ── LOGIN GATE ── */
+    #login-gate {
+      display: none; position: fixed; inset: 0; background: var(--navy);
+      align-items: center; justify-content: center; z-index: 999;
+      background-image: radial-gradient(circle at 20% 50%, rgba(232,119,34,0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.02) 0%, transparent 50%);
+    }
+    #login-gate.show { display: flex; }
+
+    .gate-card {
+      width: 100%; max-width: 400px; background: var(--navy2);
+      border: 1px solid var(--border2); border-radius: 20px;
+      padding: 40px 36px; animation: fadeUp 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .gate-logo { font-family: var(--font-d); font-size: 1.4rem; font-weight: 800; color: var(--text); text-decoration: none; }
+    .gate-logo span { color: var(--orange); }
+    .gate-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(232,119,34,0.12); border: 1px solid rgba(232,119,34,0.25);
+      color: var(--orange); font-size: 0.7rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px; margin: 10px 0 24px;
+      font-family: var(--font-d); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .gate-title { font-family: var(--font-d); font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .gate-sub { font-size: 0.8125rem; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+
+    .gate-alert {
+      display: none; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 8px; padding: 10px 14px; margin-bottom: 14px;
+      font-size: 0.8rem; color: #fca5a5; align-items: center; gap: 8px;
+    }
+    .gate-alert.show { display: flex; }
+
+    .gate-input-wrap { position: relative; margin-bottom: 14px; }
+    .gate-input {
+      width: 100%; padding: 12px 42px 12px 14px;
+      background: var(--navy3); border: 1px solid var(--border2);
+      border-radius: 10px; color: var(--text); font-family: var(--font-b);
+      font-size: 0.875rem; outline: none; transition: border-color 0.2s;
+    }
+    .gate-input:focus { border-color: var(--orange); }
+    .gate-input::placeholder { color: var(--muted); }
+    .gate-pw-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--muted);
+      display: flex; align-items: center; transition: color 0.2s;
+    }
+    .gate-pw-toggle:hover { color: var(--text); }
+
+    .gate-btn {
+      width: 100%; padding: 13px; background: var(--orange);
+      color: #fff; border: none; border-radius: 10px; font-family: var(--font-d);
+      font-size: 0.9rem; font-weight: 700; letter-spacing: 0.02em;
+      cursor: pointer; transition: background 0.2s; display: flex;
+      align-items: center; justify-content: center; gap: 10px;
+    }
+    .gate-btn:hover:not(:disabled) { background: var(--orange2); }
+    .gate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .gate-spinner {
+      width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.6s linear infinite; display: none; flex-shrink: 0;
+    }
+    .gate-btn.loading .gate-spinner { display: block; }
+    .gate-btn.loading .gate-label { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── MAIN APP ── */
+    #app { display: none; min-height: 100vh; }
+    #app.show { display: flex; }
+
+    /* ── SIDEBAR ── */
+    .admin-sidebar {
+      width: 240px; flex-shrink: 0; background: var(--navy2);
+      border-right: 1px solid var(--border); display: flex;
+      flex-direction: column; position: sticky; top: 0; height: 100vh;
+    }
+    .sidebar-logo-wrap {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-logo { font-family: var(--font-d); font-size: 1.25rem; font-weight: 800; color: var(--text); text-decoration: none; }
+    .sidebar-logo span { color: var(--orange); }
+    .admin-chip {
+      display: inline-block; background: rgba(232,119,34,0.12);
+      border: 1px solid rgba(232,119,34,0.2); color: var(--orange);
+      font-size: 0.65rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 20px; margin-top: 6px; font-family: var(--font-d);
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-nav-label {
+      font-size: 0.65rem; font-weight: 700; color: var(--muted);
+      letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 8px 6px;
+      font-family: var(--font-d);
+    }
+    .sidebar-nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: 8px; color: var(--muted); text-decoration: none;
+      font-size: 0.875rem; cursor: pointer; transition: all 0.15s;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .sidebar-nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+    .sidebar-nav-item.active { background: rgba(232,119,34,0.12); color: var(--orange); }
+    .sidebar-nav-item svg { flex-shrink: 0; }
+
+    .sidebar-bottom { padding: 16px 12px; border-top: 1px solid var(--border); }
+    .admin-info { display: flex; align-items: center; gap: 10px; padding: 10px 12px; }
+    .admin-avatar {
+      width: 32px; height: 32px; border-radius: 50%; background: rgba(232,119,34,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: var(--orange); font-family: var(--font-d);
+      flex-shrink: 0;
+    }
+    .admin-name { font-size: 0.8125rem; font-weight: 500; color: var(--text); }
+    .admin-role { font-size: 0.7rem; color: var(--muted); }
+    .signout-btn {
+      display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+      border-radius: 8px; color: var(--muted); font-size: 0.8125rem;
+      cursor: pointer; transition: all 0.15s; border: none; background: none;
+      width: 100%; margin-top: 4px;
+    }
+    .signout-btn:hover { color: #fca5a5; background: rgba(239,68,68,0.08); }
+
+    /* ── MAIN CONTENT ── */
+    .admin-main { flex: 1; overflow-y: auto; }
+
+    .admin-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 28px; border-bottom: 1px solid var(--border);
+      background: var(--navy2); position: sticky; top: 0; z-index: 10;
+    }
+    .topbar-title { font-family: var(--font-d); font-size: 1.1rem; font-weight: 700; }
+    .topbar-sub { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── VIEWS ── */
+    .admin-view { display: none; padding: 28px; }
+    .admin-view.active { display: block; }
+
+    /* ── STATS ROW ── */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--navy2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px 20px;
+    }
+    .stat-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 6px; font-family: var(--font-d); text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-value { font-size: 1.75rem; font-weight: 700; font-family: var(--font-d); color: var(--text); }
+    .stat-value.orange { color: var(--orange); }
+    .stat-value.green { color: var(--success); }
+
+    /* ── SECTION HEADER ── */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .section-title { font-family: var(--font-d); font-size: 0.9rem; font-weight: 700; color: var(--text); }
+
+    /* ── BTN ── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
+      background: var(--orange); color: #fff; border: none; border-radius: 8px;
+      font-family: var(--font-d); font-size: 0.825rem; font-weight: 700;
+      cursor: pointer; transition: background 0.2s; letter-spacing: 0.02em;
+    }
+    .btn-primary:hover { background: var(--orange2); }
+
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px;
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border2); border-radius: 8px;
+      font-family: var(--font-d); font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.05); border-color: var(--border2); }
+
+    .btn-danger {
+      display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
+      background: transparent; color: #fca5a5;
+      border: 1px solid rgba(239,68,68,0.3); border-radius: 8px;
+      font-size: 0.775rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); }
+
+    /* ── TABLE ── */
+    .table-wrap { background: var(--navy2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 12px 16px; text-align: left; font-size: 0.7rem; font-weight: 700;
+      color: var(--muted); font-family: var(--font-d); text-transform: uppercase;
+      letter-spacing: 0.08em; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    tbody td { padding: 14px 16px; font-size: 0.8375rem; color: var(--text); }
+    .td-muted { color: var(--muted); font-size: 0.8rem; }
+    .td-actions { display: flex; gap: 8px; }
+
+    /* ── TAGS ── */
+    .tag {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 700; font-family: var(--font-d);
+    }
+    .tag-green { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+    .tag-orange { background: rgba(249,115,22,0.12); color: #fb923c; border: 1px solid rgba(249,115,22,0.2); }
+    .tag-red { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9998;
+      align-items: flex-start; justify-content: center;
+      padding: 40px 20px; background: rgba(10,18,30,0.8);
+      backdrop-filter: blur(6px); overflow-y: auto;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      width: 100%; max-width: 560px; background: var(--navy2);
+      border: 1px solid var(--border2); border-radius: 16px;
+      padding: 28px; animation: fadeUp 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+      margin: auto;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+    .modal-title { font-family: var(--font-d); font-size: 1rem; font-weight: 700; }
+    .modal-close {
+      width: 28px; height: 28px; background: rgba(255,255,255,0.06);
+      border: none; border-radius: 6px; color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+    /* ── FORM ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    .form-grid .full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 0.75rem; font-weight: 600; color: var(--muted); font-family: var(--font-d); letter-spacing: 0.04em; text-transform: uppercase; }
+    .form-input, .form-select {
+      padding: 10px 12px; background: var(--navy3);
+      border: 1px solid var(--border2); border-radius: 8px;
+      color: var(--text); font-family: var(--font-b); font-size: 0.875rem;
+      outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--orange); }
+    .form-input::placeholder { color: var(--muted); }
+    .form-select option { background: var(--navy2); }
+    .form-section { font-family: var(--font-d); font-size: 0.75rem; font-weight: 700; color: var(--orange); text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
+    .empty-state svg { margin-bottom: 12px; opacity: 0.3; }
+    .empty-state p { font-size: 0.875rem; }
+
+    /* ── TOAST ── */
+    .admin-toast {
+      position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
+      background: var(--navy3); border: 1px solid var(--border2);
+      border-radius: 10px; font-size: 0.875rem; color: var(--text);
+      z-index: 99999; transform: translateY(20px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1); max-width: 320px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .admin-toast.show { transform: translateY(0); opacity: 1; }
+    .admin-toast.success { border-color: rgba(34,197,94,0.3); }
+    .admin-toast.error { border-color: rgba(239,68,68,0.3); }
+
+    /* ── CUSTOMER DETAIL ── */
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px; color: var(--muted);
+      font-size: 0.8125rem; cursor: pointer; margin-bottom: 20px;
+      background: none; border: none; transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--text); }
+    .customer-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+    .customer-avatar-lg {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: rgba(232,119,34,0.15); border: 2px solid rgba(232,119,34,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-d); font-weight: 700; font-size: 1.1rem; color: var(--orange);
+    }
+    .customer-name-lg { font-family: var(--font-d); font-size: 1.2rem; font-weight: 700; }
+    .customer-email-lg { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+
+    .detail-tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--navy2); border: 1px solid var(--border); border-radius: 10px; padding: 4px; width: fit-content; }
+    .detail-tab {
+      padding: 8px 16px; border-radius: 7px; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; color: var(--muted); transition: all 0.2s; border: none; background: none;
+      font-family: var(--font-d);
+    }
+    .detail-tab.active { background: var(--orange); color: #fff; }
+
+    .detail-panel { display: none; }
+    .detail-panel.active { display: block; }
+
+    /* ── ADMINS LIST ── */
+    .admin-card {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--navy2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 18px; margin-bottom: 10px;
+    }
+    .admin-card-left { display: flex; align-items: center; gap: 12px; }
+    .admin-card-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(232,119,34,0.15); display: flex; align-items: center;
+      justify-content: center; font-family: var(--font-d); font-weight: 700;
+      font-size: 0.8rem; color: var(--orange);
+    }
+    .admin-card-name { font-size: 0.875rem; font-weight: 600; }
+    .admin-card-email { font-size: 0.775rem; color: var(--muted); }
+
+    @media (max-width: 768px) {
+      .admin-sidebar { display: none; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loading-screen">
+  <div class="loading-logo">Haul<span>xify</span></div>
+  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+</div>
+
+<!-- Login Gate -->
+<div id="login-gate">
+  <div class="gate-card">
+    <div class="gate-logo">Haul<span>xify</span></div>
+    <div class="gate-badge">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Admin Access Only
+    </div>
+    <p class="gate-title">Sign in to Admin Panel</p>
+    <p class="gate-sub">Only authorized admins can access this area. Sign in with your admin credentials.</p>
+
+    <div class="gate-alert" id="gate-error">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="gate-error-msg">Access denied.</span>
+    </div>
+
+    <div class="gate-input-wrap">
+      <input id="gate-email" type="email" class="gate-input" placeholder="Admin email" autocomplete="email">
+    </div>
+    <div class="gate-input-wrap">
+      <input id="gate-password" type="password" class="gate-input" placeholder="Password" autocomplete="current-password" style="padding-right:42px;">
+      <button class="gate-pw-toggle" onclick="toggleGatePw()" type="button">
+        <svg id="gate-eye" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+
+    <button class="gate-btn" id="gate-btn" onclick="adminSignIn()">
+      <div class="gate-spinner"></div>
+      <span class="gate-label">Sign In</span>
+    </button>
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="app">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo-wrap">
+      <div class="sidebar-logo">Haul<span>xify</span></div>
+      <div class="admin-chip">Admin Panel</div>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="sidebar-nav-label">Overview</span>
+      <button class="sidebar-nav-item active" onclick="showView('dashboard')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <span class="sidebar-nav-label">Customers</span>
+      <button class="sidebar-nav-item" onclick="showView('customers')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        All Customers
+      </button>
+      <button class="sidebar-nav-item" onclick="openAddCustomer()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Customer
+      </button>
+      <span class="sidebar-nav-label">Admin</span>
+      <button class="sidebar-nav-item" onclick="showView('admins')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Manage Admins
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="admin-info">
+        <div class="admin-avatar" id="admin-avatar-initials">AD</div>
+        <div>
+          <div class="admin-name" id="admin-display-name">Admin</div>
+          <div class="admin-role">Super Admin</div>
+        </div>
+      </div>
+      <button class="signout-btn" onclick="adminSignOut()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div class="topbar-sub" id="topbar-sub">Welcome back</div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div class="admin-view active" id="view-dashboard">
+      <div class="stats-row" id="stats-row">
+        <div class="stat-card"><div class="stat-label">Total Customers</div><div class="stat-value orange" id="stat-customers">—</div></div>
+        <div class="stat-card"><div class="stat-label">Active Admins</div><div class="stat-value green" id="stat-admins">—</div></div>
+        <div class="stat-card"><div class="stat-label">Total Loads</div><div class="stat-value" id="stat-loads">—</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Invoices</div><div class="stat-value orange" id="stat-invoices">—</div></div>
+      </div>
+      <div class="section-header">
+        <div class="section-title">Recent Customers</div>
+        <button class="btn-primary" onclick="openAddCustomer()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Customer
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Plan</th><th>Action</th></tr></thead>
+          <tbody id="dashboard-customers-tbody">
+            <tr><td colspan="5"><div class="empty-state"><p>Loading...</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS VIEW -->
+    <div class="admin-view" id="view-customers">
+      <div class="section-header">
+        <div class="section-title">All Customers</div>
+        <button class="btn-primary" onclick="openAddCustomer()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Customer
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Plan</th><th>Actions</th></tr></thead>
+          <tbody id="customers-tbody">
+            <tr><td colspan="5"><div class="empty-state"><p>Loading...</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CUSTOMER DETAIL VIEW -->
+    <div class="admin-view" id="view-customer-detail">
+      <button class="back-btn" onclick="showView('customers')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Customers
+      </button>
+      <div class="customer-header">
+        <div class="customer-avatar-lg" id="detail-avatar">?</div>
+        <div>
+          <div class="customer-name-lg" id="detail-name">—</div>
+          <div class="customer-email-lg" id="detail-email">—</div>
+        </div>
+      </div>
+
+      <div class="detail-tabs">
+        <button class="detail-tab active" onclick="switchDetailTab('profile')">Profile</button>
+        <button class="detail-tab" onclick="switchDetailTab('loads')">Loads</button>
+        <button class="detail-tab" onclick="switchDetailTab('invoices')">Invoices</button>
+        <button class="detail-tab" onclick="switchDetailTab('billing')">Billing</button>
+        <button class="detail-tab" onclick="switchDetailTab('statements')">Statements</button>
+      </div>
+
+      <!-- Profile Panel -->
+      <div class="detail-panel active" id="detail-panel-profile">
+        <div class="form-grid" id="profile-edit-grid"></div>
+        <div class="form-actions">
+          <button class="btn-primary" onclick="saveProfile()">Save Profile</button>
+        </div>
+      </div>
+
+      <!-- Loads Panel -->
+      <div class="detail-panel" id="detail-panel-loads">
+        <div class="section-header">
+          <div class="section-title">Loads</div>
+          <button class="btn-primary" onclick="openAddSubDoc('loads')">+ Add Load</button>
+        </div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Load #</th><th>Route</th><th>Driver</th><th>Date</th><th>Rate</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="detail-loads-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- Invoices Panel -->
+      <div class="detail-panel" id="detail-panel-invoices">
+        <div class="section-header">
+          <div class="section-title">Invoices</div>
+          <button class="btn-primary" onclick="openAddSubDoc('invoices')">+ Add Invoice</button>
+        </div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Invoice #</th><th>Client</th><th>Amount</th><th>Issued</th><th>Due</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="detail-invoices-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- Billing Panel -->
+      <div class="detail-panel" id="detail-panel-billing">
+        <div class="form-grid" id="billing-edit-grid"></div>
+        <div class="form-actions"><button class="btn-primary" onclick="saveBilling()">Save Billing</button></div>
+        <div style="margin-top:24px;">
+          <div class="section-header">
+            <div class="section-title">Billing History</div>
+            <button class="btn-primary" onclick="openAddSubDoc('billing-history')">+ Add Entry</button>
+          </div>
+          <div class="table-wrap">
+            <table><thead><tr><th>Date</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="detail-billing-tbody"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statements Panel -->
+      <div class="detail-panel" id="detail-panel-statements">
+        <div class="section-header">
+          <div class="section-title">Statements</div>
+          <button class="btn-primary" onclick="openAddSubDoc('statements')">+ Add Entry</button>
+        </div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Date</th><th>Description</th><th>Load #</th><th>Credit</th><th>Debit</th><th>Balance</th><th>Action</th></tr></thead>
+          <tbody id="detail-statements-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMINS VIEW -->
+    <div class="admin-view" id="view-admins">
+      <div class="section-header">
+        <div class="section-title">Admin Users</div>
+        <button class="btn-primary" onclick="openAddAdmin()">+ Add Admin</button>
+      </div>
+      <div id="admins-list"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Add Customer Modal -->
+<div class="modal-overlay" id="modal-add-customer">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add New Customer</div>
+      <button class="modal-close" onclick="closeModal('modal-add-customer')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="form-section">Account Credentials</div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">Email Address</label><input type="email" class="form-input" id="new-email" placeholder="customer@company.com"></div>
+      <div class="form-group full"><label class="form-label">Password</label><input type="password" class="form-input" id="new-password" placeholder="Min 6 characters"></div>
+    </div>
+    <div class="form-section">Profile Information</div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">Full Name</label><input type="text" class="form-input" id="new-name" placeholder="John D. Transport"></div>
+      <div class="form-group full"><label class="form-label">Company Name</label><input type="text" class="form-input" id="new-company" placeholder="Transport LLC"></div>
+      <div class="form-group"><label class="form-label">MC Number</label><input type="text" class="form-input" id="new-mc" placeholder="MC-000000"></div>
+      <div class="form-group"><label class="form-label">DOT Number</label><input type="text" class="form-input" id="new-dot" placeholder="DOT-000000"></div>
+      <div class="form-group"><label class="form-label">Phone</label><input type="text" class="form-input" id="new-phone" placeholder="+1 (000) 000-0000"></div>
+      <div class="form-group">
+        <label class="form-label">Plan</label>
+        <select class="form-select" id="new-plan">
+          <option>Pro Back Office</option>
+          <option>Standard</option>
+          <option>Enterprise</option>
+        </select>
+      </div>
+      <div class="form-group full"><label class="form-label">Business Address</label><input type="text" class="form-input" id="new-address" placeholder="123 Main St, Dallas, TX"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-add-customer')">Cancel</button>
+      <button class="btn-primary" id="btn-add-customer" onclick="addCustomer()">
+        <div class="gate-spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:#fff;"></div>
+        <span class="gate-label">Create Customer</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Sub-Document Modal -->
+<div class="modal-overlay" id="modal-add-subdoc">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="subdoc-modal-title">Add Entry</div>
+      <button class="modal-close" onclick="closeModal('modal-add-subdoc')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="subdoc-form-fields" class="form-grid"></div>
+    <div class="form-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-add-subdoc')">Cancel</button>
+      <button class="btn-primary" onclick="saveSubDoc()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Admin Modal -->
+<div class="modal-overlay" id="modal-add-admin">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Admin</div>
+      <button class="modal-close" onclick="closeModal('modal-add-admin')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:18px;line-height:1.6;">The person must already have a Haulxify portal account. Enter their Firebase UID to grant admin access.</p>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">Name</label><input type="text" class="form-input" id="admin-new-name" placeholder="Admin Name"></div>
+      <div class="form-group full"><label class="form-label">Email</label><input type="email" class="form-input" id="admin-new-email" placeholder="admin@company.com"></div>
+      <div class="form-group full"><label class="form-label">Firebase UID</label><input type="text" class="form-input" id="admin-new-uid" placeholder="Paste UID from Firebase Auth console"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-add-admin')">Cancel</button>
+      <button class="btn-primary" onclick="addAdmin()">Grant Access</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="admin-toast" id="admin-toast"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyBaRMQBLfDyufJkC4E8XCvzOIMEawOQObw",
+    authDomain: "haulxify-app.firebaseapp.com",
+    projectId: "haulxify-app",
+    storageBucket: "haulxify-app.firebasestorage.app",
+    messagingSenderId: "453228026261",
+    appId: "1:453228026261:web:1d66ab1d47418906807e9c"
+  });
+
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
+
+  let currentAdminData = null;
+  let selectedCustomerUID = null;
+  let currentSubDocType = null;
+
+  // ── AUTH STATE ──
+  auth.onAuthStateChanged(async function(user) {
+    document.getElementById('loading-screen').style.display = 'none';
+    if (!user) {
+      document.getElementById('login-gate').classList.add('show');
+      return;
+    }
+    // Check if admin
+    const adminDoc = await db.collection('admins').doc(user.uid).get();
+    if (!adminDoc.exists) {
+      auth.signOut();
+      document.getElementById('login-gate').classList.add('show');
+      showGateError('Access denied. You are not an authorized admin.');
+      return;
+    }
+    currentAdminData = adminDoc.data();
+    document.getElementById('admin-display-name').textContent = currentAdminData.name || 'Admin';
+    const initials = (currentAdminData.name || 'AD').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+    document.getElementById('admin-avatar-initials').textContent = initials;
+    document.getElementById('app').classList.add('show');
+    loadDashboard();
+  });
+
+  // ── SIGN IN ──
+  async function adminSignIn() {
+    const email    = document.getElementById('gate-email').value.trim();
+    const password = document.getElementById('gate-password').value;
+    const btn      = document.getElementById('gate-btn');
+    document.getElementById('gate-error').classList.remove('show');
+
+    if (!email || !password) {
+      showGateError('Please enter email and password.');
+      return;
+    }
+    btn.classList.add('loading'); btn.disabled = true;
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+    } catch(e) {
+      btn.classList.remove('loading'); btn.disabled = false;
+      showGateError('Incorrect email or password.');
+    }
+  }
+
+  function showGateError(msg) {
+    document.getElementById('gate-error-msg').textContent = msg;
+    document.getElementById('gate-error').classList.add('show');
+  }
+
+  function adminSignOut() {
+    auth.signOut().then(() => { window.location.reload(); });
+  }
+
+  function toggleGatePw() {
+    const pw = document.getElementById('gate-password');
+    const icon = document.getElementById('gate-eye');
+    if (pw.type === 'password') {
+      pw.type = 'text';
+      icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    } else {
+      pw.type = 'password';
+      icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  }
+
+  // ── VIEWS ──
+  function showView(view) {
+    document.querySelectorAll('.admin-view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
+    document.getElementById('view-' + view).classList.add('active');
+    const titles = { dashboard: 'Dashboard', customers: 'All Customers', admins: 'Admin Users', 'customer-detail': 'Customer Detail' };
+    document.getElementById('topbar-title').textContent = titles[view] || view;
+    document.getElementById('topbar-sub').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+    if (view === 'customers') { loadCustomers(); }
+    if (view === 'admins') { loadAdmins(); }
+  }
+
+  // ── LOAD DASHBOARD ──
+  async function loadDashboard() {
+    const custSnap  = await db.collection('customers').get();
+    const adminSnap = await db.collection('admins').get();
+    document.getElementById('stat-customers').textContent = custSnap.size;
+    document.getElementById('stat-admins').textContent    = adminSnap.size;
+
+    let totalLoads = 0, pendingInv = 0;
+    const tbody = document.getElementById('dashboard-customers-tbody');
+    tbody.innerHTML = '';
+
+    for (const doc of custSnap.docs) {
+      const d = doc.data();
+      const loadsSnap = await db.collection('customers').doc(doc.id).collection('loads').get();
+      const invSnap   = await db.collection('customers').doc(doc.id).collection('invoices').get();
+      totalLoads += loadsSnap.size;
+      invSnap.forEach(i => { if (i.data().status === 'Pending' || i.data().status === 'Overdue') pendingInv++; });
+      const initials = (d.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      tbody.innerHTML += `
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:30px;height:30px;border-radius:50%;background:rgba(232,119,34,0.15);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--orange);font-family:var(--font-d);">${initials}</div>
+            ${d.name || '—'}
+          </div></td>
+          <td class="td-muted">${d.company || '—'}</td>
+          <td class="td-muted">${d.email || '—'}</td>
+          <td><span class="tag tag-orange">${d.plan || '—'}</span></td>
+          <td><button class="btn-secondary" onclick="openCustomerDetail('${doc.id}')">View</button></td>
+        </tr>`;
+    }
+    document.getElementById('stat-loads').textContent    = totalLoads;
+    document.getElementById('stat-invoices').textContent = pendingInv;
+    if (custSnap.size === 0) tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>No customers yet. Add your first customer.</p></div></td></tr>';
+  }
+
+  // ── LOAD CUSTOMERS ──
+  async function loadCustomers() {
+    const snap  = await db.collection('customers').get();
+    const tbody = document.getElementById('customers-tbody');
+    tbody.innerHTML = '';
+    if (snap.empty) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>No customers yet.</p></div></td></tr>'; return; }
+    snap.forEach(doc => {
+      const d = doc.data();
+      const initials = (d.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      tbody.innerHTML += `
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:30px;height:30px;border-radius:50%;background:rgba(232,119,34,0.15);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--orange);font-family:var(--font-d);">${initials}</div>
+            ${d.name || '—'}
+          </div></td>
+          <td class="td-muted">${d.company || '—'}</td>
+          <td class="td-muted">${d.email || '—'}</td>
+          <td><span class="tag tag-orange">${d.plan || '—'}</span></td>
+          <td><div class="td-actions">
+            <button class="btn-secondary" onclick="openCustomerDetail('${doc.id}')">Edit</button>
+            <button class="btn-danger" onclick="deleteCustomer('${doc.id}')">Delete</button>
+          </div></td>
+        </tr>`;
+    });
+  }
+
+  // ── ADD CUSTOMER ──
+  function openAddCustomer() {
+    document.getElementById('modal-add-customer').classList.add('show');
+  }
+
+  async function addCustomer() {
+    const email   = document.getElementById('new-email').value.trim();
+    const password = document.getElementById('new-password').value;
+    const name    = document.getElementById('new-name').value.trim();
+    const company = document.getElementById('new-company').value.trim();
+    const mc      = document.getElementById('new-mc').value.trim();
+    const dot     = document.getElementById('new-dot').value.trim();
+    const phone   = document.getElementById('new-phone').value.trim();
+    const plan    = document.getElementById('new-plan').value;
+    const address = document.getElementById('new-address').value.trim();
+    const btn     = document.getElementById('btn-add-customer');
+
+    if (!email || !password || !name) { showToast('Email, password and name are required.', 'error'); return; }
+    if (password.length < 6) { showToast('Password must be at least 6 characters.', 'error'); return; }
+
+    btn.classList.add('loading'); btn.disabled = true;
+
+    try {
+      // Create Firebase Auth user via REST API (secondary app trick)
+      const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBaRMQBLfDyufJkC4E8XCvzOIMEawOQObw`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, returnSecureToken: true })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+
+      const uid = data.localId;
+
+      // Create Firestore document
+      await db.collection('customers').doc(uid).set({
+        name, email, company, mc, dot, phone, plan, address, activeLoads: 0
+      });
+
+      closeModal('modal-add-customer');
+      showToast(`Customer ${name} created successfully!`, 'success');
+      clearAddCustomerForm();
+      loadDashboard();
+    } catch(e) {
+      showToast('Error: ' + (e.message || 'Could not create customer.'), 'error');
+    }
+    btn.classList.remove('loading'); btn.disabled = false;
+  }
+
+  function clearAddCustomerForm() {
+    ['new-email','new-password','new-name','new-company','new-mc','new-dot','new-phone','new-address'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+  }
+
+  // ── DELETE CUSTOMER ──
+  async function deleteCustomer(uid) {
+    if (!confirm('Are you sure you want to delete this customer? This cannot be undone.')) return;
+    await db.collection('customers').doc(uid).delete();
+    showToast('Customer deleted.', 'success');
+    loadCustomers();
+  }
+
+  // ── CUSTOMER DETAIL ──
+  async function openCustomerDetail(uid) {
+    selectedCustomerUID = uid;
+    const doc = await db.collection('customers').doc(uid).get();
+    const d   = doc.data();
+    const initials = (d.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+    document.getElementById('detail-avatar').textContent = initials;
+    document.getElementById('detail-name').textContent   = d.name || '—';
+    document.getElementById('detail-email').textContent  = d.email || '—';
+
+    // Build profile form
+    document.getElementById('profile-edit-grid').innerHTML = `
+      <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="edit-name" value="${d.name||''}"></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="edit-email" value="${d.email||''}"></div>
+      <div class="form-group"><label class="form-label">Company</label><input type="text" class="form-input" id="edit-company" value="${d.company||''}"></div>
+      <div class="form-group"><label class="form-label">Plan</label>
+        <select class="form-select" id="edit-plan">
+          <option ${d.plan==='Pro Back Office'?'selected':''}>Pro Back Office</option>
+          <option ${d.plan==='Standard'?'selected':''}>Standard</option>
+          <option ${d.plan==='Enterprise'?'selected':''}>Enterprise</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">MC Number</label><input type="text" class="form-input" id="edit-mc" value="${d.mc||''}"></div>
+      <div class="form-group"><label class="form-label">DOT Number</label><input type="text" class="form-input" id="edit-dot" value="${d.dot||''}"></div>
+      <div class="form-group"><label class="form-label">Phone</label><input type="text" class="form-input" id="edit-phone" value="${d.phone||''}"></div>
+      <div class="form-group"><label class="form-label">Active Loads</label><input type="number" class="form-input" id="edit-activeLoads" value="${d.activeLoads||0}"></div>
+      <div class="form-group full"><label class="form-label">Address</label><input type="text" class="form-input" id="edit-address" value="${d.address||''}"></div>
+    `;
+
+    // Build billing form
+    const billingDoc = await db.collection('customers').doc(uid).collection('billing').doc('current').get();
+    const b = billingDoc.exists ? billingDoc.data() : {};
+    document.getElementById('billing-edit-grid').innerHTML = `
+      <div class="form-group"><label class="form-label">Plan Name</label><input type="text" class="form-input" id="edit-bill-plan" value="${b.plan||''}"></div>
+      <div class="form-group"><label class="form-label">Price</label><input type="text" class="form-input" id="edit-bill-price" value="${b.price||''}"></div>
+      <div class="form-group"><label class="form-label">Renews</label><input type="text" class="form-input" id="edit-bill-renews" value="${b.renews||''}"></div>
+      <div class="form-group"><label class="form-label">Card Brand</label><input type="text" class="form-input" id="edit-bill-brand" value="${b.cardBrand||''}"></div>
+      <div class="form-group"><label class="form-label">Card Last 4</label><input type="text" class="form-input" id="edit-bill-last4" value="${b.cardLast4||''}"></div>
+      <div class="form-group"><label class="form-label">Card Expiry</label><input type="text" class="form-input" id="edit-bill-expiry" value="${b.cardExpiry||''}"></div>
+    `;
+
+    switchDetailTab('profile');
+    showView('customer-detail');
+    loadDetailLoads(uid);
+    loadDetailInvoices(uid);
+    loadDetailBillingHistory(uid);
+    loadDetailStatements(uid);
+  }
+
+  async function saveProfile() {
+    await db.collection('customers').doc(selectedCustomerUID).update({
+      name:        document.getElementById('edit-name').value.trim(),
+      email:       document.getElementById('edit-email').value.trim(),
+      company:     document.getElementById('edit-company').value.trim(),
+      plan:        document.getElementById('edit-plan').value,
+      mc:          document.getElementById('edit-mc').value.trim(),
+      dot:         document.getElementById('edit-dot').value.trim(),
+      phone:       document.getElementById('edit-phone').value.trim(),
+      address:     document.getElementById('edit-address').value.trim(),
+      activeLoads: parseInt(document.getElementById('edit-activeLoads').value) || 0,
+    });
+    showToast('Profile saved!', 'success');
+  }
+
+  async function saveBilling() {
+    await db.collection('customers').doc(selectedCustomerUID).collection('billing').doc('current').set({
+      plan:      document.getElementById('edit-bill-plan').value.trim(),
+      price:     document.getElementById('edit-bill-price').value.trim(),
+      renews:    document.getElementById('edit-bill-renews').value.trim(),
+      cardBrand: document.getElementById('edit-bill-brand').value.trim(),
+      cardLast4: document.getElementById('edit-bill-last4').value.trim(),
+      cardExpiry:document.getElementById('edit-bill-expiry').value.trim(),
+    });
+    showToast('Billing saved!', 'success');
+  }
+
+  // ── LOADS ──
+  async function loadDetailLoads(uid) {
+    const snap  = await db.collection('customers').doc(uid).collection('loads').get();
+    const tbody = document.getElementById('detail-loads-tbody');
+    tbody.innerHTML = '';
+    if (snap.empty) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>No loads yet.</p></div></td></tr>'; return; }
+    snap.forEach(doc => {
+      const d = doc.data();
+      tbody.innerHTML += `<tr>
+        <td class="td-muted">#${d.loadNumber||'—'}</td><td>${d.route||'—'}</td>
+        <td>${d.driver||'—'}</td><td class="td-muted">${d.date||'—'}</td>
+        <td>${d.rate||'—'}</td><td>${d.status||'—'}</td>
+        <td><button class="btn-danger" onclick="deleteSubDoc('loads','${doc.id}')">Delete</button></td>
+      </tr>`;
+    });
+  }
+
+  // ── INVOICES ──
+  async function loadDetailInvoices(uid) {
+    const snap  = await db.collection('customers').doc(uid).collection('invoices').get();
+    const tbody = document.getElementById('detail-invoices-tbody');
+    tbody.innerHTML = '';
+    if (snap.empty) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>No invoices yet.</p></div></td></tr>'; return; }
+    snap.forEach(doc => {
+      const d = doc.data();
+      tbody.innerHTML += `<tr>
+        <td class="td-muted">${d.invoiceNumber||'—'}</td><td>${d.client||'—'}</td>
+        <td>${d.amount||'—'}</td><td class="td-muted">${d.issued||'—'}</td>
+        <td class="td-muted">${d.due||'—'}</td><td>${d.status||'—'}</td>
+        <td><button class="btn-danger" onclick="deleteSubDoc('invoices','${doc.id}')">Delete</button></td>
+      </tr>`;
+    });
+  }
+
+  // ── BILLING HISTORY ──
+  async function loadDetailBillingHistory(uid) {
+    const snap  = await db.collection('customers').doc(uid).collection('billing').get();
+    const tbody = document.getElementById('detail-billing-tbody');
+    tbody.innerHTML = '';
+    snap.forEach(doc => {
+      if (doc.id === 'current') return;
+      const d = doc.data();
+      tbody.innerHTML += `<tr>
+        <td>${d.date||'—'}</td><td>${d.amount||'—'}</td><td>${d.status||'—'}</td>
+        <td><button class="btn-danger" onclick="deleteBillingHistory('${doc.id}')">Delete</button></td>
+      </tr>`;
+    });
+    if (!tbody.innerHTML) tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><p>No billing history.</p></div></td></tr>';
+  }
+
+  // ── STATEMENTS ──
+  async function loadDetailStatements(uid) {
+    const snap  = await db.collection('customers').doc(uid).collection('statements').get();
+    const tbody = document.getElementById('detail-statements-tbody');
+    tbody.innerHTML = '';
+    if (snap.empty) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>No statements yet.</p></div></td></tr>'; return; }
+    snap.forEach(doc => {
+      const d = doc.data();
+      tbody.innerHTML += `<tr>
+        <td>${d.date||'—'}</td><td>${d.description||'—'}</td>
+        <td class="td-muted">${d.loadNumber||'—'}</td>
+        <td style="color:var(--success)">${d.credit||'—'}</td>
+        <td style="color:var(--danger)">${d.debit||'—'}</td>
+        <td>${d.balance||'—'}</td>
+        <td><button class="btn-danger" onclick="deleteSubDoc('statements','${doc.id}')">Delete</button></td>
+      </tr>`;
+    });
+  }
+
+  // ── ADD SUB DOC ──
+  const subDocSchemas = {
+    loads: [
+      { id:'loadNumber', label:'Load Number', placeholder:'TX-9001' },
+      { id:'route', label:'Route', placeholder:'Dallas → Chicago' },
+      { id:'driver', label:'Driver', placeholder:'Mike R.' },
+      { id:'date', label:'Date', placeholder:'Apr 10' },
+      { id:'rate', label:'Rate', placeholder:'$2,800' },
+      { id:'status', label:'Status', type:'select', options:['In Transit','Delivered','Cancelled'] },
+    ],
+    invoices: [
+      { id:'invoiceNumber', label:'Invoice #', placeholder:'INV-0001' },
+      { id:'client', label:'Client', placeholder:'Apex Freight LLC' },
+      { id:'amount', label:'Amount', placeholder:'$3,200' },
+      { id:'issued', label:'Issued Date', placeholder:'Apr 10' },
+      { id:'due', label:'Due Date', placeholder:'Apr 25' },
+      { id:'status', label:'Status', type:'select', options:['Pending','Paid','Overdue'] },
+    ],
+    'billing-history': [
+      { id:'date', label:'Date', placeholder:'Apr 1, 2025' },
+      { id:'amount', label:'Amount', placeholder:'$799.00' },
+      { id:'status', label:'Status', type:'select', options:['Paid','Pending','Failed'] },
+    ],
+    statements: [
+      { id:'date', label:'Date', placeholder:'Apr 10' },
+      { id:'description', label:'Description', placeholder:'Load dispatched' },
+      { id:'loadNumber', label:'Load/Invoice #', placeholder:'TX-9001' },
+      { id:'credit', label:'Credit', placeholder:'+$2,800 or —' },
+      { id:'debit', label:'Debit', placeholder:'−$799 or —' },
+      { id:'balance', label:'Balance', placeholder:'$5,000' },
+    ],
+  };
+
+  function openAddSubDoc(type) {
+    currentSubDocType = type;
+    const schema = subDocSchemas[type];
+    const titles = { loads:'Add Load', invoices:'Add Invoice', 'billing-history':'Add Billing Entry', statements:'Add Statement' };
+    document.getElementById('subdoc-modal-title').textContent = titles[type] || 'Add Entry';
+    const fields = document.getElementById('subdoc-form-fields');
+    fields.innerHTML = schema.map(f => {
+      if (f.type === 'select') {
+        return `<div class="form-group"><label class="form-label">${f.label}</label>
+          <select class="form-select" id="subdoc-${f.id}">
+            ${f.options.map(o => `<option>${o}</option>`).join('')}
+          </select></div>`;
+      }
+      return `<div class="form-group"><label class="form-label">${f.label}</label>
+        <input type="text" class="form-input" id="subdoc-${f.id}" placeholder="${f.placeholder}"></div>`;
+    }).join('');
+    document.getElementById('modal-add-subdoc').classList.add('show');
+  }
+
+  async function saveSubDoc() {
+    const schema = subDocSchemas[currentSubDocType];
+    const data = {};
+    schema.forEach(f => { data[f.id] = document.getElementById('subdoc-' + f.id).value.trim(); });
+    const collection = currentSubDocType === 'billing-history' ? 'billing' : currentSubDocType;
+    await db.collection('customers').doc(selectedCustomerUID).collection(collection).add(data);
+    closeModal('modal-add-subdoc');
+    showToast('Entry added!', 'success');
+    if (currentSubDocType === 'loads')           loadDetailLoads(selectedCustomerUID);
+    if (currentSubDocType === 'invoices')         loadDetailInvoices(selectedCustomerUID);
+    if (currentSubDocType === 'billing-history')  loadDetailBillingHistory(selectedCustomerUID);
+    if (currentSubDocType === 'statements')       loadDetailStatements(selectedCustomerUID);
+  }
+
+  async function deleteSubDoc(collection, docId) {
+    if (!confirm('Delete this entry?')) return;
+    await db.collection('customers').doc(selectedCustomerUID).collection(collection).doc(docId).delete();
+    showToast('Deleted.', 'success');
+    if (collection === 'loads')      loadDetailLoads(selectedCustomerUID);
+    if (collection === 'invoices')   loadDetailInvoices(selectedCustomerUID);
+    if (collection === 'statements') loadDetailStatements(selectedCustomerUID);
+  }
+
+  async function deleteBillingHistory(docId) {
+    if (!confirm('Delete this billing entry?')) return;
+    await db.collection('customers').doc(selectedCustomerUID).collection('billing').doc(docId).delete();
+    showToast('Deleted.', 'success');
+    loadDetailBillingHistory(selectedCustomerUID);
+  }
+
+  // ── DETAIL TABS ──
+  function switchDetailTab(tab) {
+    document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.detail-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('detail-panel-' + tab).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // ── ADMINS ──
+  async function loadAdmins() {
+    const snap = await db.collection('admins').get();
+    const list = document.getElementById('admins-list');
+    list.innerHTML = '';
+    snap.forEach(doc => {
+      const d = doc.data();
+      const initials = (d.name || 'AD').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      const isMe = doc.id === auth.currentUser?.uid;
+      list.innerHTML += `
+        <div class="admin-card">
+          <div class="admin-card-left">
+            <div class="admin-card-avatar">${initials}</div>
+            <div>
+              <div class="admin-card-name">${d.name || '—'} ${isMe ? '<span class="tag tag-green" style="font-size:0.65rem;">You</span>' : ''}</div>
+              <div class="admin-card-email">${d.email || '—'}</div>
+            </div>
+          </div>
+          ${!isMe ? `<button class="btn-danger" onclick="removeAdmin('${doc.id}')">Revoke Access</button>` : '<span style="font-size:0.75rem;color:var(--muted);">Cannot remove yourself</span>'}
+        </div>`;
+    });
+  }
+
+  function openAddAdmin() { document.getElementById('modal-add-admin').classList.add('show'); }
+
+  async function addAdmin() {
+    const name  = document.getElementById('admin-new-name').value.trim();
+    const email = document.getElementById('admin-new-email').value.trim();
+    const uid   = document.getElementById('admin-new-uid').value.trim();
+    if (!name || !email || !uid) { showToast('All fields are required.', 'error'); return; }
+    await db.collection('admins').doc(uid).set({ name, email, addedOn: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) });
+    closeModal('modal-add-admin');
+    showToast(`${name} added as admin!`, 'success');
+    loadAdmins();
+    document.getElementById('admin-new-name').value = '';
+    document.getElementById('admin-new-email').value = '';
+    document.getElementById('admin-new-uid').value = '';
+  }
+
+  async function removeAdmin(uid) {
+    if (!confirm('Revoke admin access for this user?')) return;
+    await db.collection('admins').doc(uid).delete();
+    showToast('Admin access revoked.', 'success');
+    loadAdmins();
+  }
+
+  // ── MODAL ──
+  function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+  });
+
+  // ── TOAST ──
+  let toastTimer;
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('admin-toast');
+    t.textContent = msg; t.className = 'admin-toast show ' + type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  // Enter key on gate
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const gate = document.getElementById('login-gate');
+      if (gate.classList.contains('show')) adminSignIn();
+    }
+  });
+</script>
+</body>
+</html>
