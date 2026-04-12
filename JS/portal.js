@@ -12,7 +12,7 @@ let customerData = null;
 // ── AUTH GUARD ──────────────────────────────────────────────
 auth.onAuthStateChanged(function(user) {
   if (!user) {
-    window.location.href = 'https://www.haulxify.com';
+    window.location.href = 'https://app.haulxify.com/login.html';
     return;
   }
   currentUser = user;
@@ -135,7 +135,6 @@ async function loadBilling(uid) {
   setText('billing-plan-name', d.plan || '');
   setText('billing-plan-price', d.price || '');
   setText('billing-renews', 'Renews ' + (d.renews || ''));
-  setText('billing-card-brand', d.cardBrand || '');
   setText('billing-card-last4', (d.cardBrand || '') + ' ending in •••• ' + (d.cardLast4 || ''));
   setText('billing-card-expiry', 'Expires ' + (d.cardExpiry || ''));
 
