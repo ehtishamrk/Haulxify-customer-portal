@@ -12,18 +12,12 @@
 
     :root {
       --brand-orange: #E87722;
-      --orange-dark:  #C96A18;
-      --orange-light: #F0924A;
       --brand-navy:   #0D1929;
       --font-display: 'Syne', sans-serif;
       --font-body:    'DM Sans', sans-serif;
     }
 
-    html, body {
-      height: 100%;
-      font-family: var(--font-body);
-      background: #f0f4f8;
-    }
+    html, body { height: 100%; font-family: var(--font-body); }
 
     body {
       display: flex;
@@ -31,15 +25,13 @@
       justify-content: center;
       min-height: 100vh;
       padding: 20px;
-      /* Subtle background pattern matching main site feel */
       background-color: #f0f4f8;
-      background-image: radial-gradient(circle at 20% 50%, rgba(232,119,34,0.04) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(13,25,41,0.04) 0%, transparent 50%);
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(232,119,34,0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(13,25,41,0.04) 0%, transparent 50%);
     }
 
-    /* ── CARD ── */
     .login-card {
-      position: relative;
       width: 100%;
       max-width: 420px;
       background: #fff;
@@ -54,7 +46,6 @@
       to   { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    /* ── HEADER ── */
     .card-header { margin-bottom: 28px; }
 
     .logo {
@@ -72,26 +63,21 @@
       margin: 8px 0 0;
       font-size: 0.875rem;
       color: rgba(13,25,41,0.5);
-      font-family: var(--font-body);
     }
 
-    /* ── ERROR BOX ── */
-    .error-box {
+    .alert-box {
       display: none;
-      background: #fff1f0;
-      border: 1px solid #fca5a5;
       border-radius: 10px;
       padding: 10px 14px;
       margin-bottom: 16px;
       font-size: 0.8125rem;
-      color: #dc2626;
-      font-family: var(--font-body);
       align-items: center;
       gap: 8px;
     }
-    .error-box.show { display: flex; }
+    .alert-box.show { display: flex; }
+    .alert-box.error { background: #fff1f0; border: 1px solid #fca5a5; color: #dc2626; }
+    .alert-box.success { background: #f0fdf4; border: 1px solid #86efac; color: #16a34a; }
 
-    /* ── FORM ── */
     .form-fields { display: flex; flex-direction: column; gap: 16px; }
 
     .field-label {
@@ -116,7 +102,7 @@
       font-size: 0.78rem;
       color: var(--brand-orange);
       text-decoration: none;
-      font-family: var(--font-body);
+      cursor: pointer;
       transition: text-decoration 0.2s;
     }
     .forgot-link:hover { text-decoration: underline; }
@@ -144,13 +130,9 @@
       color: var(--brand-navy);
       outline: none;
       background: #f9fafb;
-      box-sizing: border-box;
       transition: border-color 0.2s, background 0.2s;
     }
-    .field-input:focus {
-      border-color: var(--brand-orange);
-      background: #fff;
-    }
+    .field-input:focus { border-color: var(--brand-orange); background: #fff; }
     .field-input::placeholder { color: rgba(13,25,41,0.35); }
     .field-input.pw-input { padding-right: 42px; }
 
@@ -170,7 +152,6 @@
     }
     .pw-toggle:hover { color: var(--brand-navy); }
 
-    /* ── REMEMBER ── */
     .remember-row {
       display: flex;
       align-items: center;
@@ -178,7 +159,6 @@
       cursor: pointer;
       font-size: 0.8125rem;
       color: rgba(13,25,41,0.5);
-      font-family: var(--font-body);
       margin-top: -4px;
     }
     .remember-row input[type="checkbox"] {
@@ -189,7 +169,6 @@
       flex-shrink: 0;
     }
 
-    /* ── SUBMIT BTN ── */
     .btn-signin {
       width: 100%;
       padding: 14px;
@@ -204,12 +183,29 @@
       cursor: pointer;
       transition: background 0.25s, transform 0.2s;
       margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
-    .btn-signin:hover { background: #1a3358; transform: translateY(-1px); }
-    .btn-signin:active { transform: translateY(0); }
-    .btn-signin:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    .btn-signin:hover:not(:disabled) { background: #1a3358; transform: translateY(-1px); }
+    .btn-signin:active:not(:disabled) { transform: translateY(0); }
+    .btn-signin:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
 
-    /* ── DIVIDER ── */
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+      flex-shrink: 0;
+    }
+    .btn-signin.loading .spinner { display: block; }
+    .btn-signin.loading .btn-label { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     .divider {
       display: flex;
       align-items: center;
@@ -217,14 +213,8 @@
       margin: 22px 0 18px;
     }
     .divider-line { flex: 1; height: 1px; background: rgba(13,25,41,0.08); }
-    .divider-text {
-      font-size: 0.75rem;
-      color: rgba(13,25,41,0.35);
-      font-family: var(--font-body);
-      white-space: nowrap;
-    }
+    .divider-text { font-size: 0.75rem; color: rgba(13,25,41,0.35); white-space: nowrap; }
 
-    /* ── GET STARTED LINK ── */
     .get-started-link {
       display: block;
       text-align: center;
@@ -238,31 +228,126 @@
       text-decoration: none;
       transition: border-color 0.2s, color 0.2s;
     }
-    .get-started-link:hover {
-      border-color: var(--brand-orange);
-      color: var(--brand-orange);
+    .get-started-link:hover { border-color: var(--brand-orange); color: var(--brand-orange); }
+
+    /* ── FORGOT MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,18,30,0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
 
-    /* ── BACK LINK ── */
-    .back-link {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
+    .modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px 28px 28px;
+      box-shadow: 0 24px 64px rgba(10,18,30,0.22);
+      animation: cardIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(13,25,41,0.06);
+      border: none;
+      border-radius: 8px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .modal-close:hover { background: rgba(13,25,41,0.12); }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--brand-navy);
+      margin-bottom: 6px;
+    }
+    .modal-subtitle {
       font-size: 0.8125rem;
-      color: rgba(13,25,41,0.4);
-      text-decoration: none;
-      font-family: var(--font-body);
-      transition: color 0.2s;
+      color: rgba(13,25,41,0.5);
+      margin-bottom: 20px;
+      line-height: 1.5;
     }
-    .back-link:hover { color: var(--brand-navy); }
-    .back-link svg { vertical-align: middle; margin-right: 4px; }
 
-    /* ── MOBILE ── */
+    .btn-reset {
+      width: 100%;
+      padding: 13px;
+      background: var(--brand-navy);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      font-weight: 700;
+      font-family: var(--font-display);
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-reset:hover:not(:disabled) { background: #1a3358; }
+    .btn-reset:disabled { opacity: 0.65; cursor: not-allowed; }
+    .btn-reset.loading .spinner { display: block; }
+    .btn-reset.loading .btn-label { display: none; }
+
+    .reset-success {
+      display: none;
+      text-align: center;
+      padding: 8px 0 4px;
+    }
+    .reset-success-icon {
+      width: 52px;
+      height: 52px;
+      background: #f0fdf4;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+    }
+    .reset-success h4 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brand-navy);
+      margin-bottom: 8px;
+    }
+    .reset-success p {
+      font-size: 0.8125rem;
+      color: rgba(13,25,41,0.5);
+      line-height: 1.6;
+    }
+    .reset-success strong { color: var(--brand-navy); }
+
     @media (max-width: 480px) {
-      .login-card {
-        padding: 32px 22px 28px;
-        border-radius: 16px;
-      }
+      .login-card { padding: 32px 22px 28px; border-radius: 16px; }
+      .modal-card { padding: 28px 20px 24px; }
     }
   </style>
 </head>
@@ -270,24 +355,20 @@
 
   <div class="login-card">
 
-    <!-- Header -->
     <div class="card-header">
       <a href="https://www.haulxify.com" class="logo">Haul<span>xify</span></a>
       <p class="card-subtitle">Customer Portal — Sign in to your account</p>
     </div>
 
-    <!-- Error Box -->
-    <div class="error-box" id="signin-error">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" style="flex-shrink:0;">
+    <div class="alert-box error" id="signin-error">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
       </svg>
       <span id="signin-error-msg">Invalid email or password.</span>
     </div>
 
-    <!-- Form -->
     <div class="form-fields">
 
-      <!-- Email -->
       <div>
         <label class="field-label">Email Address</label>
         <div class="input-wrap">
@@ -301,11 +382,10 @@
         </div>
       </div>
 
-      <!-- Password -->
       <div>
         <div class="field-label-row">
           <label class="field-label" style="margin-bottom:0;">Password</label>
-          <a href="#" class="forgot-link" onclick="handleForgot(event)">Forgot password?</a>
+          <span class="forgot-link" onclick="openForgot()">Forgot password?</span>
         </div>
         <div class="input-wrap">
           <span class="input-icon">
@@ -324,20 +404,18 @@
         </div>
       </div>
 
-      <!-- Remember me -->
       <label class="remember-row">
         <input type="checkbox" id="signin-remember">
         Keep me signed in
       </label>
 
-      <!-- Submit -->
       <button class="btn-signin" id="signin-btn" onclick="handleSignIn()">
-        Sign In to Customer Portal
+        <div class="spinner"></div>
+        <span class="btn-label">Sign In to Customer Portal</span>
       </button>
 
     </div>
 
-    <!-- Divider -->
     <div class="divider">
       <div class="divider-line"></div>
       <span class="divider-text">Not a customer yet?</span>
@@ -350,14 +428,58 @@
 
   </div>
 
-  <a href="https://www.haulxify.com" class="back-link">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <polyline points="15 18 9 12 15 6"/>
-    </svg>
-    Back to haulxify.com
-  </a>
+  <!-- ── FORGOT PASSWORD MODAL ── -->
+  <div class="modal-overlay" id="forgot-overlay">
+    <div class="modal-backdrop" onclick="closeForgot()"></div>
+    <div class="modal-card">
 
-  <!-- Firebase -->
+      <button class="modal-close" onclick="closeForgot()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+
+      <div id="reset-form-wrap">
+        <p class="modal-title">Reset your password</p>
+        <p class="modal-subtitle">Enter your email and we'll send you a reset link right away.</p>
+
+        <div class="alert-box error" id="reset-error">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span id="reset-error-msg"></span>
+        </div>
+
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </span>
+          <input id="reset-email" type="email" class="field-input" placeholder="you@company.com" autocomplete="email">
+        </div>
+
+        <button class="btn-reset" id="reset-btn" onclick="sendReset()">
+          <div class="spinner"></div>
+          <span class="btn-label">Send Reset Link</span>
+        </button>
+      </div>
+
+      <div class="reset-success" id="reset-success">
+        <div class="reset-success-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <h4>Check your inbox</h4>
+        <p>We sent a reset link to<br><strong id="reset-sent-to"></strong></p>
+      </div>
+
+    </div>
+  </div>
+
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script>
@@ -372,7 +494,6 @@
 
     const auth = firebase.auth();
 
-    // If already logged in go straight to dashboard
     auth.onAuthStateChanged(function(user) {
       if (user) window.location.href = 'index.html';
     });
@@ -399,7 +520,7 @@
         return;
       }
 
-      btn.textContent = 'Signing in…';
+      btn.classList.add('loading');
       btn.disabled = true;
 
       var persistence = document.getElementById('signin-remember').checked
@@ -407,24 +528,63 @@
         : firebase.auth.Auth.Persistence.SESSION;
 
       auth.setPersistence(persistence)
-        .then(function() {
-          return auth.signInWithEmailAndPassword(email, password);
-        })
-        .then(function() {
-          btn.textContent = '✓ Redirecting…';
-          btn.style.background = '#16a34a';
-          setTimeout(function() {
-            window.location.href = 'index.html';
-          }, 800);
-        })
-        .catch(function(error) {
-          btn.textContent = 'Sign In to Customer Portal';
+        .then(function() { return auth.signInWithEmailAndPassword(email, password); })
+        .then(function() { window.location.href = 'index.html'; })
+        .catch(function() {
+          btn.classList.remove('loading');
           btn.disabled = false;
-          btn.style.background = '';
           errorMsg.textContent = 'Incorrect email or password. Please try again.';
           errorBox.classList.add('show');
           document.getElementById('signin-password').value = '';
           document.getElementById('signin-password').focus();
+        });
+    }
+
+    function openForgot() {
+      var email = document.getElementById('signin-email').value.trim();
+      if (email) document.getElementById('reset-email').value = email;
+      document.getElementById('reset-form-wrap').style.display = 'block';
+      document.getElementById('reset-success').style.display = 'none';
+      document.getElementById('reset-error').classList.remove('show');
+      document.getElementById('reset-btn').classList.remove('loading');
+      document.getElementById('reset-btn').disabled = false;
+      document.getElementById('forgot-overlay').classList.add('show');
+      setTimeout(function() { document.getElementById('reset-email').focus(); }, 100);
+    }
+
+    function closeForgot() {
+      document.getElementById('forgot-overlay').classList.remove('show');
+    }
+
+    function sendReset() {
+      var email  = document.getElementById('reset-email').value.trim();
+      var btn    = document.getElementById('reset-btn');
+      var errBox = document.getElementById('reset-error');
+      var errMsg = document.getElementById('reset-error-msg');
+
+      errBox.classList.remove('show');
+
+      if (!email) {
+        errMsg.textContent = 'Please enter your email address.';
+        errBox.classList.add('show');
+        document.getElementById('reset-email').focus();
+        return;
+      }
+
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      auth.sendPasswordResetEmail(email)
+        .then(function() {
+          document.getElementById('reset-sent-to').textContent = email;
+          document.getElementById('reset-form-wrap').style.display = 'none';
+          document.getElementById('reset-success').style.display = 'block';
+        })
+        .catch(function() {
+          btn.classList.remove('loading');
+          btn.disabled = false;
+          errMsg.textContent = 'Could not send reset email. Please check the address.';
+          errBox.classList.add('show');
         });
     }
 
@@ -440,36 +600,12 @@
       }
     }
 
-    function handleForgot(e) {
-      e.preventDefault();
-      var email = document.getElementById('signin-email').value.trim();
-      if (!email) {
-        var errorMsg = document.getElementById('signin-error-msg');
-        var errorBox = document.getElementById('signin-error');
-        errorMsg.textContent = 'Enter your email above first, then click Forgot password.';
-        errorBox.classList.add('show');
-        document.getElementById('signin-email').focus();
-        return;
-      }
-      auth.sendPasswordResetEmail(email).then(function() {
-        var errorMsg = document.getElementById('signin-error-msg');
-        var errorBox = document.getElementById('signin-error');
-        errorBox.style.background = '#f0fdf4';
-        errorBox.style.borderColor = '#86efac';
-        errorMsg.style.color = '#16a34a';
-        errorMsg.textContent = 'Password reset email sent! Check your inbox.';
-        errorBox.classList.add('show');
-      }).catch(function() {
-        var errorMsg = document.getElementById('signin-error-msg');
-        var errorBox = document.getElementById('signin-error');
-        errorMsg.textContent = 'Could not send reset email. Check the address and try again.';
-        errorBox.classList.add('show');
-      });
-    }
-
-    // Enter key support
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') handleSignIn();
+      if (e.key === 'Escape') closeForgot();
+      if (e.key === 'Enter') {
+        if (document.getElementById('forgot-overlay').classList.contains('show')) sendReset();
+        else handleSignIn();
+      }
     });
   </script>
 
