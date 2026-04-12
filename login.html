@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Haulxify — Customer Portal Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand-orange: #E87722;
+      --orange-dark:  #C96A18;
+      --orange-light: #F0924A;
+      --brand-navy:   #0D1929;
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font-body);
+      background: #f0f4f8;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      /* Subtle background pattern matching main site feel */
+      background-color: #f0f4f8;
+      background-image: radial-gradient(circle at 20% 50%, rgba(232,119,34,0.04) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(13,25,41,0.04) 0%, transparent 50%);
+    }
+
+    /* ── CARD ── */
+    .login-card {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px 36px 36px;
+      box-shadow: 0 32px 80px rgba(10,18,30,0.18);
+      animation: cardIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: scale(0.93) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ── HEADER ── */
+    .card-header { margin-bottom: 28px; }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--brand-navy);
+      text-decoration: none;
+      letter-spacing: -0.03em;
+      display: inline-block;
+    }
+    .logo span { color: var(--brand-orange); }
+
+    .card-subtitle {
+      margin: 8px 0 0;
+      font-size: 0.875rem;
+      color: rgba(13,25,41,0.5);
+      font-family: var(--font-body);
+    }
+
+    /* ── ERROR BOX ── */
+    .error-box {
+      display: none;
+      background: #fff1f0;
+      border: 1px solid #fca5a5;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      font-size: 0.8125rem;
+      color: #dc2626;
+      font-family: var(--font-body);
+      align-items: center;
+      gap: 8px;
+    }
+    .error-box.show { display: flex; }
+
+    /* ── FORM ── */
+    .form-fields { display: flex; flex-direction: column; gap: 16px; }
+
+    .field-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--brand-navy);
+      font-family: var(--font-display);
+      margin-bottom: 6px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .field-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .forgot-link {
+      font-size: 0.78rem;
+      color: var(--brand-orange);
+      text-decoration: none;
+      font-family: var(--font-body);
+      transition: text-decoration 0.2s;
+    }
+    .forgot-link:hover { text-decoration: underline; }
+
+    .input-wrap { position: relative; }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: rgba(13,25,41,0.35);
+      display: flex;
+      align-items: center;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 12px 14px 12px 42px;
+      border: 1.5px solid rgba(13,25,41,0.12);
+      border-radius: 10px;
+      font-size: 0.875rem;
+      font-family: var(--font-body);
+      color: var(--brand-navy);
+      outline: none;
+      background: #f9fafb;
+      box-sizing: border-box;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .field-input:focus {
+      border-color: var(--brand-orange);
+      background: #fff;
+    }
+    .field-input::placeholder { color: rgba(13,25,41,0.35); }
+    .field-input.pw-input { padding-right: 42px; }
+
+    .pw-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: rgba(13,25,41,0.35);
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+    .pw-toggle:hover { color: var(--brand-navy); }
+
+    /* ── REMEMBER ── */
+    .remember-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 0.8125rem;
+      color: rgba(13,25,41,0.5);
+      font-family: var(--font-body);
+      margin-top: -4px;
+    }
+    .remember-row input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--brand-orange);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ── SUBMIT BTN ── */
+    .btn-signin {
+      width: 100%;
+      padding: 14px;
+      background: var(--brand-navy);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: var(--font-display);
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.2s;
+      margin-top: 2px;
+    }
+    .btn-signin:hover { background: #1a3358; transform: translateY(-1px); }
+    .btn-signin:active { transform: translateY(0); }
+    .btn-signin:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0 18px;
+    }
+    .divider-line { flex: 1; height: 1px; background: rgba(13,25,41,0.08); }
+    .divider-text {
+      font-size: 0.75rem;
+      color: rgba(13,25,41,0.35);
+      font-family: var(--font-body);
+      white-space: nowrap;
+    }
+
+    /* ── GET STARTED LINK ── */
+    .get-started-link {
+      display: block;
+      text-align: center;
+      padding: 12px;
+      border: 1.5px solid rgba(13,25,41,0.12);
+      border-radius: 10px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      font-family: var(--font-display);
+      color: var(--brand-navy);
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .get-started-link:hover {
+      border-color: var(--brand-orange);
+      color: var(--brand-orange);
+    }
+
+    /* ── BACK LINK ── */
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.8125rem;
+      color: rgba(13,25,41,0.4);
+      text-decoration: none;
+      font-family: var(--font-body);
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--brand-navy); }
+    .back-link svg { vertical-align: middle; margin-right: 4px; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 32px 22px 28px;
+        border-radius: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+
+    <!-- Header -->
+    <div class="card-header">
+      <a href="https://www.haulxify.com" class="logo">Haul<span>xify</span></a>
+      <p class="card-subtitle">Customer Portal — Sign in to your account</p>
+    </div>
+
+    <!-- Error Box -->
+    <div class="error-box" id="signin-error">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" style="flex-shrink:0;">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span id="signin-error-msg">Invalid email or password.</span>
+    </div>
+
+    <!-- Form -->
+    <div class="form-fields">
+
+      <!-- Email -->
+      <div>
+        <label class="field-label">Email Address</label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </span>
+          <input id="signin-email" type="email" class="field-input" placeholder="you@company.com" autocomplete="email">
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div>
+        <div class="field-label-row">
+          <label class="field-label" style="margin-bottom:0;">Password</label>
+          <a href="#" class="forgot-link" onclick="handleForgot(event)">Forgot password?</a>
+        </div>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </span>
+          <input id="signin-password" type="password" class="field-input pw-input" placeholder="••••••••" autocomplete="current-password">
+          <button class="pw-toggle" type="button" onclick="togglePw()" aria-label="Toggle password">
+            <svg id="pw-eye" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Remember me -->
+      <label class="remember-row">
+        <input type="checkbox" id="signin-remember">
+        Keep me signed in
+      </label>
+
+      <!-- Submit -->
+      <button class="btn-signin" id="signin-btn" onclick="handleSignIn()">
+        Sign In to Customer Portal
+      </button>
+
+    </div>
+
+    <!-- Divider -->
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-text">Not a customer yet?</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <a href="https://www.haulxify.com/contact.html" class="get-started-link">
+      Get Started — Contact Us →
+    </a>
+
+  </div>
+
+  <a href="https://www.haulxify.com" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Back to haulxify.com
+  </a>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyBaRMQBLfDyufJkC4E8XCvzOIMEawOQObw",
+      authDomain: "haulxify-app.firebaseapp.com",
+      projectId: "haulxify-app",
+      storageBucket: "haulxify-app.firebasestorage.app",
+      messagingSenderId: "453228026261",
+      appId: "1:453228026261:web:1d66ab1d47418906807e9c"
+    });
+
+    const auth = firebase.auth();
+
+    // If already logged in go straight to dashboard
+    auth.onAuthStateChanged(function(user) {
+      if (user) window.location.href = 'index.html';
+    });
+
+    function handleSignIn() {
+      var email    = document.getElementById('signin-email').value.trim();
+      var password = document.getElementById('signin-password').value;
+      var btn      = document.getElementById('signin-btn');
+      var errorBox = document.getElementById('signin-error');
+      var errorMsg = document.getElementById('signin-error-msg');
+
+      errorBox.classList.remove('show');
+
+      if (!email) {
+        errorMsg.textContent = 'Please enter your email address.';
+        errorBox.classList.add('show');
+        document.getElementById('signin-email').focus();
+        return;
+      }
+      if (!password) {
+        errorMsg.textContent = 'Please enter your password.';
+        errorBox.classList.add('show');
+        document.getElementById('signin-password').focus();
+        return;
+      }
+
+      btn.textContent = 'Signing in…';
+      btn.disabled = true;
+
+      var persistence = document.getElementById('signin-remember').checked
+        ? firebase.auth.Auth.Persistence.LOCAL
+        : firebase.auth.Auth.Persistence.SESSION;
+
+      auth.setPersistence(persistence)
+        .then(function() {
+          return auth.signInWithEmailAndPassword(email, password);
+        })
+        .then(function() {
+          btn.textContent = '✓ Redirecting…';
+          btn.style.background = '#16a34a';
+          setTimeout(function() {
+            window.location.href = 'index.html';
+          }, 800);
+        })
+        .catch(function(error) {
+          btn.textContent = 'Sign In to Customer Portal';
+          btn.disabled = false;
+          btn.style.background = '';
+          errorMsg.textContent = 'Incorrect email or password. Please try again.';
+          errorBox.classList.add('show');
+          document.getElementById('signin-password').value = '';
+          document.getElementById('signin-password').focus();
+        });
+    }
+
+    function togglePw() {
+      var pw   = document.getElementById('signin-password');
+      var icon = document.getElementById('pw-eye');
+      if (pw.type === 'password') {
+        pw.type = 'text';
+        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+      } else {
+        pw.type = 'password';
+        icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+      }
+    }
+
+    function handleForgot(e) {
+      e.preventDefault();
+      var email = document.getElementById('signin-email').value.trim();
+      if (!email) {
+        var errorMsg = document.getElementById('signin-error-msg');
+        var errorBox = document.getElementById('signin-error');
+        errorMsg.textContent = 'Enter your email above first, then click Forgot password.';
+        errorBox.classList.add('show');
+        document.getElementById('signin-email').focus();
+        return;
+      }
+      auth.sendPasswordResetEmail(email).then(function() {
+        var errorMsg = document.getElementById('signin-error-msg');
+        var errorBox = document.getElementById('signin-error');
+        errorBox.style.background = '#f0fdf4';
+        errorBox.style.borderColor = '#86efac';
+        errorMsg.style.color = '#16a34a';
+        errorMsg.textContent = 'Password reset email sent! Check your inbox.';
+        errorBox.classList.add('show');
+      }).catch(function() {
+        var errorMsg = document.getElementById('signin-error-msg');
+        var errorBox = document.getElementById('signin-error');
+        errorMsg.textContent = 'Could not send reset email. Check the address and try again.';
+        errorBox.classList.add('show');
+      });
+    }
+
+    // Enter key support
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleSignIn();
+    });
+  </script>
+
+</body>
+</html>
