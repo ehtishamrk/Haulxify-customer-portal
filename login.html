@@ -539,7 +539,7 @@ function openForgot() {
   var errorBox = document.getElementById('signin-error');
   var errorMsg = document.getElementById('signin-error-msg');
   errorBox.className = 'alert-box success show';
-  errorMsg.textContent = 'Reset link sent — check your inbox and spam folder.';
+  errorMsg.textContent = 'A secure reset link has been sent to your email. If it’s not in your inbox, it may be in your spam folder.';
 })
         .catch(function() {
           btn.classList.remove('loading');
