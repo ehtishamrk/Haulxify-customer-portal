@@ -316,35 +316,6 @@
     .btn-reset.loading .spinner { display: block; }
     .btn-reset.loading .btn-label { display: none; }
 
-    .reset-success {
-      display: none;
-      text-align: center;
-      padding: 8px 0 4px;
-    }
-    .reset-success-icon {
-      width: 52px;
-      height: 52px;
-      background: #f0fdf4;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 14px;
-    }
-    .reset-success h4 {
-      font-family: var(--font-display);
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--brand-navy);
-      margin-bottom: 8px;
-    }
-    .reset-success p {
-      font-size: 0.8125rem;
-      color: rgba(13,25,41,0.5);
-      line-height: 1.6;
-    }
-    .reset-success strong { color: var(--brand-navy); }
-
     @media (max-width: 480px) {
       .login-card { padding: 32px 22px 28px; border-radius: 16px; }
       .modal-card { padding: 28px 20px 24px; }
@@ -466,17 +437,6 @@
         </button>
       </div>
 
-      <div class="reset-success" id="reset-success">
-        <div class="reset-success-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
-        </div>
-        <h4>Check your inbox</h4>
-        <p>We sent a reset link to<br><strong id="reset-sent-to"></strong></p>
-      </div>
-
     </div>
   </div>
 
@@ -575,11 +535,13 @@
       btn.disabled = true;
 
       auth.sendPasswordResetEmail(email)
-        .then(function() {
-          document.getElementById('reset-sent-to').textContent = email;
-          document.getElementById('reset-form-wrap').style.display = 'none';
-          document.getElementById('reset-success').style.display = 'block';
-        })
+.then(function() {
+  closeForgot();
+  var errorBox = document.getElementById('signin-error');
+  var errorMsg = document.getElementById('signin-error-msg');
+  errorBox.className = 'alert-box success show';
+  errorMsg.textContent = 'Reset link sent — check your inbox and spam folder.';
+})
         .catch(function() {
           btn.classList.remove('loading');
           btn.disabled = false;
@@ -599,7 +561,12 @@
         icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
       }
     }
-
+document.getElementById('signin-email').addEventListener('input', function() {
+  document.getElementById('signin-error').classList.remove('show');
+});
+document.getElementById('signin-password').addEventListener('input', function() {
+  document.getElementById('signin-error').classList.remove('show');
+});
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeForgot();
       if (e.key === 'Enter') {
