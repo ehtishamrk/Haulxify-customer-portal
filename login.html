@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Haulxify — Customer Portal Sign In</title>
+  <link rel="icon" type="image/webp" href="images/logo.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
@@ -500,17 +501,15 @@
         });
     }
 
-    function openForgot() {
-      var email = document.getElementById('signin-email').value.trim();
-      if (email) document.getElementById('reset-email').value = email;
-      document.getElementById('reset-form-wrap').style.display = 'block';
-      document.getElementById('reset-success').style.display = 'none';
-      document.getElementById('reset-error').classList.remove('show');
-      document.getElementById('reset-btn').classList.remove('loading');
-      document.getElementById('reset-btn').disabled = false;
-      document.getElementById('forgot-overlay').classList.add('show');
-      setTimeout(function() { document.getElementById('reset-email').focus(); }, 100);
-    }
+function openForgot() {
+  var email = document.getElementById('signin-email').value.trim();
+  if (email) document.getElementById('reset-email').value = email;
+  document.getElementById('reset-error').classList.remove('show');
+  document.getElementById('reset-btn').classList.remove('loading');
+  document.getElementById('reset-btn').disabled = false;
+  document.getElementById('forgot-overlay').classList.add('show');
+  setTimeout(function() { document.getElementById('reset-email').focus(); }, 100);
+}
 
     function closeForgot() {
       document.getElementById('forgot-overlay').classList.remove('show');
