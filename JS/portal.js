@@ -70,6 +70,10 @@ function renderDashboard(data) {
    setText('ytd-revenue', '$' + (data.ytdRevenue || 0).toLocaleString());
 setText('ytd-loads', data.ytdLoads || 0);
 setText('ytd-avg', '$' + (data.avgRatePerLoad || 0).toLocaleString());
+   setText('fleet-total', data.fleetTotal || 0);
+setText('fleet-transit', data.fleetInTransit || 0);
+setText('fleet-available', data.fleetAvailable || 0);
+setText('fleet-down', data.fleetDown || 0);
 
   const hour = new Date().getHours();
   const greeting = document.querySelector('.welcome-greeting');
@@ -304,11 +308,16 @@ function initCharts() {
   const labelColor = isDark ? 'rgba(240,244,255,0.4)'  : 'rgba(0,0,0,0.4)';
   Chart.defaults.color = labelColor;
 
-  const donutCtx = document.getElementById('fleet-donut');
+const donutCtx = document.getElementById('fleet-donut');
   if (donutCtx && !donutCtx._chartInstance) {
+    const fleetData = customerData ? [
+      customerData.fleetInTransit || 0,
+      customerData.fleetAvailable || 0,
+      customerData.fleetDown || 0
+    ] : [0, 0, 0];
     donutCtx._chartInstance = new Chart(donutCtx, {
       type: 'doughnut',
-      data: { labels: ['In Transit','Available','Down'], datasets: [{ data: [5,3,1], backgroundColor: ['#f97316','#22c55e','#ef4444'], borderColor: isDark ? '#162033' : '#ffffff', borderWidth: 3, hoverOffset: 6 }] },
+      data: { labels: ['In Transit','Available','Down'], datasets: [{ data: fleetData, backgroundColor: ['#f97316','#22c55e','#ef4444'], borderColor: isDark ? '#162033' : '#ffffff', borderWidth: 3, hoverOffset: 6 }] },
       options: { cutout: '72%', plugins: { legend: { display: false } }, animation: { animateScale: true, duration: 900 } }
     });
   }
