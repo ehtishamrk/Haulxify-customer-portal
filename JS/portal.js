@@ -63,6 +63,9 @@ function renderProfile(data) {
 function renderDashboard(data) {
   setText('welcome-name-first', (data.name || 'there').split(' ')[0]);
   setText('kpi-active-loads', data.activeLoads || 0);
+  setText('kpi-loads-month', data.loadsThisMonth || 0);
+  setText('kpi-revenue', '$' + (data.revenueDispatched || 0).toLocaleString());
+  setText('kpi-drivers', data.driversManaged || 0);
 
   const hour = new Date().getHours();
   const greeting = document.querySelector('.welcome-greeting');
@@ -72,7 +75,6 @@ function renderDashboard(data) {
     else                greeting.textContent = 'Good evening,';
   }
 }
-
 // ── LOAD LOADS ──────────────────────────────────────────────
 async function loadLoads(uid) {
   const snap = await db.collection('customers').doc(uid).collection('loads').get();
