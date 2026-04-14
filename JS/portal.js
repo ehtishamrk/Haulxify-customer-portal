@@ -66,6 +66,9 @@ function renderDashboard(data) {
   setText('kpi-loads-month', data.loadsThisMonth || 0);
   setText('kpi-revenue', '$' + (data.revenueDispatched || 0).toLocaleString());
   setText('kpi-drivers', data.driversManaged || 0);
+   setText('ytd-revenue', '$' + (data.ytdRevenue || 0).toLocaleString());
+setText('ytd-loads', data.ytdLoads || 0);
+setText('ytd-avg', '$' + (data.avgRatePerLoad || 0).toLocaleString());
 
   const hour = new Date().getHours();
   const greeting = document.querySelector('.welcome-greeting');
