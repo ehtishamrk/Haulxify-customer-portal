@@ -322,11 +322,12 @@ const donutCtx = document.getElementById('fleet-donut');
     });
   }
 
-  const barCtx = document.getElementById('revenue-bar');
+const barCtx = document.getElementById('revenue-bar');
   if (barCtx && !barCtx._chartInstance) {
+    const revenueData = (customerData && customerData.revenueChart) ? customerData.revenueChart : [0,0,0,0,0,0];
     barCtx._chartInstance = new Chart(barCtx, {
       type: 'bar',
-      data: { labels: ['Nov','Dec','Jan','Feb','Mar','Apr'], datasets: [{ label: 'Revenue ($)', data: [52000,68000,61000,74000,79000,84200], backgroundColor: '#f97316', borderRadius: 6 }] },
+      data: { labels: ['Nov','Dec','Jan','Feb','Mar','Apr'], datasets: [{ label: 'Revenue ($)', data: revenueData, backgroundColor: '#f97316', borderRadius: 6 }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: gridColor }, ticks: { callback: v => '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : v) } } } }
     });
   }
