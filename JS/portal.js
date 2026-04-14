@@ -88,9 +88,11 @@ async function loadLoads(uid) {
   const snap = await db.collection('customers').doc(uid).collection('loads').get();
   const tbody = document.getElementById('loads-tbody');
   if (!tbody) return;
-  tbody.innerHTML = '';
-  snap.forEach(doc => {
+tbody.innerHTML = '';
+  let activeLoadsCount = 0;
+snap.forEach(doc => {
     const d = doc.data();
+    if (d.status === 'In Transit') activeLoadsCount++;
     tbody.innerHTML += `
       <tr>
         <td class="mono">#${d.loadNumber}</td>
@@ -101,6 +103,7 @@ async function loadLoads(uid) {
         <td><span class="tag ${statusClass(d.status)}">${d.status}</span></td>
       </tr>`;
   });
+  setText('badge-loads', activeLoadsCount);
 }
 
 // ── LOAD INVOICES ────────────────────────────────────────────
@@ -136,6 +139,8 @@ setText('inv-outstanding', '$' + totalOutstanding.toLocaleString());
   setText('inv-overdue', '$' + totalOverdue.toLocaleString());
   setText('inv-paid', '$' + totalPaid.toLocaleString());
   setText('kpi-pending-inv', '$' + totalOutstanding.toLocaleString());
+const pendingCount = snap.docs.filter(d => d.data().status === 'Pending' || d.data().status === 'Overdue').length;
+  setText('badge-invoices', pendingCount);
 }
 
 // ── LOAD BILLING ─────────────────────────────────────────────
