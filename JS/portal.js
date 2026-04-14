@@ -124,9 +124,10 @@ async function loadInvoices(uid) {
       </tr>`;
   });
 
-  setText('inv-outstanding', '$' + totalOutstanding.toLocaleString());
+setText('inv-outstanding', '$' + totalOutstanding.toLocaleString());
   setText('inv-overdue', '$' + totalOverdue.toLocaleString());
   setText('inv-paid', '$' + totalPaid.toLocaleString());
+  setText('kpi-pending-inv', '$' + totalOutstanding.toLocaleString());
 }
 
 // ── LOAD BILLING ─────────────────────────────────────────────
