@@ -90,10 +90,17 @@ async function loadLoads(uid) {
   if (!tbody) return;
 tbody.innerHTML = '';
   let activeLoadsCount = 0;
+  let countAll = 0;
+  let countTransit = 0;
+  let countDelivered = 0;
+  let countCancelled = 0;
 snap.forEach(doc => {
     const d = doc.data();
-    if (d.status === 'In Transit') activeLoadsCount++;
-    tbody.innerHTML += `
+if (d.status === 'In Transit') { activeLoadsCount++; countTransit++; }
+    if (d.status === 'Delivered') countDelivered++;
+    if (d.status === 'Cancelled') countCancelled++;
+    countAll++;
+   tbody.innerHTML += `
       <tr>
         <td class="mono">#${d.loadNumber}</td>
         <td>${d.route}</td>
@@ -103,7 +110,11 @@ snap.forEach(doc => {
         <td><span class="tag ${statusClass(d.status)}">${d.status}</span></td>
       </tr>`;
   });
-  setText('badge-loads', activeLoadsCount);
+setText('badge-loads', activeLoadsCount);
+  setText('pill-all', 'All (' + countAll + ')');
+  setText('pill-transit', 'In Transit (' + countTransit + ')');
+  setText('pill-delivered', 'Delivered (' + countDelivered + ')');
+  setText('pill-cancelled', 'Cancelled (' + countCancelled + ')');
 }
 
 // ── LOAD INVOICES ────────────────────────────────────────────
