@@ -30,10 +30,11 @@ async function loadCustomerData(uid) {
     customerData = doc.data();
     renderProfile(customerData);
     renderDashboard(customerData);
-    await loadLoads(uid);
+await loadLoads(uid);
     await loadInvoices(uid);
     await loadBilling(uid);
     await loadStatements(uid);
+    await loadActivity(uid);
   } catch(err) {
     console.error('Error loading data:', err);
     showToast('Error loading your data. Please refresh.');
@@ -181,6 +182,26 @@ async function loadStatements(uid) {
   });
 }
 
+// ── LOAD ACTIVITY ─────────────────────────────────────────────
+async function loadActivity(uid) {
+  const snap = await db.collection('customers').doc(uid).collection('activity')
+    .orderBy('order').get();
+  const list = document.getElementById('activity-list');
+  if (!list) return;
+  list.innerHTML = '';
+  snap.forEach(doc => {
+    const d = doc.data();
+    list.innerHTML += `
+      <li class="activity-item">
+        <span class="act-dot ${d.dot}"></span>
+        <div class="act-body">
+          <p class="act-title">${d.title}</p>
+          <p class="act-sub">${d.sub}</p>
+        </div>
+        <span class="act-tag ${statusClass(d.status)}">${d.status}</span>
+      </li>`;
+  });
+}
 // ── HELPERS ──────────────────────────────────────────────────
 function setText(id, val) {
   const el = document.getElementById(id);
