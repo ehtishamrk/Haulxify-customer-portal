@@ -439,10 +439,11 @@
         <div class="card">
           <h3 class="section-title"><i class="fa-solid fa-bell"></i> Notifications</h3>
           <div class="toggle-list">
-            <div class="toggle-item"><span>Load status updates</span><label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label></div>
-            <div class="toggle-item"><span>Invoice reminders</span><label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label></div>
-            <div class="toggle-item"><span>Driver compliance alerts</span><label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label></div>
-            <div class="toggle-item"><span>Weekly summary email</span><label class="toggle-switch"><input type="checkbox"><span class="slider"></span></label></div>
+          <div class="toggle-item"><span>Load status updates</span><label class="toggle-switch"><input type="checkbox" id="notif-loads" checked><span class="slider"></span></label></div>
+<div class="toggle-item"><span>Invoice reminders</span><label class="toggle-switch"><input type="checkbox" id="notif-invoices" checked><span class="slider"></span></label></div>
+<div class="toggle-item"><span>Driver compliance alerts</span><label class="toggle-switch"><input type="checkbox" id="notif-compliance" checked><span class="slider"></span></label></div>
+<div class="toggle-item"><span>Weekly summary email</span><label class="toggle-switch"><input type="checkbox" id="notif-weekly"><span class="slider"></span></label></div>
+<button class="btn-primary" onclick="saveSettings()" style="margin-top:16px;">Save Notifications</button>
           </div>
         </div>
         <div class="card">
