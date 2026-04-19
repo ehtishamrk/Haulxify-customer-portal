@@ -278,6 +278,28 @@ function statusClass(status) {
   return map[status] || '';
 }
 
+// ── SAVE PROFILE ─────────────────────────────────────────────
+async function saveProfile() {
+  if (!currentUser) return;
+  const btn = document.querySelector('#tab-profile .btn-primary');
+  if (btn) { btn.textContent = 'Saving…'; btn.disabled = true; }
+
+  try {
+    await db.collection('customers').doc(currentUser.uid).update({
+      company: document.getElementById('profile-company').value.trim(),
+      mc:      document.getElementById('profile-mc').value.trim(),
+      dot:     document.getElementById('profile-dot').value.trim(),
+      phone:   document.getElementById('profile-phone').value.trim(),
+      address: document.getElementById('profile-address').value.trim(),
+    });
+    showToast('Profile saved successfully!');
+  } catch(err) {
+    showToast('Error saving profile. Try again.');
+  }
+
+  if (btn) { btn.textContent = 'Save Changes'; btn.disabled = false; }
+}
+
 // ── SIGN OUT ─────────────────────────────────────────────────
 function signOut() {
   showToast('Signing out…');
