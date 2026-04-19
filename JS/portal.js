@@ -16,8 +16,39 @@ auth.onAuthStateChanged(function(user) {
     return;
   }
   currentUser = user;
+  showSkeletons();
   loadCustomerData(user.uid);
 });
+
+// ── SKELETON LOADERS ─────────────────────────────────────────
+function showSkeletons() {
+  // KPI values
+  ['kpi-active-loads','kpi-loads-month','kpi-revenue','kpi-pending-inv','kpi-drivers'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<span class="skeleton skeleton-text-lg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+  });
+  // Welcome name
+  const name = document.getElementById('welcome-name-first');
+  if (name) name.innerHTML = '<span class="skeleton skeleton-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+  // Sidebar name
+  const sname = document.getElementById('sidebar-profile-name');
+  if (sname) sname.innerHTML = '<span class="skeleton skeleton-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+  // Activity list
+  const list = document.getElementById('activity-list');
+  if (list) {
+    list.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+      list.innerHTML += `
+        <li class="activity-item">
+          <span class="skeleton skeleton-avatar"></span>
+          <div class="act-body">
+            <p><span class="skeleton skeleton-text"></span></p>
+            <p><span class="skeleton skeleton-text-sm"></span></p>
+          </div>
+        </li>`;
+    }
+  }
+}
 
 // ── LOAD ALL CUSTOMER DATA ──────────────────────────────────
 async function loadCustomerData(uid) {
