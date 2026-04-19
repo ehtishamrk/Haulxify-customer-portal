@@ -74,6 +74,10 @@ setText('ytd-avg', '$' + (data.avgRatePerLoad || 0).toLocaleString());
 setText('fleet-transit', data.fleetInTransit || 0);
 setText('fleet-available', data.fleetAvailable || 0);
 setText('fleet-down', data.fleetDown || 0);
+   setText('delta-loads-text', data.deltaLoads || '—');
+setText('delta-revenue-text', data.deltaRevenue || '—');
+setText('delta-invoices-text', data.deltaInvoices || '—');
+setText('delta-drivers-text', data.deltaDrivers || '—');
 
   const hour = new Date().getHours();
   const greeting = document.querySelector('.welcome-greeting');
