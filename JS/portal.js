@@ -59,8 +59,9 @@ async function loadCustomerData(uid) {
       return;
     }
     customerData = doc.data();
-    renderProfile(customerData);
+renderProfile(customerData);
     renderDashboard(customerData);
+    loadSettings(customerData);
 await loadLoads(uid);
     await loadInvoices(uid);
     await loadBilling(uid);
@@ -278,6 +279,8 @@ function statusClass(status) {
   return map[status] || '';
 }
 
+
+
 // ── SAVE PROFILE ─────────────────────────────────────────────
 async function saveProfile() {
   if (!currentUser) return;
@@ -298,6 +301,38 @@ async function saveProfile() {
   }
 
   if (btn) { btn.textContent = 'Save Changes'; btn.disabled = false; }
+}
+
+// ── SAVE SETTINGS ─────────────────────────────────────────────
+async function saveSettings() {
+  if (!currentUser) return;
+  const settings = {
+    notifLoads:      document.getElementById('notif-loads').checked,
+    notifInvoices:   document.getElementById('notif-invoices').checked,
+    notifCompliance: document.getElementById('notif-compliance').checked,
+    notifWeekly:     document.getElementById('notif-weekly').checked,
+  };
+  try {
+    await db.collection('customers').doc(currentUser.uid).update({ settings });
+    showToast('Settings saved!');
+  } catch(err) {
+    showToast('Error saving settings.');
+  }
+}
+
+// ── LOAD SETTINGS ─────────────────────────────────────────────
+function loadSettings(data) {
+  if (!data.settings) return;
+  const s = data.settings;
+  setCheck('notif-loads',      s.notifLoads !== false);
+  setCheck('notif-invoices',   s.notifInvoices !== false);
+  setCheck('notif-compliance', s.notifCompliance !== false);
+  setCheck('notif-weekly',     s.notifWeekly === true);
+}
+
+function setCheck(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.checked = val;
 }
 
 // ── SIGN OUT ─────────────────────────────────────────────────
