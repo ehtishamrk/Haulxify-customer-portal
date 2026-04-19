@@ -912,23 +912,47 @@
     document.getElementById('detail-email').textContent  = d.email || '—';
 
     // Build profile form
-    document.getElementById('profile-edit-grid').innerHTML = `
-      <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="edit-name" value="${d.name||''}"></div>
-      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="edit-email" value="${d.email||''}"></div>
-      <div class="form-group"><label class="form-label">Company</label><input type="text" class="form-input" id="edit-company" value="${d.company||''}"></div>
-      <div class="form-group"><label class="form-label">Plan</label>
-        <select class="form-select" id="edit-plan">
-          <option ${d.plan==='Pro Back Office'?'selected':''}>Pro Back Office</option>
-          <option ${d.plan==='Standard'?'selected':''}>Standard</option>
-          <option ${d.plan==='Enterprise'?'selected':''}>Enterprise</option>
-        </select>
-      </div>
-      <div class="form-group"><label class="form-label">MC Number</label><input type="text" class="form-input" id="edit-mc" value="${d.mc||''}"></div>
-      <div class="form-group"><label class="form-label">DOT Number</label><input type="text" class="form-input" id="edit-dot" value="${d.dot||''}"></div>
-      <div class="form-group"><label class="form-label">Phone</label><input type="text" class="form-input" id="edit-phone" value="${d.phone||''}"></div>
-      <div class="form-group"><label class="form-label">Active Loads</label><input type="number" class="form-input" id="edit-activeLoads" value="${d.activeLoads||0}"></div>
-      <div class="form-group full"><label class="form-label">Address</label><input type="text" class="form-input" id="edit-address" value="${d.address||''}"></div>
-    `;
+document.getElementById('profile-edit-grid').innerHTML = `
+  <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" id="edit-name" value="${d.name||''}"></div>
+  <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="edit-email" value="${d.email||''}"></div>
+  <div class="form-group"><label class="form-label">Company</label><input type="text" class="form-input" id="edit-company" value="${d.company||''}"></div>
+  <div class="form-group"><label class="form-label">Plan</label>
+    <select class="form-select" id="edit-plan">
+      <option ${d.plan==='Pro Back Office'?'selected':''}>Pro Back Office</option>
+      <option ${d.plan==='Standard'?'selected':''}>Standard</option>
+      <option ${d.plan==='Enterprise'?'selected':''}>Enterprise</option>
+    </select>
+  </div>
+  <div class="form-group"><label class="form-label">MC Number</label><input type="text" class="form-input" id="edit-mc" value="${d.mc||''}"></div>
+  <div class="form-group"><label class="form-label">DOT Number</label><input type="text" class="form-input" id="edit-dot" value="${d.dot||''}"></div>
+  <div class="form-group"><label class="form-label">Phone</label><input type="text" class="form-input" id="edit-phone" value="${d.phone||''}"></div>
+  <div class="form-group"><label class="form-label">Active Loads</label><input type="number" class="form-input" id="edit-activeLoads" value="${d.activeLoads||0}"></div>
+  <div class="form-group full"><label class="form-label">Address</label><input type="text" class="form-input" id="edit-address" value="${d.address||''}"></div>
+  <div class="form-section" style="grid-column:1/-1;">Dashboard KPIs</div>
+  <div class="form-group"><label class="form-label">Loads This Month</label><input type="number" class="form-input" id="edit-loadsThisMonth" value="${d.loadsThisMonth||0}"></div>
+  <div class="form-group"><label class="form-label">Revenue Dispatched</label><input type="number" class="form-input" id="edit-revenueDispatched" value="${d.revenueDispatched||0}"></div>
+  <div class="form-group"><label class="form-label">Drivers Managed</label><input type="number" class="form-input" id="edit-driversManaged" value="${d.driversManaged||0}"></div>
+  <div class="form-group"><label class="form-label">YTD Revenue</label><input type="number" class="form-input" id="edit-ytdRevenue" value="${d.ytdRevenue||0}"></div>
+  <div class="form-group"><label class="form-label">YTD Loads</label><input type="number" class="form-input" id="edit-ytdLoads" value="${d.ytdLoads||0}"></div>
+  <div class="form-group"><label class="form-label">Avg Rate/Load</label><input type="number" class="form-input" id="edit-avgRatePerLoad" value="${d.avgRatePerLoad||0}"></div>
+  <div class="form-section" style="grid-column:1/-1;">Fleet Status</div>
+  <div class="form-group"><label class="form-label">Fleet Total</label><input type="number" class="form-input" id="edit-fleetTotal" value="${d.fleetTotal||0}"></div>
+  <div class="form-group"><label class="form-label">In Transit</label><input type="number" class="form-input" id="edit-fleetInTransit" value="${d.fleetInTransit||0}"></div>
+  <div class="form-group"><label class="form-label">Available</label><input type="number" class="form-input" id="edit-fleetAvailable" value="${d.fleetAvailable||0}"></div>
+  <div class="form-group"><label class="form-label">Down</label><input type="number" class="form-input" id="edit-fleetDown" value="${d.fleetDown||0}"></div>
+  <div class="form-section" style="grid-column:1/-1;">KPI Delta Text</div>
+  <div class="form-group"><label class="form-label">Loads Delta</label><input type="text" class="form-input" id="edit-deltaLoads" value="${d.deltaLoads||''}"></div>
+  <div class="form-group"><label class="form-label">Revenue Delta</label><input type="text" class="form-input" id="edit-deltaRevenue" value="${d.deltaRevenue||''}"></div>
+  <div class="form-group"><label class="form-label">Invoices Delta</label><input type="text" class="form-input" id="edit-deltaInvoices" value="${d.deltaInvoices||''}"></div>
+  <div class="form-group"><label class="form-label">Drivers Delta</label><input type="text" class="form-input" id="edit-deltaDrivers" value="${d.deltaDrivers||''}"></div>
+  <div class="form-section" style="grid-column:1/-1;">Revenue Chart (last 6 months)</div>
+  <div class="form-group"><label class="form-label">Month 1 (oldest)</label><input type="number" class="form-input" id="edit-rev0" value="${(d.revenueChart&&d.revenueChart[0])||0}"></div>
+  <div class="form-group"><label class="form-label">Month 2</label><input type="number" class="form-input" id="edit-rev1" value="${(d.revenueChart&&d.revenueChart[1])||0}"></div>
+  <div class="form-group"><label class="form-label">Month 3</label><input type="number" class="form-input" id="edit-rev2" value="${(d.revenueChart&&d.revenueChart[2])||0}"></div>
+  <div class="form-group"><label class="form-label">Month 4</label><input type="number" class="form-input" id="edit-rev3" value="${(d.revenueChart&&d.revenueChart[3])||0}"></div>
+  <div class="form-group"><label class="form-label">Month 5</label><input type="number" class="form-input" id="edit-rev4" value="${(d.revenueChart&&d.revenueChart[4])||0}"></div>
+  <div class="form-group"><label class="form-label">Month 6 (latest)</label><input type="number" class="form-input" id="edit-rev5" value="${(d.revenueChart&&d.revenueChart[5])||0}"></div>
+`;
 
     // Build billing form
     const billingDoc = await db.collection('customers').doc(uid).collection('billing').doc('current').get();
@@ -950,17 +974,39 @@
     loadDetailStatements(uid);
   }
 
-  async function saveProfile() {
+async function saveProfile() {
     await db.collection('customers').doc(selectedCustomerUID).update({
-      name:        document.getElementById('edit-name').value.trim(),
-      email:       document.getElementById('edit-email').value.trim(),
-      company:     document.getElementById('edit-company').value.trim(),
-      plan:        document.getElementById('edit-plan').value,
-      mc:          document.getElementById('edit-mc').value.trim(),
-      dot:         document.getElementById('edit-dot').value.trim(),
-      phone:       document.getElementById('edit-phone').value.trim(),
-      address:     document.getElementById('edit-address').value.trim(),
-      activeLoads: parseInt(document.getElementById('edit-activeLoads').value) || 0,
+      name:             document.getElementById('edit-name').value.trim(),
+      email:            document.getElementById('edit-email').value.trim(),
+      company:          document.getElementById('edit-company').value.trim(),
+      plan:             document.getElementById('edit-plan').value,
+      mc:               document.getElementById('edit-mc').value.trim(),
+      dot:              document.getElementById('edit-dot').value.trim(),
+      phone:            document.getElementById('edit-phone').value.trim(),
+      address:          document.getElementById('edit-address').value.trim(),
+      activeLoads:      parseInt(document.getElementById('edit-activeLoads').value) || 0,
+      loadsThisMonth:   parseInt(document.getElementById('edit-loadsThisMonth').value) || 0,
+      revenueDispatched:parseInt(document.getElementById('edit-revenueDispatched').value) || 0,
+      driversManaged:   parseInt(document.getElementById('edit-driversManaged').value) || 0,
+      ytdRevenue:       parseInt(document.getElementById('edit-ytdRevenue').value) || 0,
+      ytdLoads:         parseInt(document.getElementById('edit-ytdLoads').value) || 0,
+      avgRatePerLoad:   parseInt(document.getElementById('edit-avgRatePerLoad').value) || 0,
+      fleetTotal:       parseInt(document.getElementById('edit-fleetTotal').value) || 0,
+      fleetInTransit:   parseInt(document.getElementById('edit-fleetInTransit').value) || 0,
+      fleetAvailable:   parseInt(document.getElementById('edit-fleetAvailable').value) || 0,
+      fleetDown:        parseInt(document.getElementById('edit-fleetDown').value) || 0,
+      deltaLoads:       document.getElementById('edit-deltaLoads').value.trim(),
+      deltaRevenue:     document.getElementById('edit-deltaRevenue').value.trim(),
+      deltaInvoices:    document.getElementById('edit-deltaInvoices').value.trim(),
+      deltaDrivers:     document.getElementById('edit-deltaDrivers').value.trim(),
+      revenueChart: [
+        parseInt(document.getElementById('edit-rev0').value) || 0,
+        parseInt(document.getElementById('edit-rev1').value) || 0,
+        parseInt(document.getElementById('edit-rev2').value) || 0,
+        parseInt(document.getElementById('edit-rev3').value) || 0,
+        parseInt(document.getElementById('edit-rev4').value) || 0,
+        parseInt(document.getElementById('edit-rev5').value) || 0,
+      ],
     });
     showToast('Profile saved!', 'success');
   }
