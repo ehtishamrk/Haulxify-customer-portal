@@ -1287,3 +1287,19 @@ body.light ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); }
   .card { padding: 16px 16px; }
   .topbar-search { display: none; }
 }
+/* ── SKELETON LOADER ─────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+  display: inline-block;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skeleton-text { height: 14px; width: 120px; }
+.skeleton-text-lg { height: 28px; width: 80px; }
+.skeleton-text-sm { height: 12px; width: 80px; margin-top: 6px; }
+.skeleton-avatar { width: 36px; height: 36px; border-radius: 50%; }
