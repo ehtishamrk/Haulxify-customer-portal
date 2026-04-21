@@ -515,13 +515,14 @@
         </div>
       </div>
 
-      <div class="detail-tabs">
-        <button class="detail-tab active" onclick="switchDetailTab('profile')">Profile</button>
-        <button class="detail-tab" onclick="switchDetailTab('loads')">Loads</button>
-        <button class="detail-tab" onclick="switchDetailTab('invoices')">Invoices</button>
-        <button class="detail-tab" onclick="switchDetailTab('billing')">Billing</button>
-        <button class="detail-tab" onclick="switchDetailTab('statements')">Statements</button>
-      </div>
+<div class="detail-tabs">
+  <button class="detail-tab active" onclick="switchDetailTab('profile')">Profile</button>
+  <button class="detail-tab" onclick="switchDetailTab('loads')">Loads</button>
+  <button class="detail-tab" onclick="switchDetailTab('invoices')">Invoices</button>
+  <button class="detail-tab" onclick="switchDetailTab('billing')">Billing</button>
+  <button class="detail-tab" onclick="switchDetailTab('statements')">Statements</button>
+  <button class="detail-tab" onclick="switchDetailTab('paperwork')">Paperwork</button>
+</div>
 
       <!-- Profile Panel -->
       <div class="detail-panel active" id="detail-panel-profile">
@@ -582,6 +583,19 @@
           <tbody id="detail-statements-tbody"></tbody></table>
         </div>
       </div>
+      <!-- Paperwork Panel -->
+<div class="detail-panel" id="detail-panel-paperwork">
+  <div class="section-header">
+    <div class="section-title">Documents</div>
+    <button class="btn-primary" onclick="openAddSubDoc('paperwork')">+ Add Document</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Category</th><th>Date</th><th>Load #</th><th>Description</th><th>Action</th></tr></thead>
+      <tbody id="detail-paperwork-tbody"></tbody>
+    </table>
+  </div>
+</div>
     </div>
 
     <!-- ADMINS VIEW -->
@@ -968,10 +982,11 @@ document.getElementById('profile-edit-grid').innerHTML = `
 
     switchDetailTab('profile');
     showView('customer-detail');
-    loadDetailLoads(uid);
+loadDetailLoads(uid);
     loadDetailInvoices(uid);
     loadDetailBillingHistory(uid);
     loadDetailStatements(uid);
+    loadDetailPaperwork(uid);
   }
 
 async function saveProfile() {
@@ -1092,6 +1107,28 @@ async function saveProfile() {
     });
   }
 
+  async function loadDetailPaperwork(uid) {
+  const snap  = await db.collection('customers').doc(uid).collection('paperwork')
+    .orderBy('date', 'desc').get();
+  const tbody = document.getElementById('detail-paperwork-tbody');
+  tbody.innerHTML = '';
+  if (snap.empty) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>No documents yet.</p></div></td></tr>';
+    return;
+  }
+  snap.forEach(doc => {
+    const d = doc.data();
+    tbody.innerHTML += `<tr>
+      <td>${d.name||'—'}</td>
+      <td><span class="tag tag-orange" style="font-size:0.7rem;">${d.category||'—'}</span></td>
+      <td class="td-muted">${d.date||'—'}</td>
+      <td class="td-muted">${d.loadNumber||'—'}</td>
+      <td class="td-muted">${d.description||'—'}</td>
+      <td><button class="btn-danger" onclick="deleteSubDoc('paperwork','${doc.id}')">Delete</button></td>
+    </tr>`;
+  });
+}
+
   // ── ADD SUB DOC ──
   const subDocSchemas = {
     loads: [
@@ -1123,6 +1160,42 @@ async function saveProfile() {
       { id:'debit', label:'Debit', placeholder:'−$799 or —' },
       { id:'balance', label:'Balance', placeholder:'$5,000' },
     ],
+    paperwork: [
+      { id:'name', label:'File Name', placeholder:'BOL_TX9001.pdf' },
+      { id:'category', label:'Category', type:'select', options:[
+        'Bills of Lading (BOL)',
+        'Proof of Delivery (POD)',
+        'Rate Confirmations',
+        'Lumper Receipts',
+        'Trip Sheets',
+        'Invoices',
+        'Factoring Documents',
+        'W-9 Forms',
+        'Settlement Statements',
+        'Carrier Packets',
+        'MC Authority',
+        'Operating Authority',
+        'Insurance Certificates',
+        'CDL Licenses',
+        'Medical Certificates',
+        'HOS Logs',
+        'Driver Qualification Files',
+        'Vehicle Registration',
+        'Inspection Reports',
+        'Maintenance Records',
+        'Permits & Licenses',
+        'IFTA Reports',
+        'Roadside Inspection Reports',
+        'Accident Reports',
+        'Drug & Alcohol Testing',
+        'Contracts & Agreements',
+        'Other'
+      ]},
+      { id:'date', label:'Date', placeholder:'2026-04-19' },
+      { id:'loadNumber', label:'Load # (optional)', placeholder:'TX-9001' },
+      { id:'description', label:'Description (optional)', placeholder:'Bill of lading for Dallas run' },
+      { id:'url', label:'Google Drive Link', placeholder:'https://drive.google.com/file/d/...' },
+    ],
   };
 
   function openAddSubDoc(type) {
@@ -1148,23 +1221,25 @@ async function saveProfile() {
     const schema = subDocSchemas[currentSubDocType];
     const data = {};
     schema.forEach(f => { data[f.id] = document.getElementById('subdoc-' + f.id).value.trim(); });
-    const collection = currentSubDocType === 'billing-history' ? 'billing' : currentSubDocType;
+const collection = currentSubDocType === 'billing-history' ? 'billing' : currentSubDocType;
     await db.collection('customers').doc(selectedCustomerUID).collection(collection).add(data);
     closeModal('modal-add-subdoc');
     showToast('Entry added!', 'success');
-    if (currentSubDocType === 'loads')           loadDetailLoads(selectedCustomerUID);
+if (currentSubDocType === 'loads')           loadDetailLoads(selectedCustomerUID);
     if (currentSubDocType === 'invoices')         loadDetailInvoices(selectedCustomerUID);
     if (currentSubDocType === 'billing-history')  loadDetailBillingHistory(selectedCustomerUID);
     if (currentSubDocType === 'statements')       loadDetailStatements(selectedCustomerUID);
+    if (currentSubDocType === 'paperwork')        loadDetailPaperwork(selectedCustomerUID);
   }
 
   async function deleteSubDoc(collection, docId) {
     if (!confirm('Delete this entry?')) return;
     await db.collection('customers').doc(selectedCustomerUID).collection(collection).doc(docId).delete();
     showToast('Deleted.', 'success');
-    if (collection === 'loads')      loadDetailLoads(selectedCustomerUID);
+if (collection === 'loads')      loadDetailLoads(selectedCustomerUID);
     if (collection === 'invoices')   loadDetailInvoices(selectedCustomerUID);
     if (collection === 'statements') loadDetailStatements(selectedCustomerUID);
+    if (collection === 'paperwork')  loadDetailPaperwork(selectedCustomerUID);
   }
 
   async function deleteBillingHistory(docId) {
