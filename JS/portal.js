@@ -67,6 +67,7 @@ await loadLoads(uid);
     await loadBilling(uid);
     await loadStatements(uid);
     await loadActivity(uid);
+     await loadPaperwork(uid);
   } catch(err) {
     console.error('Error loading data:', err);
     showToast('Error loading your data. Please refresh.');
@@ -258,6 +259,99 @@ async function loadActivity(uid) {
       </li>`;
   });
 }
+
+// ── LOAD PAPERWORK ─────────────────────────────────────────────
+let allPaperworkDocs = [];
+
+async function loadPaperwork(uid) {
+  const snap = await db.collection('customers').doc(uid).collection('paperwork')
+    .orderBy('date', 'desc').get();
+  allPaperworkDocs = [];
+  snap.forEach(doc => {
+    allPaperworkDocs.push({ id: doc.id, ...doc.data() });
+  });
+  renderPaperwork(allPaperworkDocs);
+}
+
+function renderPaperwork(docs) {
+  const list    = document.getElementById('paperwork-list');
+  const results = document.getElementById('pw-results');
+  if (!list) return;
+
+  if (docs.length === 0) {
+    list.innerHTML = `
+      <div class="pw-empty">
+        <i class="fa-solid fa-folder-open"></i>
+        <p>No documents found matching your search.</p>
+      </div>`;
+    if (results) results.textContent = '0 documents found';
+    return;
+  }
+
+  if (results) results.textContent = docs.length + ' document' + (docs.length !== 1 ? 's' : '') + ' found';
+
+  list.innerHTML = docs.map(d => {
+    const downloadUrl = convertToDownloadLink(d.url || '');
+    return `
+      <div class="doc-item-card">
+        <div class="doc-item-left">
+          <div class="doc-icon"><i class="fa-solid fa-file-pdf"></i></div>
+          <div>
+            <p class="doc-name">${d.name || 'Untitled'}</p>
+            <div class="doc-meta">
+              <span><i class="fa-solid fa-calendar"></i> ${formatDate(d.date)}</span>
+              ${d.loadNumber ? `<span><i class="fa-solid fa-truck"></i> ${d.loadNumber}</span>` : ''}
+              ${d.description ? `<span><i class="fa-solid fa-info-circle"></i> ${d.description}</span>` : ''}
+            </div>
+          </div>
+        </div>
+        <div class="doc-item-right">
+          <span class="doc-category-badge">${d.category || 'Other'}</span>
+          <a href="${downloadUrl}" target="_blank" class="doc-download-btn">
+            <i class="fa-solid fa-download"></i> Download
+          </a>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function filterPaperwork() {
+  const search   = (document.getElementById('pw-search')?.value || '').toLowerCase();
+  const category = document.getElementById('pw-category')?.value || '';
+  const dateFrom = document.getElementById('pw-date-from')?.value || '';
+  const dateTo   = document.getElementById('pw-date-to')?.value || '';
+
+  const filtered = allPaperworkDocs.filter(d => {
+    const matchSearch   = !search || (d.name||'').toLowerCase().includes(search) || (d.description||'').toLowerCase().includes(search);
+    const matchCategory = !category || d.category === category;
+    const matchFrom     = !dateFrom || d.date >= dateFrom;
+    const matchTo       = !dateTo   || d.date <= dateTo;
+    return matchSearch && matchCategory && matchFrom && matchTo;
+  });
+
+  renderPaperwork(filtered);
+}
+
+function clearPaperworkFilters() {
+  document.getElementById('pw-search').value    = '';
+  document.getElementById('pw-category').value  = '';
+  document.getElementById('pw-date-from').value = '';
+  document.getElementById('pw-date-to').value   = '';
+  renderPaperwork(allPaperworkDocs);
+}
+
+function convertToDownloadLink(url) {
+  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (match) return 'https://drive.google.com/uc?export=download&id=' + match[1];
+  return url;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 // ── HELPERS ──────────────────────────────────────────────────
 function setText(id, val) {
   const el = document.getElementById(id);
