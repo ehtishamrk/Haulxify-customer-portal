@@ -350,36 +350,78 @@
       </div>
     </section>
 
-    <!-- PAPERWORK -->
-    <section class="tab-panel" id="tab-paperwork">
-      <div class="panel-header">
-        <h2>Paperwork</h2>
-        <button class="btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Document</button>
-      </div>
-      <div class="doc-categories">
-        <div class="doc-cat">
-          <div class="doc-cat-head"><i class="fa-solid fa-file-contract"></i> Carrier Packets</div>
-          <ul class="doc-list">
-            <li class="doc-item"><i class="fa-solid fa-file-pdf red"></i><span>Carrier_Packet_2025.pdf</span><button class="icon-btn-sm"><i class="fa-solid fa-download"></i></button></li>
-            <li class="doc-item"><i class="fa-solid fa-file-pdf red"></i><span>MC_Authority.pdf</span><button class="icon-btn-sm"><i class="fa-solid fa-download"></i></button></li>
-          </ul>
-        </div>
-        <div class="doc-cat">
-          <div class="doc-cat-head"><i class="fa-solid fa-id-card"></i> Driver Documents</div>
-          <ul class="doc-list">
-            <li class="doc-item"><i class="fa-solid fa-file-pdf red"></i><span>CDL_MikeR_2025.pdf</span><button class="icon-btn-sm"><i class="fa-solid fa-download"></i></button></li>
-            <li class="doc-item"><i class="fa-solid fa-file-pdf red"></i><span>Medical_SamK_2025.pdf</span><button class="icon-btn-sm"><i class="fa-solid fa-download"></i></button></li>
-          </ul>
-        </div>
-        <div class="doc-cat">
-          <div class="doc-cat-head"><i class="fa-solid fa-clipboard-list"></i> BOLs & Confirmations</div>
-          <ul class="doc-list">
-            <li class="doc-item"><i class="fa-solid fa-file-pdf red"></i><span>BOL_TX9841.pdf</span><button class="icon-btn-sm"><i class="fa-solid fa-download"></i></button></li>
-            <li class="doc-item"><i class="fa-solid fa-file-pdf red"></i><span>RateConf_TX9840.pdf</span><button class="icon-btn-sm"><i class="fa-solid fa-download"></i></button></li>
-          </ul>
-        </div>
-      </div>
-    </section>
+<!-- PAPERWORK -->
+<section class="tab-panel" id="tab-paperwork">
+  <div class="panel-header">
+    <h2>Paperwork</h2>
+  </div>
+
+  <!-- Search & Filter Bar -->
+  <div class="paperwork-filters">
+    <div class="pw-search-wrap">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="pw-search" placeholder="Search by file name or description…" oninput="filterPaperwork()">
+    </div>
+    <select id="pw-category" onchange="filterPaperwork()">
+      <option value="">All Categories</option>
+      <optgroup label="Load Documents">
+        <option>Bills of Lading (BOL)</option>
+        <option>Proof of Delivery (POD)</option>
+        <option>Rate Confirmations</option>
+        <option>Lumper Receipts</option>
+        <option>Trip Sheets</option>
+      </optgroup>
+      <optgroup label="Financial Documents">
+        <option>Invoices</option>
+        <option>Factoring Documents</option>
+        <option>W-9 Forms</option>
+        <option>Settlement Statements</option>
+      </optgroup>
+      <optgroup label="Carrier & Compliance">
+        <option>Carrier Packets</option>
+        <option>MC Authority</option>
+        <option>Operating Authority</option>
+        <option>Insurance Certificates</option>
+      </optgroup>
+      <optgroup label="Driver Documents">
+        <option>CDL Licenses</option>
+        <option>Medical Certificates</option>
+        <option>HOS Logs</option>
+        <option>Driver Qualification Files</option>
+      </optgroup>
+      <optgroup label="Vehicle & Maintenance">
+        <option>Vehicle Registration</option>
+        <option>Inspection Reports</option>
+        <option>Maintenance Records</option>
+        <option>Permits & Licenses</option>
+      </optgroup>
+      <optgroup label="Safety & Regulatory">
+        <option>IFTA Reports</option>
+        <option>Roadside Inspection Reports</option>
+        <option>Accident Reports</option>
+        <option>Drug & Alcohol Testing</option>
+      </optgroup>
+      <option>Contracts & Agreements</option>
+      <option>Other</option>
+    </select>
+    <div class="pw-date-wrap">
+      <label>From</label>
+      <input type="date" id="pw-date-from" onchange="filterPaperwork()">
+    </div>
+    <div class="pw-date-wrap">
+      <label>To</label>
+      <input type="date" id="pw-date-to" onchange="filterPaperwork()">
+    </div>
+    <button class="btn-outline" onclick="clearPaperworkFilters()">Clear</button>
+  </div>
+
+  <!-- Results count -->
+  <p class="pw-results" id="pw-results">Loading documents…</p>
+
+  <!-- Document List -->
+  <div class="doc-list-wrap" id="paperwork-list"></div>
+
+</section>
 
     <!-- HELP -->
     <section class="tab-panel" id="tab-help">
