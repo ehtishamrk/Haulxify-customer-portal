@@ -716,17 +716,18 @@
   let currentSubDocType = null;
 
   // ── AUTH STATE ──
-  auth.onAuthStateChanged(async function(user) {
+auth.onAuthStateChanged(async function(user) {
     document.getElementById('loading-screen').style.display = 'none';
     if (!user) {
       document.getElementById('login-gate').classList.add('show');
+      document.getElementById('app').classList.remove('show');
       return;
     }
-    // Check if admin
     const adminDoc = await db.collection('admins').doc(user.uid).get();
     if (!adminDoc.exists) {
       auth.signOut();
       document.getElementById('login-gate').classList.add('show');
+      document.getElementById('app').classList.remove('show');
       showGateError('Access denied. You are not an authorized admin.');
       return;
     }
@@ -734,12 +735,15 @@
     document.getElementById('admin-display-name').textContent = currentAdminData.name || 'Admin';
     const initials = (currentAdminData.name || 'AD').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
     document.getElementById('admin-avatar-initials').textContent = initials;
+    document.getElementById('login-gate').classList.remove('show');
     document.getElementById('app').classList.add('show');
+    const btn = document.getElementById('gate-btn');
+    if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
     loadDashboard();
   });
 
   // ── SIGN IN ──
-  async function adminSignIn() {
+async function adminSignIn() {
     const email    = document.getElementById('gate-email').value.trim();
     const password = document.getElementById('gate-password').value;
     const btn      = document.getElementById('gate-btn');
@@ -752,6 +756,7 @@
     btn.classList.add('loading'); btn.disabled = true;
     try {
       await auth.signInWithEmailAndPassword(email, password);
+      // onAuthStateChanged will handle the rest
     } catch(e) {
       btn.classList.remove('loading'); btn.disabled = false;
       showGateError('Incorrect email or password.');
@@ -1250,11 +1255,13 @@ if (collection === 'loads')      loadDetailLoads(selectedCustomerUID);
   }
 
   // ── DETAIL TABS ──
-  function switchDetailTab(tab) {
+function switchDetailTab(tab) {
     document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.detail-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('detail-panel-' + tab).classList.add('active');
-    event.target.classList.add('active');
+    const panel = document.getElementById('detail-panel-' + tab);
+    if (panel) panel.classList.add('active');
+    const activeBtn = document.querySelector(`.detail-tab[onclick*="'${tab}'"]`);
+    if (activeBtn) activeBtn.classList.add('active');
   }
 
   // ── ADMINS ──
