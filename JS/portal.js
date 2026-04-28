@@ -430,6 +430,39 @@ function setCheck(id, val) {
 }
 
 // ── SIGN OUT ─────────────────────────────────────────────────
+// ── EXPORT CSV ───────────────────────────────────────────────
+function exportStatementsCSV() {
+  if (!customerData) { showToast('No data to export.'); return; }
+
+  const rows = [['Date', 'Description', 'Load #', 'Credit', 'Debit', 'Balance']];
+  const tbody = document.getElementById('statements-tbody');
+  if (tbody) {
+    const trs = tbody.querySelectorAll('tr');
+    trs.forEach(tr => {
+      const cells = tr.querySelectorAll('td');
+      if (cells.length >= 6) {
+        rows.push([
+          cells[0].textContent.trim(),
+          cells[1].textContent.trim(),
+          cells[2].textContent.trim(),
+          cells[3].textContent.trim(),
+          cells[4].textContent.trim(),
+          cells[5].textContent.trim(),
+        ]);
+      }
+    });
+  }
+
+  const csv = rows.map(r => r.map(cell => '"' + cell.replace(/"/g, '""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = (customerData.company || 'Haulxify') + '_Statements.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV downloaded!');
+}
 function signOut() {
   showToast('Signing out…');
   auth.signOut().then(() => {
