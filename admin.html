@@ -522,6 +522,7 @@
   <button class="detail-tab" onclick="switchDetailTab('billing')">Billing</button>
   <button class="detail-tab" onclick="switchDetailTab('statements')">Statements</button>
   <button class="detail-tab" onclick="switchDetailTab('paperwork')">Paperwork</button>
+  <button class="detail-tab" onclick="switchDetailTab('activity')">Activity</button>
 </div>
 
       <!-- Profile Panel -->
@@ -593,6 +594,19 @@
     <table>
       <thead><tr><th>Name</th><th>Category</th><th>Date</th><th>Load #</th><th>Description</th><th>Action</th></tr></thead>
       <tbody id="detail-paperwork-tbody"></tbody>
+    </table>
+  </div>
+</div>
+      <!-- Activity Panel -->
+<div class="detail-panel" id="detail-panel-activity">
+  <div class="section-header">
+    <div class="section-title">Activity Feed</div>
+    <button class="btn-primary" onclick="openAddSubDoc('activity')">+ Add Entry</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Order</th><th>Title</th><th>Sub</th><th>Status</th><th>Dot Color</th><th>Action</th></tr></thead>
+      <tbody id="detail-activity-tbody"></tbody>
     </table>
   </div>
 </div>
@@ -991,8 +1005,8 @@ loadDetailLoads(uid);
     loadDetailInvoices(uid);
     loadDetailBillingHistory(uid);
     loadDetailStatements(uid);
-    loadDetailPaperwork(uid);
-  }
+loadDetailPaperwork(uid);
+    loadDetailActivity(uid);  }
 
 async function saveProfile() {
     await db.collection('customers').doc(selectedCustomerUID).update({
@@ -1133,7 +1147,28 @@ async function saveProfile() {
     </tr>`;
   });
 }
-
+async function loadDetailActivity(uid) {
+  const snap  = await db.collection('customers').doc(uid).collection('activity')
+    .orderBy('order').get();
+  const tbody = document.getElementById('detail-activity-tbody');
+  tbody.innerHTML = '';
+  if (snap.empty) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>No activity entries yet.</p></div></td></tr>';
+    return;
+  }
+  snap.forEach(doc => {
+    const d = doc.data();
+    tbody.innerHTML += `<tr>
+      <td class="td-muted">${d.order||'—'}</td>
+      <td>${d.title||'—'}</td>
+      <td class="td-muted">${d.sub||'—'}</td>
+      <td><span class="tag tag-orange">${d.status||'—'}</span></td>
+      <td><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${d.dot||'gray'};vertical-align:middle;"></span> ${d.dot||'—'}</td>
+      <td><button class="btn-danger" onclick="deleteSubDoc('activity','${doc.id}')">Delete</button></td>
+    </tr>`;
+  });
+}
+  
   // ── ADD SUB DOC ──
   const subDocSchemas = {
     loads: [
@@ -1201,6 +1236,13 @@ async function saveProfile() {
       { id:'description', label:'Description (optional)', placeholder:'Bill of lading for Dallas run' },
       { id:'url', label:'Google Drive Link', placeholder:'https://drive.google.com/file/d/...' },
     ],
+    activity: [
+      { id:'order', label:'Order (1 = top)', placeholder:'1' },
+      { id:'title', label:'Title', placeholder:'Load #TX-9001 delivered' },
+      { id:'sub', label:'Subtitle', placeholder:'Dallas → Chicago · 2h ago' },
+      { id:'status', label:'Status', type:'select', options:['Delivered','In Transit','Pending','Overdue','Done','Cancelled'] },
+      { id:'dot', label:'Dot Color', type:'select', options:['green','orange','blue','red'] },
+    ],
   };
 
   function openAddSubDoc(type) {
@@ -1234,8 +1276,8 @@ if (currentSubDocType === 'loads')           loadDetailLoads(selectedCustomerUID
     if (currentSubDocType === 'invoices')         loadDetailInvoices(selectedCustomerUID);
     if (currentSubDocType === 'billing-history')  loadDetailBillingHistory(selectedCustomerUID);
     if (currentSubDocType === 'statements')       loadDetailStatements(selectedCustomerUID);
-    if (currentSubDocType === 'paperwork')        loadDetailPaperwork(selectedCustomerUID);
-  }
+if (currentSubDocType === 'paperwork')        loadDetailPaperwork(selectedCustomerUID);
+    if (currentSubDocType === 'activity')         loadDetailActivity(selectedCustomerUID);  }
 
   async function deleteSubDoc(collection, docId) {
     if (!confirm('Delete this entry?')) return;
@@ -1244,8 +1286,8 @@ if (currentSubDocType === 'loads')           loadDetailLoads(selectedCustomerUID
 if (collection === 'loads')      loadDetailLoads(selectedCustomerUID);
     if (collection === 'invoices')   loadDetailInvoices(selectedCustomerUID);
     if (collection === 'statements') loadDetailStatements(selectedCustomerUID);
-    if (collection === 'paperwork')  loadDetailPaperwork(selectedCustomerUID);
-  }
+if (collection === 'paperwork')  loadDetailPaperwork(selectedCustomerUID);
+    if (collection === 'activity')   loadDetailActivity(selectedCustomerUID);  }
 
   async function deleteBillingHistory(docId) {
     if (!confirm('Delete this billing entry?')) return;
