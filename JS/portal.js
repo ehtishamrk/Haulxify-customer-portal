@@ -619,13 +619,24 @@ const barCtx = document.getElementById('revenue-bar');
     barCtx._chartInstance = new Chart(barCtx, {
       type: 'bar',
       data: { labels: ['Nov','Dec','Jan','Feb','Mar','Apr'], datasets: [{ label: 'Revenue ($)', data: revenueData, backgroundColor: '#f97316', borderRadius: 6 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: gridColor }, ticks: { callback: v => '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : v) } } } }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 600 },
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { color: gridColor }, ticks: { callback: v => '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : v) } }
+        }
+      }
     });
   }
-}
 
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(initCharts, 200);
+  setTimeout(function() {
+    if (customerData) initCharts();
+    else setTimeout(initCharts, 1000);
+  }, 500);
 });
 
 document.addEventListener('keydown', e => {
