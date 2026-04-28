@@ -78,6 +78,7 @@ await loadLoads(uid);
 function renderProfile(data) {
   setText('profile-name-display', data.name || '');
   setText('profile-email-display', data.email || '');
+   setText('profile-plan-chip', data.plan || 'Pro Client');
   setVal('profile-company', data.company || '');
   setVal('profile-mc', data.mc || '');
   setVal('profile-dot', data.dot || '');
@@ -91,6 +92,8 @@ function renderProfile(data) {
 
   // Sidebar name
   setText('sidebar-profile-name', data.name || '');
+   const tierEl = document.getElementById('sidebar-profile-tier');
+if (tierEl) tierEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + (data.plan || 'Pro Client');
 }
 
 // ── RENDER DASHBOARD ────────────────────────────────────────
