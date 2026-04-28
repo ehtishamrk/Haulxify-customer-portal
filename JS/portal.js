@@ -67,7 +67,8 @@ await loadLoads(uid);
     await loadBilling(uid);
     await loadStatements(uid);
     await loadActivity(uid);
-     await loadPaperwork(uid);
+await loadPaperwork(uid);
+    initCharts();
   } catch(err) {
     console.error('Error loading data:', err);
     showToast('Error loading your data. Please refresh.');
@@ -632,9 +633,7 @@ const barCtx = document.getElementById('revenue-bar');
     });
   }
 }
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(initCharts, 1500);
-});
+
 
 document.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
