@@ -491,9 +491,9 @@
         <div class="card">
           <h3 class="section-title"><i class="fa-solid fa-shield-halved"></i> Security</h3>
           <div class="security-items">
-            <div class="security-item"><div><p>Password</p><p class="sec-sub">Last changed 3 months ago</p></div><button class="btn-outline-sm" onclick="showToast('Password change coming soon!')">Change</button></div>
+            <div class="security-item"><div><p>Password</p><p class="sec-sub">Click Change to receive a reset email</p></div><button class="btn-outline-sm" onclick="changePassword()">Change</button></div>
             <div class="security-item"><div><p>Two-Factor Auth</p><p class="sec-sub">Currently disabled</p></div><button class="btn-outline-sm" onclick="showToast('2FA setup coming soon!')">Enable</button></div>
-            <div class="security-item"><div><p>Active Sessions</p><p class="sec-sub">1 active session</p></div><button class="btn-outline-sm danger" onclick="showToast('Sessions cleared!')">Revoke All</button></div>
+            <div class="security-item"><div><p>Active Sessions</p><p class="sec-sub">Signs you out of all devices</p></div><button class="btn-outline-sm danger" onclick="revokeAllSessions()">Revoke All</button></div>
           </div>
         </div>
         <div class="card">
