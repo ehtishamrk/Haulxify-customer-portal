@@ -219,10 +219,10 @@
 
     <!-- LOADS / DISPATCH -->
     <section class="tab-panel" id="tab-loads">
-      <div class="panel-header">
-        <h2>Loads & Dispatch</h2>
-        <button class="btn-primary"><i class="fa-solid fa-plus"></i> New Load</button>
-      </div>
+<div class="panel-header">
+  <h2>Loads & Dispatch</h2>
+  <button class="btn-primary" onclick="requestNewLoad()"><i class="fa-solid fa-plus"></i> Request New Load</button>
+</div>
 <div class="filter-bar">
   <button class="filter-pill active" id="pill-all">All (0)</button>
   <button class="filter-pill" id="pill-transit">In Transit (0)</button>
@@ -278,10 +278,10 @@
 
     <!-- INVOICES -->
     <section class="tab-panel" id="tab-invoices">
-      <div class="panel-header">
-        <h2>Invoices</h2>
-        <button class="btn-primary"><i class="fa-solid fa-plus"></i> New Invoice</button>
-      </div>
+<div class="panel-header">
+  <h2>Invoices</h2>
+  <button class="btn-primary" onclick="requestNewInvoice()"><i class="fa-solid fa-plus"></i> Request Invoice</button>
+</div>
       <div class="stats-row">
      <div class="stat-chip"><span class="chip-label">Total Outstanding</span><span class="chip-val orange" id="inv-outstanding">$0</span></div>
 <div class="stat-chip"><span class="chip-label">Overdue</span><span class="chip-val red" id="inv-overdue">$0</span></div>
@@ -335,7 +335,7 @@
     <section class="tab-panel" id="tab-statements">
       <div class="panel-header">
         <h2>Account Statements</h2>
-        <button class="btn-outline"><i class="fa-solid fa-download"></i> Export CSV</button>
+<button class="btn-outline" onclick="exportStatementsCSV()"><i class="fa-solid fa-download"></i> Export CSV</button>
       </div>
       <div class="stats-row">
       <div class="stat-chip"><span class="chip-label">YTD Revenue</span><span class="chip-val green" id="ytd-revenue">$0</span></div>
