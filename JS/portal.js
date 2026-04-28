@@ -633,10 +633,7 @@ const barCtx = document.getElementById('revenue-bar');
   }
 
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(function() {
-    if (customerData) initCharts();
-    else setTimeout(initCharts, 1000);
-  }, 500);
+  setTimeout(initCharts, 1500);
 });
 
 document.addEventListener('keydown', e => {
