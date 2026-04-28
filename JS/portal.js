@@ -428,9 +428,39 @@ function setCheck(id, val) {
   const el = document.getElementById(id);
   if (el) el.checked = val;
 }
+// ── REQUEST ACTIONS ──────────────────────────────────────────
+function requestNewLoad() {
+  const name    = customerData ? customerData.name : 'Customer';
+  const company = customerData ? customerData.company : '';
+  const message = encodeURIComponent(
+    'Hi Haulxify Team,\n\nI would like to request a new load dispatch.\n\n' +
+    'Name: ' + name + '\nCompany: ' + company + '\n\nDetails:\n'
+  );
+  window.open('https://wa.me/923311419141?text=' + message, '_blank');
+}
 
+function requestNewInvoice() {
+  const name    = customerData ? customerData.name : 'Customer';
+  const company = customerData ? customerData.company : '';
+  const message = encodeURIComponent(
+    'Hi Haulxify Team,\n\nI would like to request a new invoice.\n\n' +
+    'Name: ' + name + '\nCompany: ' + company + '\n\nDetails:\n'
+  );
+  window.open('https://wa.me/923311419141?text=' + message, '_blank');
+}
+
+function requestDocument() {
+  const name    = customerData ? customerData.name : 'Customer';
+  const company = customerData ? customerData.company : '';
+  const message = encodeURIComponent(
+    'Hi Haulxify Team,\n\nI would like to request a document upload to my portal.\n\n' +
+    'Name: ' + name + '\nCompany: ' + company + '\n\nDocument details:\n'
+  );
+  window.open('https://wa.me/923056160430?text=' + message, '_blank');
+}
 // ── SIGN OUT ─────────────────────────────────────────────────
 // ── EXPORT CSV ───────────────────────────────────────────────
+
 function exportStatementsCSV() {
   if (!customerData) { showToast('No data to export.'); return; }
 
