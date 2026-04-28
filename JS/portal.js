@@ -458,6 +458,29 @@ function requestDocument() {
   );
   window.open('https://wa.me/923056160430?text=' + message, '_blank');
 }
+
+// ── REVOKE ALL SESSIONS ──────────────────────────────────────
+function revokeAllSessions() {
+  if (!confirm('This will sign you out of all devices. Continue?')) return;
+  showToast('Signing out of all devices…');
+  setTimeout(function() {
+    auth.signOut().then(function() {
+      window.location.href = 'https://app.haulxify.com/login.html';
+    });
+  }, 1200);
+}
+
+// ── CHANGE PASSWORD ──────────────────────────────────────────
+function changePassword() {
+  if (!currentUser || !currentUser.email) return;
+  firebase.auth().sendPasswordResetEmail(currentUser.email)
+    .then(function() {
+      showToast('Password reset email sent to ' + currentUser.email);
+    })
+    .catch(function() {
+      showToast('Error sending reset email. Try again.');
+    });
+}
 // ── SIGN OUT ─────────────────────────────────────────────────
 // ── EXPORT CSV ───────────────────────────────────────────────
 
