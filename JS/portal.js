@@ -631,7 +631,7 @@ const barCtx = document.getElementById('revenue-bar');
       }
     });
   }
-
+}
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(initCharts, 1500);
 });
