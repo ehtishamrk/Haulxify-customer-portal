@@ -593,6 +593,18 @@ function setTheme(theme, btn) {
   }
 })();
 
+// ── GET LAST 6 MONTHS ─────────────────────────────────────────
+function getLast6Months() {
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const result = [];
+  const now = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    result.push(months[d.getMonth()]);
+  }
+  return result;
+}
+
 // ── CHARTS ───────────────────────────────────────────────────
 function initCharts() {
   const isDark = !document.body.classList.contains('light');
@@ -619,7 +631,7 @@ const barCtx = document.getElementById('revenue-bar');
     const revenueData = (customerData && customerData.revenueChart) ? customerData.revenueChart : [0,0,0,0,0,0];
     barCtx._chartInstance = new Chart(barCtx, {
       type: 'bar',
-      data: { labels: ['Nov','Dec','Jan','Feb','Mar','Apr'], datasets: [{ label: 'Revenue ($)', data: revenueData, backgroundColor: '#f97316', borderRadius: 6 }] },
+      data: { labels: getLast6Months(), datasets: [{ label: 'Revenue ($)', data: revenueData, backgroundColor: '#f97316', borderRadius: 6 }] },
       options: {
         responsive: true,
         maintainAspectRatio: false,
