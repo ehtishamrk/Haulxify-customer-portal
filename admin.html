@@ -484,13 +484,28 @@
 
     <!-- CUSTOMERS VIEW -->
     <div class="admin-view" id="view-customers">
-      <div class="section-header">
-        <div class="section-title">All Customers</div>
-        <button class="btn-primary" onclick="openAddCustomer()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Customer
-        </button>
-      </div>
+<div class="section-header">
+  <div class="section-title">All Customers</div>
+  <button class="btn-primary" onclick="openAddCustomer()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Add Customer
+  </button>
+</div>
+<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+  <div style="position:relative;flex:1;min-width:200px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="customer-search" placeholder="Search by name or company…" oninput="filterCustomers()"
+      style="width:100%;padding:9px 12px 9px 32px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font-b);font-size:0.875rem;outline:none;">
+  </div>
+  <select id="customer-plan-filter" onchange="filterCustomers()"
+    style="padding:9px 12px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font-b);font-size:0.875rem;outline:none;cursor:pointer;">
+    <option value="">All Plans</option>
+    <option>Pro Back Office</option>
+    <option>Standard</option>
+    <option>Enterprise</option>
+  </select>
+  <button class="btn-secondary" onclick="clearCustomerFilters()">Clear</button>
+</div>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Plan</th><th>Actions</th></tr></thead>
@@ -846,30 +861,60 @@ async function adminSignIn() {
   }
 
   // ── LOAD CUSTOMERS ──
-  async function loadCustomers() {
-    const snap  = await db.collection('customers').get();
-    const tbody = document.getElementById('customers-tbody');
-    tbody.innerHTML = '';
-    if (snap.empty) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>No customers yet.</p></div></td></tr>'; return; }
-    snap.forEach(doc => {
-      const d = doc.data();
-      const initials = (d.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
-      tbody.innerHTML += `
-        <tr>
-          <td><div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:30px;height:30px;border-radius:50%;background:rgba(232,119,34,0.15);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--orange);font-family:var(--font-d);">${initials}</div>
-            ${d.name || '—'}
-          </div></td>
-          <td class="td-muted">${d.company || '—'}</td>
-          <td class="td-muted">${d.email || '—'}</td>
-          <td><span class="tag tag-orange">${d.plan || '—'}</span></td>
-          <td><div class="td-actions">
-            <button class="btn-secondary" onclick="openCustomerDetail('${doc.id}')">Edit</button>
-            <button class="btn-danger" onclick="deleteCustomer('${doc.id}')">Delete</button>
-          </div></td>
-        </tr>`;
-    });
+let allCustomers = [];
+
+async function loadCustomers() {
+  const snap  = await db.collection('customers').get();
+  allCustomers = [];
+  snap.forEach(doc => allCustomers.push({ uid: doc.id, ...doc.data() }));
+  renderCustomersTable(allCustomers);
+}
+
+function renderCustomersTable(customers) {
+  const tbody = document.getElementById('customers-tbody');
+  tbody.innerHTML = '';
+  if (customers.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>No customers match your search.</p></div></td></tr>';
+    return;
   }
+  customers.forEach(d => {
+    const initials = (d.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+    tbody.innerHTML += `
+      <tr>
+        <td><div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:30px;height:30px;border-radius:50%;background:rgba(232,119,34,0.15);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--orange);font-family:var(--font-d);">${initials}</div>
+          ${d.name || '—'}
+        </div></td>
+        <td class="td-muted">${d.company || '—'}</td>
+        <td class="td-muted">${d.email || '—'}</td>
+        <td><span class="tag tag-orange">${d.plan || '—'}</span></td>
+        <td><div class="td-actions">
+          <button class="btn-secondary" onclick="openCustomerDetail('${d.uid}')">Edit</button>
+          <button class="btn-danger" onclick="deleteCustomer('${d.uid}')">Delete</button>
+        </div></td>
+      </tr>`;
+  });
+}
+
+function filterCustomers() {
+  const search = (document.getElementById('customer-search')?.value || '').toLowerCase();
+  const plan   = document.getElementById('customer-plan-filter')?.value || '';
+  const filtered = allCustomers.filter(d => {
+    const matchSearch = !search ||
+      (d.name||'').toLowerCase().includes(search) ||
+      (d.company||'').toLowerCase().includes(search) ||
+      (d.email||'').toLowerCase().includes(search);
+    const matchPlan = !plan || d.plan === plan;
+    return matchSearch && matchPlan;
+  });
+  renderCustomersTable(filtered);
+}
+
+function clearCustomerFilters() {
+  document.getElementById('customer-search').value = '';
+  document.getElementById('customer-plan-filter').value = '';
+  renderCustomersTable(allCustomers);
+}
 
   // ── ADD CUSTOMER ──
   function openAddCustomer() {
