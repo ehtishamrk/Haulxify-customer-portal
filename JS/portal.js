@@ -485,7 +485,6 @@ function changePassword() {
       showToast('Error sending reset email. Try again.');
     });
 }
-// ── SIGN OUT ─────────────────────────────────────────────────
 // ── EXPORT CSV ───────────────────────────────────────────────
 
 function exportStatementsCSV() {
