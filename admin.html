@@ -972,12 +972,12 @@ function clearCustomerFilters() {
   }
 
   // ── DELETE CUSTOMER ──
-  async function deleteCustomer(uid) {
-    if (!confirm('Are you sure you want to delete this customer? This cannot be undone.')) return;
-    await db.collection('customers').doc(uid).delete();
-    showToast('Customer deleted.', 'success');
-    loadCustomers();
-  }
+async function deleteCustomer(uid) {
+  if (!confirm('Are you sure you want to delete this customer?\n\nIMPORTANT: You must also manually delete their account from Firebase Console → Authentication → Users.\n\nContinue?')) return;
+  await db.collection('customers').doc(uid).delete();
+  showToast('Firestore data deleted. Remember to delete from Firebase Auth console too!', 'success');
+  loadCustomers();
+}
 
   // ── CUSTOMER DETAIL ──
   async function openCustomerDetail(uid) {
