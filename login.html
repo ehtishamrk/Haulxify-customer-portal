@@ -321,6 +321,23 @@
       .login-card { padding: 32px 22px 28px; border-radius: 16px; }
       .modal-card { padding: 28px 20px 24px; }
     }
+    /* ── SIGNUP MODAL ── */
+.modal-overlay { display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;padding:20px; }
+.modal-overlay.show { display:flex; }
+.modal-backdrop { position:absolute;inset:0;background:rgba(10,18,30,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px); }
+.modal-card { position:relative;width:100%;max-width:380px;background:#fff;border-radius:16px;padding:32px 28px 28px;box-shadow:0 24px 64px rgba(10,18,30,0.22);animation:cardIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
+.modal-close { position:absolute;top:14px;right:14px;background:rgba(13,25,41,0.06);border:none;border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.2s; }
+.modal-close:hover { background:rgba(13,25,41,0.12); }
+.modal-title { font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--brand-navy);margin-bottom:6px; }
+.modal-subtitle { font-size:0.8125rem;color:rgba(13,25,41,0.5);margin-bottom:20px;line-height:1.5; }
+
+.doc-upload-item { display:flex;align-items:center;gap:10px;padding:12px 14px;background:#f9fafb;border:1.5px solid rgba(13,25,41,0.1);border-radius:10px;flex-wrap:wrap; }
+.doc-upload-item.uploaded { border-color:#16a34a;background:#f0fdf4; }
+.doc-upload-label { flex:1;font-size:0.8125rem;font-weight:600;color:var(--brand-navy);display:flex;align-items:center;gap:8px;min-width:160px; }
+.doc-upload-btn { display:inline-flex;align-items:center;padding:7px 14px;background:var(--brand-navy);color:#fff;border-radius:8px;font-size:0.775rem;font-weight:600;cursor:pointer;transition:background 0.2s;font-family:var(--font-display); }
+.doc-upload-btn:hover { background:#1a3358; }
+.doc-upload-btn input[type="file"] { display:none; }
+.doc-upload-status { font-size:0.75rem;color:#16a34a;font-weight:600;width:100%; }
   </style>
 </head>
 <body>
@@ -394,9 +411,9 @@
       <div class="divider-line"></div>
     </div>
 
-    <a href="https://www.haulxify.com/contact.html" class="get-started-link">
-      Get Started — Contact Us →
-    </a>
+<a href="#" class="get-started-link" onclick="openSignup(event)">
+  Get Started
+</a>
 
   </div>
 
@@ -441,6 +458,160 @@
     </div>
   </div>
 
+<!-- ── SIGNUP MODAL ── -->
+<div class="modal-overlay" id="signup-overlay">
+  <div class="modal-backdrop" onclick="closeSignup()"></div>
+  <div class="modal-card" style="max-width:560px;max-height:90vh;overflow-y:auto;">
+
+    <button class="modal-close" onclick="closeSignup()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+
+    <!-- Step 1 — Basic Info -->
+    <div id="signup-step-1">
+      <p class="modal-title">Get Started with Haulxify</p>
+      <p class="modal-subtitle">Tell us about your business and we'll set up your account.</p>
+
+      <div class="alert-box error" id="signup-error" style="margin-bottom:14px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="signup-error-msg"></span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div style="grid-column:1/-1;">
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Full Name *</label>
+          <input type="text" id="su-name" class="field-input" placeholder="John D. Transport">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Company Name *</label>
+          <input type="text" id="su-company" class="field-input" placeholder="Transport LLC">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Email Address *</label>
+          <input type="email" id="su-email" class="field-input" placeholder="you@company.com">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Phone Number *</label>
+          <input type="tel" id="su-phone" class="field-input" placeholder="+1 (000) 000-0000">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">MC Number</label>
+          <input type="text" id="su-mc" class="field-input" placeholder="MC-000000">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">DOT Number</label>
+          <input type="text" id="su-dot" class="field-input" placeholder="DOT-000000">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Business Address</label>
+          <input type="text" id="su-address" class="field-input" placeholder="123 Main St, Dallas, TX">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Plan *</label>
+          <select id="su-plan" class="field-input" style="padding:12px 14px;">
+            <option value="">Select a plan…</option>
+            <option>Weekly</option>
+            <option>Monthly</option>
+            <option>Quarterly</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-signin" onclick="goToStep2()">
+        <span class="btn-label">Next — Fleet Info →</span>
+      </button>
+    </div>
+
+    <!-- Step 2 — Fleet Info -->
+    <div id="signup-step-2" style="display:none;">
+      <button onclick="goToStep1()" style="background:none;border:none;color:rgba(13,25,41,0.5);font-size:0.8rem;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:4px;padding:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <p class="modal-title">Your Fleet</p>
+      <p class="modal-subtitle">Tell us about your trucks so we can serve you better.</p>
+
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Number of Trucks *</label>
+        <input type="number" id="su-truck-count" class="field-input" min="1" max="50" placeholder="e.g. 3" oninput="generateSignupTruckFields()">
+      </div>
+      <div id="su-truck-fields" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;"></div>
+
+      <button class="btn-signin" onclick="goToStep3()">
+        <span class="btn-label">Next — Documents →</span>
+      </button>
+    </div>
+
+    <!-- Step 3 — Documents -->
+    <div id="signup-step-3" style="display:none;">
+      <button onclick="goToStep2()" style="background:none;border:none;color:rgba(13,25,41,0.5);font-size:0.8rem;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:4px;padding:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <p class="modal-title">Upload Documents</p>
+      <p class="modal-subtitle">Please upload the following documents. All files are securely stored.</p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px;">
+        <div class="doc-upload-item" id="upload-mc">
+          <div class="doc-upload-label"><i class="fa-solid fa-file-contract"></i> MC Permit <span style="color:#dc2626;">*</span></div>
+          <label class="doc-upload-btn">
+            <input type="file" id="file-mc" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect('mc',this)">
+            <span id="file-mc-label">Choose File</span>
+          </label>
+          <span class="doc-upload-status" id="status-mc"></span>
+        </div>
+        <div class="doc-upload-item" id="upload-w9">
+          <div class="doc-upload-label"><i class="fa-solid fa-file-invoice"></i> W9 Form <span style="color:#dc2626;">*</span></div>
+          <label class="doc-upload-btn">
+            <input type="file" id="file-w9" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect('w9',this)">
+            <span id="file-w9-label">Choose File</span>
+          </label>
+          <span class="doc-upload-status" id="status-w9"></span>
+        </div>
+        <div class="doc-upload-item" id="upload-coi">
+          <div class="doc-upload-label"><i class="fa-solid fa-shield-halved"></i> Certificate of Insurance (COI) <span style="color:#dc2626;">*</span></div>
+          <label class="doc-upload-btn">
+            <input type="file" id="file-coi" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect('coi',this)">
+            <span id="file-coi-label">Choose File</span>
+          </label>
+          <span class="doc-upload-status" id="status-coi"></span>
+        </div>
+        <div class="doc-upload-item" id="upload-voided">
+          <div class="doc-upload-label"><i class="fa-solid fa-money-check"></i> Voided Check / Factoring Info</div>
+          <label class="doc-upload-btn">
+            <input type="file" id="file-voided" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect('voided',this)">
+            <span id="file-voided-label">Choose File</span>
+          </label>
+          <span class="doc-upload-status" id="status-voided"></span>
+        </div>
+      </div>
+
+      <button class="btn-signin" id="su-submit-btn" onclick="submitSignup()">
+        <div class="spinner"></div>
+        <span class="btn-label">Submit Application</span>
+      </button>
+
+    </div>
+
+    <!-- Step 4 — Success -->
+    <div id="signup-step-4" style="display:none;text-align:center;padding:20px 0;">
+      <div style="width:60px;height:60px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <h3 style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--brand-navy);margin-bottom:8px;">Application Submitted!</h3>
+      <p style="font-size:0.875rem;color:rgba(13,25,41,0.5);line-height:1.6;">Our team will review your application and set up your account within <strong>24 hours</strong>. We'll contact you at <strong id="su-confirm-email"></strong></p>
+    </div>
+
+  </div>
+</div>
+  
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script>
@@ -572,6 +743,169 @@ document.getElementById('signin-password').addEventListener('input', function() 
         if (document.getElementById('forgot-overlay').classList.contains('show')) sendReset();
         else handleSignIn();
       }
+    });
+    // ── SIGNUP FLOW ──
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxekhmeU_MGAD905Yzel-aHsXyUlX6xOtPjEZJg-DfVcJ50asUYjDycvK3DpcL6oqhW/exec';
+
+    const TRUCK_TYPES = [
+      'Dry Van','Flatbed','Reefer','Step Deck','Conestoga','Hotshot',
+      'Box Truck','Sprinter Van','Cargo Van','Semi Truck','Power Only',
+      'RGN/Lowboy','Double Drop Flatbed','Car Hauler','Bull Hauler',
+      'Animal/Livestock Hauler','Dump Truck','End Dump','Grain Hauler',
+      'Tow Truck','NEMT Van','Taxi','Limousine/Black Car','Moving Truck',
+      'Fuel Tanker','Liquid Tanker','Pneumatic/Dry Bulk Tanker',
+      'Intermodal Container','Flatbed with Tarps','Curtainsider',
+      'Stretch Van','Maxi Cube','Pickup Truck (Hotshot)'
+    ];
+    const TRAILER_LENGTHS = ['No Trailer','16 ft','20 ft','24 ft','28 ft','40 ft','45 ft','48 ft','53 ft','Other'];
+
+    let selectedFiles = {};
+
+    function openSignup(e) {
+      if (e) e.preventDefault();
+      document.getElementById('signup-overlay').classList.add('show');
+      showSignupStep(1);
+    }
+
+    function closeSignup() {
+      document.getElementById('signup-overlay').classList.remove('show');
+    }
+
+    function showSignupStep(n) {
+      [1,2,3,4].forEach(i => {
+        const el = document.getElementById('signup-step-' + i);
+        if (el) el.style.display = i === n ? 'block' : 'none';
+      });
+    }
+
+    function goToStep1() { showSignupStep(1); }
+
+    function goToStep2() {
+      const name  = document.getElementById('su-name').value.trim();
+      const email = document.getElementById('su-email').value.trim();
+      const phone = document.getElementById('su-phone').value.trim();
+      const plan  = document.getElementById('su-plan').value;
+      const company = document.getElementById('su-company').value.trim();
+      if (!name || !email || !phone || !plan || !company) {
+        document.getElementById('signup-error-msg').textContent = 'Please fill in all required fields.';
+        document.getElementById('signup-error').classList.add('show');
+        return;
+      }
+      document.getElementById('signup-error').classList.remove('show');
+      showSignupStep(2);
+    }
+
+    function goToStep3() { showSignupStep(3); }
+
+    function generateSignupTruckFields() {
+      const count = parseInt(document.getElementById('su-truck-count').value) || 0;
+      const wrap  = document.getElementById('su-truck-fields');
+      wrap.innerHTML = '';
+      for (let i = 0; i < Math.min(count, 50); i++) {
+        wrap.innerHTML += `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#f9fafb;border:1.5px solid rgba(13,25,41,0.1);border-radius:10px;padding:12px;">
+            <div style="font-size:0.72rem;font-weight:700;color:var(--brand-orange);grid-column:1/-1;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Truck ${i+1}</div>
+            <div>
+              <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--brand-navy);margin-bottom:4px;">Type</label>
+              <select class="field-input" id="su-truck-type-${i}" style="padding:10px 12px;">
+                ${TRUCK_TYPES.map(t => `<option>${t}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--brand-navy);margin-bottom:4px;">Trailer Length</label>
+              <select class="field-input" id="su-truck-trailer-${i}" style="padding:10px 12px;">
+                ${TRAILER_LENGTHS.map(l => `<option>${l}</option>`).join('')}
+              </select>
+            </div>
+          </div>`;
+      }
+    }
+
+    function handleFileSelect(key, input) {
+      const file = input.files[0];
+      if (!file) return;
+      selectedFiles[key] = file;
+      document.getElementById('file-' + key + '-label').textContent = file.name;
+      document.getElementById('status-' + key).textContent = '✓ Selected';
+      document.getElementById('upload-' + key).classList.add('uploaded');
+    }
+
+    async function submitSignup() {
+      const btn = document.getElementById('su-submit-btn');
+      btn.classList.add('loading'); btn.disabled = true;
+
+      const truckCount = parseInt(document.getElementById('su-truck-count').value) || 0;
+      const trucks = [];
+      for (let i = 0; i < truckCount; i++) {
+        trucks.push({
+          type:          document.getElementById('su-truck-type-' + i)?.value || '',
+          trailerLength: document.getElementById('su-truck-trailer-' + i)?.value || '',
+        });
+      }
+
+      // Upload files to Apps Script
+      let documents = {};
+      try {
+        const fileData = {};
+        for (const [key, file] of Object.entries(selectedFiles)) {
+          const base64 = await fileToBase64(file);
+          fileData[key] = { name: file.name, base64, type: file.type };
+        }
+        if (Object.keys(fileData).length > 0) {
+          const res  = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            body:   JSON.stringify(fileData)
+          });
+          const data = await res.json();
+          if (data.success) documents = data.links;
+        }
+      } catch(err) {
+        console.warn('File upload failed:', err);
+      }
+
+      // Save to Firestore pendingCustomers
+      try {
+        firebase.initializeApp({
+          apiKey: "AIzaSyBaRMQBLfDyufJkC4E8XCvzOIMEawOQObw",
+          authDomain: "haulxify-app.firebaseapp.com",
+          projectId: "haulxify-app",
+          storageBucket: "haulxify-app.firebasestorage.app",
+          messagingSenderId: "453228026261",
+          appId: "1:453228026261:web:1d66ab1d47418906807e9c"
+        });
+      } catch(e) {}
+
+      const db = firebase.firestore();
+      await db.collection('pendingCustomers').add({
+        name:        document.getElementById('su-name').value.trim(),
+        company:     document.getElementById('su-company').value.trim(),
+        email:       document.getElementById('su-email').value.trim(),
+        phone:       document.getElementById('su-phone').value.trim(),
+        mc:          document.getElementById('su-mc').value.trim(),
+        dot:         document.getElementById('su-dot').value.trim(),
+        address:     document.getElementById('su-address').value.trim(),
+        plan:        document.getElementById('su-plan').value,
+        truckCount,  trucks, documents,
+        status:      'pending',
+        submittedAt: new Date().toISOString(),
+      });
+
+      document.getElementById('su-confirm-email').textContent = document.getElementById('su-email').value.trim();
+      showSignupStep(4);
+      btn.classList.remove('loading'); btn.disabled = false;
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload  = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    document.getElementById('signup-overlay').addEventListener('click', function(e) {
+      if (e.target === this) closeSignup();
     });
   </script>
 
