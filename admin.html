@@ -427,8 +427,12 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Add Customer
       </button>
-      <span class="sidebar-nav-label">Admin</span>
-      <button class="sidebar-nav-item" onclick="showView('admins')">
+<span class="sidebar-nav-label">Admin</span>
+<button class="sidebar-nav-item" onclick="showView('pending')">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  Pending Signups <span id="pending-badge" style="background:var(--danger);color:#fff;font-size:0.65rem;padding:2px 6px;border-radius:10px;margin-left:4px;display:none;">0</span>
+</button>
+<button class="sidebar-nav-item" onclick="showView('admins')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Manage Admins
       </button>
@@ -627,6 +631,21 @@
 </div>
     </div>
 
+    <!-- PENDING SIGNUPS VIEW -->
+<div class="admin-view" id="view-pending">
+  <div class="section-header">
+    <div class="section-title">Pending Customer Signups</div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Phone</th><th>Plan</th><th>Submitted</th><th>Actions</th></tr></thead>
+      <tbody id="pending-tbody">
+        <tr><td colspan="7"><div class="empty-state"><p>No pending signups.</p></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+    
     <!-- ADMINS VIEW -->
     <div class="admin-view" id="view-admins">
       <div class="section-header">
@@ -641,18 +660,20 @@
 
 <!-- Add Customer Modal -->
 <div class="modal-overlay" id="modal-add-customer">
-  <div class="modal">
+  <div class="modal" style="max-width:680px;">
     <div class="modal-header">
       <div class="modal-title">Add New Customer</div>
       <button class="modal-close" onclick="closeModal('modal-add-customer')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
+
     <div class="form-section">Account Credentials</div>
     <div class="form-grid">
       <div class="form-group full"><label class="form-label">Email Address</label><input type="email" class="form-input" id="new-email" placeholder="customer@company.com"></div>
       <div class="form-group full"><label class="form-label">Password</label><input type="password" class="form-input" id="new-password" placeholder="Min 6 characters"></div>
     </div>
+
     <div class="form-section">Profile Information</div>
     <div class="form-grid">
       <div class="form-group full"><label class="form-label">Full Name</label><input type="text" class="form-input" id="new-name" placeholder="John D. Transport"></div>
@@ -663,13 +684,41 @@
       <div class="form-group">
         <label class="form-label">Plan</label>
         <select class="form-select" id="new-plan">
-          <option>Pro Back Office</option>
-          <option>Standard</option>
-          <option>Enterprise</option>
+          <option>Weekly</option>
+          <option>Monthly</option>
+          <option>Quarterly</option>
         </select>
       </div>
       <div class="form-group full"><label class="form-label">Business Address</label><input type="text" class="form-input" id="new-address" placeholder="123 Main St, Dallas, TX"></div>
     </div>
+
+    <div class="form-section">Fleet Information</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Number of Trucks</label>
+        <input type="number" class="form-input" id="new-truck-count" min="1" max="50" placeholder="e.g. 3" oninput="generateTruckFields()">
+      </div>
+    </div>
+    <div id="truck-fields-wrap" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;"></div>
+
+    <div class="form-section">Account Manager</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Assign Account Manager</label>
+        <select class="form-select" id="new-account-manager">
+          <option value="">Loading employees…</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section">Documents (Google Drive Links)</div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">MC Permit Link</label><input type="url" class="form-input" id="new-doc-mc" placeholder="https://drive.google.com/..."></div>
+      <div class="form-group full"><label class="form-label">W9 Form Link</label><input type="url" class="form-input" id="new-doc-w9" placeholder="https://drive.google.com/..."></div>
+      <div class="form-group full"><label class="form-label">COI (Certificate of Insurance) Link</label><input type="url" class="form-input" id="new-doc-coi" placeholder="https://drive.google.com/..."></div>
+      <div class="form-group full"><label class="form-label">Voided Check / Factoring Info Link</label><input type="url" class="form-input" id="new-doc-voided" placeholder="https://drive.google.com/..."></div>
+    </div>
+
     <div class="form-actions">
       <button class="btn-secondary" onclick="closeModal('modal-add-customer')">Cancel</button>
       <button class="btn-primary" id="btn-add-customer" onclick="addCustomer()">
@@ -737,6 +786,32 @@
     appId: "1:453228026261:web:1d66ab1d47418906807e9c"
   });
 
+  const TRUCK_TYPES = [
+    'Dry Van','Flatbed','Reefer','Step Deck','Conestoga','Hotshot',
+    'Box Truck','Sprinter Van','Cargo Van','Semi Truck','Power Only',
+    'RGN/Lowboy','Double Drop Flatbed','Car Hauler','Bull Hauler',
+    'Animal/Livestock Hauler','Dump Truck','End Dump','Grain Hauler',
+    'Tow Truck','NEMT Van','Taxi','Limousine/Black Car','Moving Truck',
+    'Fuel Tanker','Liquid Tanker','Pneumatic/Dry Bulk Tanker',
+    'Intermodal Container','Flatbed with Tarps','Curtainsider',
+    'Stretch Van','Maxi Cube','Pickup Truck (Hotshot)'
+  ];
+
+  const TRAILER_LENGTHS = [
+    'No Trailer','16 ft','20 ft','24 ft','28 ft','40 ft',
+    '45 ft','48 ft','53 ft','Other'
+  ];
+
+  const EMP_DB = firebase.initializeApp({
+    apiKey: "AIzaSyDBd2hw7Gq1-mwR5evKF-YPcAGRYDNl3fw",
+    authDomain: "haulxify-employee-portal.firebaseapp.com",
+    projectId: "haulxify-employee-portal",
+    storageBucket: "haulxify-employee-portal.firebasestorage.app",
+    messagingSenderId: "170605105002",
+    appId: "1:170605105002:web:d5da4718f77fd1182adf13"
+  }, 'employee-portal');
+  const empDb = firebase.firestore(EMP_DB);
+  
   const auth = firebase.auth();
   const db   = firebase.firestore();
 
@@ -818,11 +893,12 @@ async function adminSignIn() {
     document.querySelectorAll('.admin-view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
     document.getElementById('view-' + view).classList.add('active');
-    const titles = { dashboard: 'Dashboard', customers: 'All Customers', admins: 'Admin Users', 'customer-detail': 'Customer Detail' };
+    const titles = { dashboard: 'Dashboard', customers: 'All Customers', admins: 'Admin Users', 'customer-detail': 'Customer Detail', pending: 'Pending Signups' };
     document.getElementById('topbar-title').textContent = titles[view] || view;
     document.getElementById('topbar-sub').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
-    if (view === 'customers') { loadCustomers(); }
-    if (view === 'admins') { loadAdmins(); }
+if (view === 'customers') { loadCustomers(); }
+    if (view === 'admins')    { loadAdmins(); }
+    if (view === 'pending')   { loadPendingSignups(); }
   }
 
   // ── LOAD DASHBOARD ──
@@ -857,7 +933,19 @@ async function adminSignIn() {
     }
     document.getElementById('stat-loads').textContent    = totalLoads;
     document.getElementById('stat-invoices').textContent = pendingInv;
-    if (custSnap.size === 0) tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>No customers yet. Add your first customer.</p></div></td></tr>';
+if (custSnap.size === 0) tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>No customers yet. Add your first customer.</p></div></td></tr>';
+
+    // Load pending badge
+    const pendingSnap = await db.collection('pendingCustomers').get();
+    const badge = document.getElementById('pending-badge');
+    if (badge) {
+      if (pendingSnap.size > 0) {
+        badge.style.display = 'inline';
+        badge.textContent   = pendingSnap.size;
+      } else {
+        badge.style.display = 'none';
+      }
+    }
   }
 
   // ── LOAD CUSTOMERS ──
@@ -917,29 +1005,99 @@ function clearCustomerFilters() {
 }
 
   // ── ADD CUSTOMER ──
-  function openAddCustomer() {
+async function openAddCustomer() {
     document.getElementById('modal-add-customer').classList.add('show');
+    document.getElementById('truck-fields-wrap').innerHTML = '';
+    document.getElementById('new-truck-count').value = '';
+    await loadEmployeesDropdown('new-account-manager');
   }
 
-  async function addCustomer() {
-    const email   = document.getElementById('new-email').value.trim();
+  async function loadEmployeesDropdown(selectId) {
+    const sel = document.getElementById(selectId);
+    sel.innerHTML = '<option value="">Select account manager…</option>';
+    try {
+      const snap = await empDb.collection('employees').get();
+      snap.forEach(doc => {
+        const e = doc.data();
+        const opt = document.createElement('option');
+        opt.value = doc.id;
+        opt.textContent = (e.name || e.firstName + ' ' + e.lastName || 'Unknown') + ' — ' + (e.designation || e.desig || '');
+        opt.dataset.name = e.name || (e.firstName + ' ' + e.lastName) || 'Unknown';
+        sel.appendChild(opt);
+      });
+    } catch(err) {
+      sel.innerHTML = '<option value="">Could not load employees</option>';
+    }
+  }
+
+  function generateTruckFields() {
+    const count = parseInt(document.getElementById('new-truck-count').value) || 0;
+    const wrap  = document.getElementById('truck-fields-wrap');
+    wrap.innerHTML = '';
+    for (let i = 0; i < Math.min(count, 50); i++) {
+      wrap.innerHTML += `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:12px;">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--orange);grid-column:1/-1;font-family:var(--font-d);text-transform:uppercase;letter-spacing:0.05em;">Truck ${i+1}</div>
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select class="form-select" id="truck-type-${i}">
+              ${TRUCK_TYPES.map(t => `<option>${t}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Trailer Length</label>
+            <select class="form-select" id="truck-trailer-${i}">
+              ${TRAILER_LENGTHS.map(l => `<option>${l}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Year (optional)</label>
+            <input type="text" class="form-input" id="truck-year-${i}" placeholder="e.g. 2022">
+          </div>
+        </div>`;
+    }
+  }
+
+async function addCustomer() {
+    const email    = document.getElementById('new-email').value.trim();
     const password = document.getElementById('new-password').value;
-    const name    = document.getElementById('new-name').value.trim();
-    const company = document.getElementById('new-company').value.trim();
-    const mc      = document.getElementById('new-mc').value.trim();
-    const dot     = document.getElementById('new-dot').value.trim();
-    const phone   = document.getElementById('new-phone').value.trim();
-    const plan    = document.getElementById('new-plan').value;
-    const address = document.getElementById('new-address').value.trim();
-    const btn     = document.getElementById('btn-add-customer');
+    const name     = document.getElementById('new-name').value.trim();
+    const company  = document.getElementById('new-company').value.trim();
+    const mc       = document.getElementById('new-mc').value.trim();
+    const dot      = document.getElementById('new-dot').value.trim();
+    const phone    = document.getElementById('new-phone').value.trim();
+    const plan     = document.getElementById('new-plan').value;
+    const address  = document.getElementById('new-address').value.trim();
+    const truckCount = parseInt(document.getElementById('new-truck-count').value) || 0;
+    const amSel    = document.getElementById('new-account-manager');
+    const amId     = amSel.value;
+    const amName   = amSel.options[amSel.selectedIndex]?.dataset?.name || '';
+    const btn      = document.getElementById('btn-add-customer');
 
     if (!email || !password || !name) { showToast('Email, password and name are required.', 'error'); return; }
     if (password.length < 6) { showToast('Password must be at least 6 characters.', 'error'); return; }
 
+    // Collect trucks
+    const trucks = [];
+    for (let i = 0; i < truckCount; i++) {
+      trucks.push({
+        type:          document.getElementById('truck-type-' + i)?.value || '',
+        trailerLength: document.getElementById('truck-trailer-' + i)?.value || '',
+        year:          document.getElementById('truck-year-' + i)?.value || '',
+      });
+    }
+
+    // Collect document links
+    const documents = {
+      mcPermit:    document.getElementById('new-doc-mc').value.trim(),
+      w9:          document.getElementById('new-doc-w9').value.trim(),
+      coi:         document.getElementById('new-doc-coi').value.trim(),
+      voidedCheck: document.getElementById('new-doc-voided').value.trim(),
+    };
+
     btn.classList.add('loading'); btn.disabled = true;
 
     try {
-      // Create Firebase Auth user via REST API (secondary app trick)
       const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBaRMQBLfDyufJkC4E8XCvzOIMEawOQObw`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -947,22 +1105,43 @@ function clearCustomerFilters() {
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error.message);
-
       const uid = data.localId;
 
-      // Create Firestore document
       await db.collection('customers').doc(uid).set({
-        name, email, company, mc, dot, phone, plan, address, activeLoads: 0
+        name, email, company, mc, dot, phone, plan, address,
+        activeLoads: 0, truckCount, trucks, documents,
+        accountManagerId: amId,
+        accountManagerName: amName,
+        status: 'active',
+        createdAt: new Date().toISOString(),
       });
 
+// Delete pending signup if approving
+      const pendingId = document.getElementById('btn-add-customer').dataset.pendingId;
+      if (pendingId) {
+        await db.collection('pendingCustomers').doc(pendingId).delete();
+        delete document.getElementById('btn-add-customer').dataset.pendingId;
+      }
       closeModal('modal-add-customer');
-      showToast(`Customer ${name} created successfully!`, 'success');
+      showToast(`Customer ${name} created!`, 'success');
       clearAddCustomerForm();
       loadDashboard();
+      loadPendingSignups();
     } catch(e) {
       showToast('Error: ' + (e.message || 'Could not create customer.'), 'error');
     }
     btn.classList.remove('loading'); btn.disabled = false;
+  }
+
+  function clearAddCustomerForm() {
+    ['new-email','new-password','new-name','new-company','new-mc',
+     'new-dot','new-phone','new-address','new-doc-mc','new-doc-w9',
+     'new-doc-coi','new-doc-voided'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('new-truck-count').value = '';
+    document.getElementById('truck-fields-wrap').innerHTML = '';
   }
 
   function clearAddCustomerForm() {
@@ -1351,6 +1530,77 @@ function switchDetailTab(tab) {
     if (activeBtn) activeBtn.classList.add('active');
   }
 
+// ── PENDING SIGNUPS ──────────────────────────────────────────
+  async function loadPendingSignups() {
+    const snap  = await db.collection('pendingCustomers').orderBy('submittedAt', 'desc').get();
+    const tbody = document.getElementById('pending-tbody');
+    const badge = document.getElementById('pending-badge');
+    tbody.innerHTML = '';
+
+    if (snap.empty) {
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>No pending signups.</p></div></td></tr>';
+      badge.style.display = 'none';
+      return;
+    }
+
+    badge.style.display = 'inline';
+    badge.textContent   = snap.size;
+
+    snap.forEach(doc => {
+      const d = doc.data();
+      tbody.innerHTML += `
+        <tr>
+          <td>${d.name||'—'}</td>
+          <td class="td-muted">${d.company||'—'}</td>
+          <td class="td-muted">${d.email||'—'}</td>
+          <td class="td-muted">${d.phone||'—'}</td>
+          <td><span class="tag tag-orange">${d.plan||'—'}</span></td>
+          <td class="td-muted">${d.submittedAt ? new Date(d.submittedAt).toLocaleDateString() : '—'}</td>
+          <td><div class="td-actions">
+            <button class="btn-primary" style="font-size:0.75rem;padding:6px 12px;" onclick="approvePending('${doc.id}')">Review & Approve</button>
+            <button class="btn-danger" onclick="rejectPending('${doc.id}')">Reject</button>
+          </div></td>
+        </tr>`;
+    });
+  }
+
+  async function approvePending(docId) {
+    const doc  = await db.collection('pendingCustomers').doc(docId).get();
+    const data = doc.data();
+    // Pre-fill add customer modal with pending data
+    document.getElementById('new-email').value   = data.email || '';
+    document.getElementById('new-name').value    = data.name  || '';
+    document.getElementById('new-company').value = data.company || '';
+    document.getElementById('new-mc').value      = data.mc    || '';
+    document.getElementById('new-dot').value     = data.dot   || '';
+    document.getElementById('new-phone').value   = data.phone || '';
+    document.getElementById('new-address').value = data.address || '';
+    document.getElementById('new-password').value = '';
+    if (data.truckCount) {
+      document.getElementById('new-truck-count').value = data.truckCount;
+      generateTruckFields();
+      if (data.trucks) {
+        data.trucks.forEach((t, i) => {
+          if (document.getElementById('truck-type-' + i)) {
+            document.getElementById('truck-type-' + i).value    = t.type || '';
+            document.getElementById('truck-trailer-' + i).value = t.trailerLength || '';
+          }
+        });
+      }
+    }
+    await loadEmployeesDropdown('new-account-manager');
+    // Store pending doc ID to delete after approval
+    document.getElementById('btn-add-customer').dataset.pendingId = docId;
+    document.getElementById('modal-add-customer').classList.add('show');
+  }
+
+  async function rejectPending(docId) {
+    if (!confirm('Reject and delete this signup request?')) return;
+    await db.collection('pendingCustomers').doc(docId).delete();
+    showToast('Signup rejected.', 'success');
+    loadPendingSignups();
+  }
+  
   // ── ADMINS ──
   async function loadAdmins() {
     const snap = await db.collection('admins').get();
