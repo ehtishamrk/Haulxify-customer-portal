@@ -821,19 +821,96 @@ document.getElementById('signin-password').addEventListener('input', function() 
       }
     }
 
+const APPS_SCRIPT_URL = 'PASTE_NEW_URL_HERE';
+    let selectedFiles = {};
+    let uploadedLinks = {};
+
     function handleFileSelect(key, input) {
       const file = input.files[0];
       if (!file) return;
+
+      // Check file size — warn if over 5MB
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File is too large. Please use a file under 5MB.');
+        input.value = '';
+        return;
+      }
+
       selectedFiles[key] = file;
       document.getElementById('file-' + key + '-label').textContent = file.name;
       document.getElementById('status-' + key).textContent = '✓ Selected';
       document.getElementById('upload-' + key).classList.add('uploaded');
     }
 
+    async function uploadSingleFile(key, file) {
+      const statusEl = document.getElementById('status-' + key);
+      statusEl.textContent = '⏳ Uploading…';
+      statusEl.style.color = '#f97316';
+
+      try {
+        const base64 = await fileToBase64(file);
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60000);
+
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            name: key + '_' + file.name,
+            base64,
+            type: file.type
+          }),
+          signal: controller.signal
+        });
+        clearTimeout(timeout);
+
+        const data = await res.json();
+        if (data.success) {
+          uploadedLinks[key] = data.url;
+          statusEl.textContent = '✓ Uploaded';
+          statusEl.style.color = '#16a34a';
+          return true;
+        } else {
+          throw new Error(data.error || 'Upload failed');
+        }
+      } catch(err) {
+        statusEl.textContent = '✗ Upload failed — ' + (err.message || 'try again');
+        statusEl.style.color = '#dc2626';
+        return false;
+      }
+    }
+
     async function submitSignup() {
       const btn = document.getElementById('su-submit-btn');
+
+      // Check required files selected
+      const requiredFiles = ['mc', 'w9', 'coi'];
+      for (const key of requiredFiles) {
+        if (!selectedFiles[key]) {
+          alert('Please select all required documents (MC Permit, W9, COI) before submitting.');
+          return;
+        }
+      }
+
       btn.classList.add('loading'); btn.disabled = true;
 
+      // Upload each file one by one
+      uploadedLinks = {};
+      let allUploaded = true;
+
+      for (const [key, file] of Object.entries(selectedFiles)) {
+        const success = await uploadSingleFile(key, file);
+        if (!success && requiredFiles.includes(key)) {
+          allUploaded = false;
+        }
+      }
+
+      if (!allUploaded) {
+        btn.classList.remove('loading'); btn.disabled = false;
+        alert('Some required documents failed to upload. Please check the files and try again.');
+        return;
+      }
+
+      // Collect truck data
       const truckCount = parseInt(document.getElementById('su-truck-count').value) || 0;
       const trucks = [];
       for (let i = 0; i < truckCount; i++) {
@@ -843,55 +920,45 @@ document.getElementById('signin-password').addEventListener('input', function() 
         });
       }
 
-      // Upload files to Apps Script
-      let documents = {};
+      // Save to Firestore
       try {
-        const fileData = {};
-        for (const [key, file] of Object.entries(selectedFiles)) {
-          const base64 = await fileToBase64(file);
-          fileData[key] = { name: file.name, base64, type: file.type };
-        }
-        if (Object.keys(fileData).length > 0) {
-          const res  = await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            body:   JSON.stringify(fileData)
+        try {
+          firebase.initializeApp({
+            apiKey: "AIzaSyBaRMQBLfDyufJkC4E8XCvzOIMEawOQObw",
+            authDomain: "haulxify-app.firebaseapp.com",
+            projectId: "haulxify-app",
+            storageBucket: "haulxify-app.firebasestorage.app",
+            messagingSenderId: "453228026261",
+            appId: "1:453228026261:web:1d66ab1d47418906807e9c"
           });
-          const data = await res.json();
-          if (data.success) documents = data.links;
-        }
+        } catch(e) {}
+
+        const db = firebase.firestore();
+        await db.collection('pendingCustomers').add({
+          name:        document.getElementById('su-name').value.trim(),
+          company:     document.getElementById('su-company').value.trim(),
+          email:       document.getElementById('su-email').value.trim(),
+          phone:       document.getElementById('su-phone').value.trim(),
+          mc:          document.getElementById('su-mc').value.trim(),
+          dot:         document.getElementById('su-dot').value.trim(),
+          address:     document.getElementById('su-address').value.trim(),
+          plan:        document.getElementById('su-plan').value,
+          truckCount,
+          trucks,
+          documents:   uploadedLinks,
+          status:      'pending',
+          submittedAt: new Date().toISOString(),
+        });
+
+        document.getElementById('su-confirm-email').textContent =
+          document.getElementById('su-email').value.trim();
+        showSignupStep(4);
+
       } catch(err) {
-        console.warn('File upload failed:', err);
+        console.error(err);
+        alert('Submission failed. Please try again.');
       }
 
-      // Save to Firestore pendingCustomers
-      try {
-        firebase.initializeApp({
-          apiKey: "AIzaSyBaRMQBLfDyufJkC4E8XCvzOIMEawOQObw",
-          authDomain: "haulxify-app.firebaseapp.com",
-          projectId: "haulxify-app",
-          storageBucket: "haulxify-app.firebasestorage.app",
-          messagingSenderId: "453228026261",
-          appId: "1:453228026261:web:1d66ab1d47418906807e9c"
-        });
-      } catch(e) {}
-
-      const db = firebase.firestore();
-      await db.collection('pendingCustomers').add({
-        name:        document.getElementById('su-name').value.trim(),
-        company:     document.getElementById('su-company').value.trim(),
-        email:       document.getElementById('su-email').value.trim(),
-        phone:       document.getElementById('su-phone').value.trim(),
-        mc:          document.getElementById('su-mc').value.trim(),
-        dot:         document.getElementById('su-dot').value.trim(),
-        address:     document.getElementById('su-address').value.trim(),
-        plan:        document.getElementById('su-plan').value,
-        truckCount,  trucks, documents,
-        status:      'pending',
-        submittedAt: new Date().toISOString(),
-      });
-
-      document.getElementById('su-confirm-email').textContent = document.getElementById('su-email').value.trim();
-      showSignupStep(4);
       btn.classList.remove('loading'); btn.disabled = false;
     }
 
