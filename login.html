@@ -689,13 +689,21 @@
 
       <div style="margin-bottom:16px;">
         <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">Equipment Types (select all that apply)</label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-dryvan" style="accent-color:#E87722;"> Dry Van</label>
           <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-reefer" style="accent-color:#E87722;"> Reefer</label>
           <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-flatbed" style="accent-color:#E87722;"> Flatbed</label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-tanker" style="accent-color:#E87722;"> Tanker</label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-hazmat" style="accent-color:#E87722;"> HazMat</label>
           <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-stepdeck" style="accent-color:#E87722;"> Step Deck</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-tanker" style="accent-color:#E87722;"> Tanker</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-conestoga" style="accent-color:#E87722;"> Conestoga</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-lowboy" style="accent-color:#E87722;"> Lowboy / RGN</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-doubledrop" style="accent-color:#E87722;"> Double Drop</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-hazmat" style="accent-color:#E87722;"> HazMat</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-intermodal" style="accent-color:#E87722;"> Intermodal</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-boxtruck" style="accent-color:#E87722;"> Box Truck</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-hotshot" style="accent-color:#E87722;"> Hotshot</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-carhauler" style="accent-color:#E87722;"> Car Hauler</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-dump" style="accent-color:#E87722;"> Dump Truck</label>
         </div>
       </div>
 
@@ -729,11 +737,11 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
         Back
       </button>
-      <p class="modal-title">Upload Documents</p>
-      <p class="modal-subtitle">Required docs are marked with *. Files are securely stored.</p>
+<p class="modal-title">Upload Documents</p>
+      <p class="modal-subtitle">All documents are optional — upload what you have now and provide the rest later.</p>
       <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px;">
         <div class="doc-upload-item" id="upload-dr-cdl">
-          <div class="doc-upload-label"><i class="fa-solid fa-id-card"></i> CDL Copy <span style="color:#dc2626;">*</span></div>
+          <div class="doc-upload-label"><i class="fa-solid fa-id-card"></i> CDL Copy</div>
           <label class="doc-upload-btn">
             <input type="file" id="file-dr-cdl" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect('dr-cdl',this)">
             <span id="file-dr-cdl-label">Choose File</span>
@@ -741,7 +749,7 @@
           <span class="doc-upload-status" id="status-dr-cdl"></span>
         </div>
         <div class="doc-upload-item" id="upload-dr-medcard">
-          <div class="doc-upload-label"><i class="fa-solid fa-notes-medical"></i> DOT Medical Card <span style="color:#dc2626;">*</span></div>
+          <div class="doc-upload-label"><i class="fa-solid fa-notes-medical"></i> DOT Medical Card</div>
           <label class="doc-upload-btn">
             <input type="file" id="file-dr-medcard" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect('dr-medcard',this)">
             <span id="file-dr-medcard-label">Choose File</span>
@@ -756,7 +764,32 @@
           </label>
           <span class="doc-upload-status" id="status-dr-mvr"></span>
         </div>
+        <div class="doc-upload-item" id="upload-dr-drugtest">
+          <div class="doc-upload-label"><i class="fa-solid fa-vial"></i> Drug Test Results</div>
+          <label class="doc-upload-btn">
+            <input type="file" id="file-dr-drugtest" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect('dr-drugtest',this)">
+            <span id="file-dr-drugtest-label">Choose File</span>
+          </label>
+          <span class="doc-upload-status" id="status-dr-drugtest"></span>
+        </div>
+        <div class="doc-upload-item" id="upload-dr-cv">
+          <div class="doc-upload-label"><i class="fa-solid fa-file-user"></i> Resume / CV</div>
+          <label class="doc-upload-btn">
+            <input type="file" id="file-dr-cv" accept=".pdf,.doc,.docx" onchange="handleFileSelect('dr-cv',this)">
+            <span id="file-dr-cv-label">Choose File</span>
+          </label>
+          <span class="doc-upload-status" id="status-dr-cv"></span>
+        </div>
       </div>
+
+      <div style="margin-bottom:20px;padding:14px;background:rgba(232,119,34,0.06);border-radius:10px;border:1px solid rgba(232,119,34,0.15);">
+        <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.04em;">Communication Consent</label>
+        <label style="display:flex;align-items:flex-start;gap:10px;font-size:0.78rem;color:rgba(13,25,41,0.75);cursor:pointer;line-height:1.5;">
+          <input type="checkbox" id="dr-sms-consent" style="accent-color:#E87722;margin-top:2px;flex-shrink:0;">
+          I agree to receive SMS messages and phone calls from Haulxify regarding my application, available loads, and account updates. Standard message & data rates may apply. Reply STOP to opt out at any time.
+        </label>
+      </div>
+
       <button class="btn-signin" id="dr-submit-btn" onclick="submitDriverSignup()">
         <div class="spinner"></div>
         <span class="btn-label">Submit Application</span>
@@ -979,31 +1012,44 @@ function openSignup(e) {
       showSignupStep('d3');
     }
 
-    async function submitDriverSignup() {
+async function submitDriverSignup() {
       const btn = document.getElementById('dr-submit-btn');
       btn.classList.add('loading'); btn.disabled = true;
 
-      const requiredDocs = ['dr-cdl', 'dr-medcard'];
-      let allUploaded = true;
-      for (const key of requiredDocs) {
-        if (!uploadedLinks[key]) {
-          const fileInput = document.getElementById('file-' + key);
-          if (fileInput && fileInput.files[0]) {
-            const ok = await uploadFile(key, fileInput.files[0]);
-            if (!ok) allUploaded = false;
+      const driverName = document.getElementById('dr-name').value.trim();
+
+      // Upload any selected files — all optional, use driver name as folder
+      const driverDocKeys = ['dr-cdl','dr-medcard','dr-mvr','dr-drugtest','dr-cv'];
+      for (const key of driverDocKeys) {
+        if (!selectedFiles[key]) continue;
+        const base64 = await fileToBase64(selectedFiles[key]);
+        const statusEl = document.getElementById('status-' + key);
+        if (statusEl) { statusEl.textContent = '⏳ Uploading…'; statusEl.style.color = '#f97316'; }
+        try {
+          const res = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+              name:    key + '_' + selectedFiles[key].name,
+              base64,
+              type:    selectedFiles[key].type,
+              company: 'Driver Documents/' + driverName
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            uploadedLinks[key] = data.url;
+            if (statusEl) { statusEl.textContent = '✓ Uploaded'; statusEl.style.color = '#16a34a'; }
           } else {
-            allUploaded = false;
+            if (statusEl) { statusEl.textContent = '✗ Failed'; statusEl.style.color = '#dc2626'; }
           }
+        } catch(err) {
+          if (statusEl) { statusEl.textContent = '✗ Failed'; statusEl.style.color = '#dc2626'; }
         }
-      }
-      if (!allUploaded) {
-        btn.classList.remove('loading'); btn.disabled = false;
-        alert('Please upload all required documents (CDL and DOT Medical Card).');
-        return;
       }
 
       const equipment = [];
-      ['dryvan','reefer','flatbed','tanker','hazmat','stepdeck'].forEach(eq => {
+      ['dryvan','reefer','flatbed','stepdeck','tanker','conestoga','lowboy','doubledrop',
+       'hazmat','intermodal','boxtruck','hotshot','carhauler','dump'].forEach(eq => {
         if (document.getElementById('dr-eq-' + eq)?.checked) equipment.push(eq);
       });
 
@@ -1012,7 +1058,7 @@ function openSignup(e) {
         const db = firebase.firestore();
         await db.collection('pendingDrivers').add({
           type:        'driver',
-          name:        document.getElementById('dr-name').value.trim(),
+          name:        driverName,
           email:       document.getElementById('dr-email').value.trim(),
           phone:       document.getElementById('dr-phone').value.trim(),
           cdlClass:    document.getElementById('dr-cdl-class').value,
@@ -1025,6 +1071,7 @@ function openSignup(e) {
           noDUI:       document.getElementById('dr-no-dui').checked,
           noAccidents: document.getElementById('dr-no-accidents').checked,
           noViolations:document.getElementById('dr-no-violations').checked,
+          smsConsent:  document.getElementById('dr-sms-consent').checked,
           documents:   uploadedLinks,
           status:      'pending',
           submittedAt: new Date().toISOString(),
