@@ -8,16 +8,32 @@ const auth = firebase.auth();
 
 let currentUser = null;
 let customerData = null;
+let userRole = null;
 
 // ── AUTH GUARD ──────────────────────────────────────────────
-auth.onAuthStateChanged(function(user) {
+auth.onAuthStateChanged(async function(user) {
   if (!user) {
     window.location.href = 'https://app.haulxify.com/login.html';
     return;
   }
   currentUser = user;
   showSkeletons();
-  loadCustomerData(user.uid);
+
+  // Detect role — check drivers collection first, fall back to customers
+  try {
+    const driverDoc = await db.collection('drivers').doc(user.uid).get();
+    if (driverDoc.exists) {
+      userRole = 'driver';
+      applyDriverUI();
+      loadDriverData(user.uid);
+    } else {
+      userRole = 'customer';
+      loadCustomerData(user.uid);
+    }
+  } catch(err) {
+    console.error('Role detection failed:', err);
+    loadCustomerData(user.uid); // safe fallback
+  }
 });
 
 // ── SKELETON LOADERS ─────────────────────────────────────────
