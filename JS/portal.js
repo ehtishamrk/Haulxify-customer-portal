@@ -571,6 +571,8 @@ function switchTab(tabId) {
     dashboard: 'Dashboard', loads: 'Loads & Dispatch', tools: 'Tools',
     invoices: 'Invoices', billing: 'Billing', statements: 'Account Statements',
     paperwork: 'Paperwork', help: 'Help Center', settings: 'Settings', profile: 'My Profile',
+    'dr-dashboard': 'Dashboard', 'dr-profile': 'My Profile',
+    'dr-documents': 'My Documents', 'dr-recruiter': 'My Recruiter',
   };
   const bc = document.getElementById('page-title');
   if (bc) bc.textContent = labels[tabId] || tabId;
