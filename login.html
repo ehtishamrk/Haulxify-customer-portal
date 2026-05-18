@@ -848,12 +848,13 @@ document.getElementById('signin-password').addEventListener('input', function() 
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 60000);
 
-        const res = await fetch(APPS_SCRIPT_URL, {
+const res = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
           body: JSON.stringify({
             name: key + '_' + file.name,
             base64,
-            type: file.type
+            type: file.type,
+            company: document.getElementById('su-company')?.value?.trim() || 'Unknown'
           }),
           signal: controller.signal
         });
