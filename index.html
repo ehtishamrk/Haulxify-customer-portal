@@ -29,8 +29,8 @@
       </div>
       <div>
         <p class="profile-name" id="sidebar-profile-name"></p>
-        <p class="profile-tier" id="sidebar-profile-tier"><i class="fa-solid fa-circle-check"></i> Pro Client</p>
-      </div>
+<p class="profile-tier" id="sidebar-profile-tier"><i class="fa-solid fa-circle-check"></i> Pro Client</p>
+        <p class="profile-tier" id="sidebar-profile-tier-driver" style="display:none;"><i class="fa-solid fa-id-card"></i> CDL Driver</p>      </div>
     </div>
 
     <nav class="sidebar-nav">
@@ -38,25 +38,35 @@
       <a href="#" class="nav-item active" data-tab="dashboard">
         <i class="fa-solid fa-house-chimney"></i><span>Dashboard</span>
       </a>
-<a href="#" class="nav-item" data-tab="loads">
+<a href="#" class="nav-item company-only" data-tab="loads">
   <i class="fa-solid fa-truck-fast"></i><span>Loads / Dispatch</span>
   <span class="badge" id="badge-loads">0</span>
 </a>
-      <a href="#" class="nav-item" data-tab="tools">
+      <a href="#" class="nav-item company-only" data-tab="tools">
         <i class="fa-solid fa-wrench"></i><span>Tools</span>
       </a>
-<a href="#" class="nav-item" data-tab="invoices">
+<a href="#" class="nav-item company-only" data-tab="invoices">
   <i class="fa-solid fa-file-invoice-dollar"></i><span>Invoices</span>
   <span class="badge badge-red" id="badge-invoices">0</span>
 </a>
-      <a href="#" class="nav-item" data-tab="billing">
+      <a href="#" class="nav-item company-only" data-tab="billing">
         <i class="fa-solid fa-credit-card"></i><span>Billing</span>
       </a>
-      <a href="#" class="nav-item" data-tab="statements">
+      <a href="#" class="nav-item company-only" data-tab="statements">
         <i class="fa-solid fa-chart-line"></i><span>Account Statements</span>
       </a>
-      <a href="#" class="nav-item" data-tab="paperwork">
+      <a href="#" class="nav-item company-only" data-tab="paperwork">
         <i class="fa-solid fa-folder-open"></i><span>Paperwork</span>
+      </a>
+
+      <a href="#" class="nav-item driver-only" data-tab="dr-profile" style="display:none;">
+        <i class="fa-solid fa-id-card"></i><span>My Profile</span>
+      </a>
+      <a href="#" class="nav-item driver-only" data-tab="dr-documents" style="display:none;">
+        <i class="fa-solid fa-folder-open"></i><span>My Documents</span>
+      </a>
+      <a href="#" class="nav-item driver-only" data-tab="dr-recruiter" style="display:none;">
+        <i class="fa-solid fa-headset"></i><span>My Recruiter</span>
       </a>
 
       <span class="nav-label">Support</span>
