@@ -701,15 +701,19 @@
     </div>
     <div id="truck-fields-wrap" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;"></div>
 
-    <div class="form-section">Account Manager</div>
-    <div class="form-grid">
-      <div class="form-group full">
-        <label class="form-label">Assign Account Manager</label>
-        <select class="form-select" id="new-account-manager">
-          <option value="">Loading employees…</option>
-        </select>
-      </div>
-    </div>
+<div class="form-section">Account Manager</div>
+<div class="form-grid">
+  <div class="form-group full">
+    <label class="form-label">Search Employee</label>
+    <input type="text" class="form-input" id="emp-search" placeholder="Type name, ID or designation…" oninput="searchEmployees()">
+  </div>
+  <div class="form-group full">
+    <label class="form-label">Assign Account Manager</label>
+    <select class="form-select" id="new-account-manager">
+      <option value="">Loading employees…</option>
+    </select>
+  </div>
+</div>
 
     <div class="form-section">Documents (Google Drive Links)</div>
     <div class="form-grid">
@@ -802,15 +806,20 @@
     '45 ft','48 ft','53 ft','Other'
   ];
 
-  const EMP_DB = firebase.initializeApp({
-    apiKey: "AIzaSyDBd2hw7Gq1-mwR5evKF-YPcAGRYDNl3fw",
-    authDomain: "haulxify-employee-portal.firebaseapp.com",
-    projectId: "haulxify-employee-portal",
-    storageBucket: "haulxify-employee-portal.firebasestorage.app",
-    messagingSenderId: "170605105002",
-    appId: "1:170605105002:web:d5da4718f77fd1182adf13"
-  }, 'employee-portal');
-  const empDb = firebase.firestore(EMP_DB);
+let empDb;
+  try {
+    const EMP_APP = firebase.initializeApp({
+      apiKey: "AIzaSyDBd2hw7Gq1-mwR5evKF-YPcAGRYDNl3fw",
+      authDomain: "haulxify-employee-portal.firebaseapp.com",
+      projectId: "haulxify-employee-portal",
+      storageBucket: "haulxify-employee-portal.firebasestorage.app",
+      messagingSenderId: "170605105002",
+      appId: "1:170605105002:web:d5da4718f77fd1182adf13"
+    }, 'employee-portal');
+    empDb = EMP_APP.firestore();
+  } catch(e) {
+    console.warn('Employee portal connection failed:', e);
+  }
   
   const auth = firebase.auth();
   const db   = firebase.firestore();
@@ -1012,24 +1021,60 @@ async function openAddCustomer() {
     await loadEmployeesDropdown('new-account-manager');
   }
 
-  async function loadEmployeesDropdown(selectId) {
+async function loadEmployeesDropdown(selectId) {
     const sel = document.getElementById(selectId);
-    sel.innerHTML = '<option value="">Select account manager…</option>';
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Loading employees…</option>';
     try {
       const snap = await empDb.collection('employees').get();
+      if (snap.empty) {
+        sel.innerHTML = '<option value="">No employees found</option>';
+        return;
+      }
+      // Store all employees for search
+      window._allEmployees = [];
       snap.forEach(doc => {
         const e = doc.data();
-        const opt = document.createElement('option');
-        opt.value = doc.id;
-        opt.textContent = (e.name || e.firstName + ' ' + e.lastName || 'Unknown') + ' — ' + (e.designation || e.desig || '');
-        opt.dataset.name = e.name || (e.firstName + ' ' + e.lastName) || 'Unknown';
-        sel.appendChild(opt);
+        window._allEmployees.push({
+          uid:         doc.id,
+          name:        e.name || e.firstName + ' ' + e.lastName || 'Unknown',
+          designation: e.designation || e.desig || '',
+          department:  e.department || e.dept || '',
+          empId:       e.id || e.empId || '',
+        });
       });
+      renderEmployeeOptions(selectId, window._allEmployees);
     } catch(err) {
-      sel.innerHTML = '<option value="">Could not load employees</option>';
+      console.error('Employee load error:', err);
+      sel.innerHTML = '<option value="">Could not load employees — check console</option>';
     }
   }
 
+  function renderEmployeeOptions(selectId, employees) {
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Select account manager…</option>';
+    employees.forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e.uid;
+      opt.textContent = e.name + ' — ' + e.designation + (e.empId ? ' (' + e.empId + ')' : '');
+      opt.dataset.name = e.name;
+      sel.appendChild(opt);
+    });
+  }
+
+function searchEmployees() {
+    const query = document.getElementById('emp-search').value.toLowerCase();
+    if (!window._allEmployees) return;
+    const filtered = window._allEmployees.filter(e =>
+      e.name.toLowerCase().includes(query) ||
+      e.designation.toLowerCase().includes(query) ||
+      e.empId.toLowerCase().includes(query) ||
+      e.department.toLowerCase().includes(query)
+    );
+    renderEmployeeOptions('new-account-manager', filtered);
+  }
+  
   function generateTruckFields() {
     const count = parseInt(document.getElementById('new-truck-count').value) || 0;
     const wrap  = document.getElementById('truck-fields-wrap');
@@ -1588,8 +1633,14 @@ function switchDetailTab(tab) {
         });
       }
     }
-    await loadEmployeesDropdown('new-account-manager');
-    // Store pending doc ID to delete after approval
+await loadEmployeesDropdown('new-account-manager');
+    // Auto-fill document links from uploaded files
+    if (data.documents) {
+      if (data.documents.mc)      document.getElementById('new-doc-mc').value    = data.documents.mc || '';
+      if (data.documents.w9)      document.getElementById('new-doc-w9').value    = data.documents.w9 || '';
+      if (data.documents.coi)     document.getElementById('new-doc-coi').value   = data.documents.coi || '';
+      if (data.documents.voided)  document.getElementById('new-doc-voided').value = data.documents.voided || '';
+    }    // Store pending doc ID to delete after approval
     document.getElementById('btn-add-customer').dataset.pendingId = docId;
     document.getElementById('modal-add-customer').classList.add('show');
   }
