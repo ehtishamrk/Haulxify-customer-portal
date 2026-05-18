@@ -469,6 +469,24 @@
       </svg>
     </button>
 
+<!-- Step 0 — Account Type -->
+    <div id="signup-step-0">
+      <p class="modal-title">Get Started with Haulxify</p>
+      <p class="modal-subtitle">What best describes you?</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
+        <button onclick="chooseSignupType('company')" style="border:2px solid rgba(13,25,41,0.12);border-radius:12px;padding:20px 12px;background:#fff;cursor:pointer;text-align:center;transition:border-color 0.2s,box-shadow 0.2s;" onmouseover="this.style.borderColor='#E87722'" onmouseout="this.style.borderColor='rgba(13,25,41,0.12)'">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E87722" stroke-width="1.8" style="margin-bottom:10px;"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+          <p style="font-family:var(--font-display);font-size:0.875rem;font-weight:700;color:var(--brand-navy);margin-bottom:4px;">Trucking Company</p>
+          <p style="font-size:0.75rem;color:rgba(13,25,41,0.5);line-height:1.4;">Owner-operator or fleet looking for back-office support</p>
+        </button>
+        <button onclick="chooseSignupType('driver')" style="border:2px solid rgba(13,25,41,0.12);border-radius:12px;padding:20px 12px;background:#fff;cursor:pointer;text-align:center;transition:border-color 0.2s,box-shadow 0.2s;" onmouseover="this.style.borderColor='#E87722'" onmouseout="this.style.borderColor='rgba(13,25,41,0.12)'">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E87722" stroke-width="1.8" style="margin-bottom:10px;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <p style="font-family:var(--font-display);font-size:0.875rem;font-weight:700;color:var(--brand-navy);margin-bottom:4px;">CDL Driver</p>
+          <p style="font-size:0.75rem;color:rgba(13,25,41,0.5);line-height:1.4;">Looking for dispatching or load-finding support</p>
+        </button>
+      </div>
+    </div>
+    
     <!-- Step 1 — Basic Info -->
     <div id="signup-step-1">
       <p class="modal-title">Get Started with Haulxify</p>
@@ -609,6 +627,142 @@
       <p style="font-size:0.875rem;color:rgba(13,25,41,0.5);line-height:1.6;">Our team will review your application and set up your account within <strong>24 hours</strong>. We'll contact you at <strong id="su-confirm-email"></strong></p>
     </div>
 
+<!-- Driver Step 1 — Personal & License Info -->
+    <div id="signup-step-d1" style="display:none;">
+      <p class="modal-title">Driver Application</p>
+      <p class="modal-subtitle">Tell us about yourself and your CDL.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div style="grid-column:1/-1;">
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Full Name *</label>
+          <input type="text" id="dr-name" class="field-input" placeholder="John Smith">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Email *</label>
+          <input type="email" id="dr-email" class="field-input" placeholder="you@email.com">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Phone *</label>
+          <input type="tel" id="dr-phone" class="field-input" placeholder="+1 (000) 000-0000">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">CDL Class *</label>
+          <select id="dr-cdl-class" class="field-input" style="padding:12px 14px;">
+            <option value="">Select…</option>
+            <option>Class A</option>
+            <option>Class B</option>
+            <option>Class C</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">CDL State</label>
+          <input type="text" id="dr-cdl-state" class="field-input" placeholder="e.g. TX">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">CDL Expiry</label>
+          <input type="date" id="dr-cdl-expiry" class="field-input">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Years of CDL Experience *</label>
+          <select id="dr-experience" class="field-input" style="padding:12px 14px;">
+            <option value="">Select…</option>
+            <option>Less than 1 year</option>
+            <option>1–2 years</option>
+            <option>3–5 years</option>
+            <option>6–10 years</option>
+            <option>10+ years</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-signin" onclick="goToDriverStep2()">
+        <span class="btn-label">Next — Experience →</span>
+      </button>
+    </div>
+
+    <!-- Driver Step 2 — Experience & Eligibility -->
+    <div id="signup-step-d2" style="display:none;">
+      <button onclick="showSignupStep('d1')" style="background:none;border:none;color:rgba(13,25,41,0.5);font-size:0.8rem;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:4px;padding:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <p class="modal-title">Experience & Eligibility</p>
+      <p class="modal-subtitle">Help us match you with the right opportunities.</p>
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">Equipment Types (select all that apply)</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-dryvan" style="accent-color:#E87722;"> Dry Van</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-reefer" style="accent-color:#E87722;"> Reefer</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-flatbed" style="accent-color:#E87722;"> Flatbed</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-tanker" style="accent-color:#E87722;"> Tanker</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-hazmat" style="accent-color:#E87722;"> HazMat</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-eq-stepdeck" style="accent-color:#E87722;"> Step Deck</label>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Preferred Run Type *</label>
+        <select id="dr-run-type" class="field-input" style="padding:12px 14px;">
+          <option value="">Select…</option>
+          <option>OTR (Over the Road)</option>
+          <option>Regional</option>
+          <option>Local</option>
+          <option>Dedicated Lane</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom:16px;display:flex;flex-direction:column;gap:10px;">
+        <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:2px;text-transform:uppercase;letter-spacing:0.04em;">Compliance Questions</label>
+        <label style="display:flex;align-items:flex-start;gap:10px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-auth" style="accent-color:#E87722;margin-top:2px;"> I am legally authorized to work in the United States</label>
+        <label style="display:flex;align-items:flex-start;gap:10px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-no-dui" style="accent-color:#E87722;margin-top:2px;"> I have had no DUI/DWI convictions in the last 5 years</label>
+        <label style="display:flex;align-items:flex-start;gap:10px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-no-accidents" style="accent-color:#E87722;margin-top:2px;"> I have had no preventable accidents in the last 3 years</label>
+        <label style="display:flex;align-items:flex-start;gap:10px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" id="dr-no-violations" style="accent-color:#E87722;margin-top:2px;"> I have had no major moving violations in the last 3 years</label>
+      </div>
+
+      <button class="btn-signin" onclick="goToDriverStep3()">
+        <span class="btn-label">Next — Documents →</span>
+      </button>
+    </div>
+
+    <!-- Driver Step 3 — Documents -->
+    <div id="signup-step-d3" style="display:none;">
+      <button onclick="showSignupStep('d2')" style="background:none;border:none;color:rgba(13,25,41,0.5);font-size:0.8rem;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:4px;padding:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <p class="modal-title">Upload Documents</p>
+      <p class="modal-subtitle">Required docs are marked with *. Files are securely stored.</p>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px;">
+        <div class="doc-upload-item" id="upload-dr-cdl">
+          <div class="doc-upload-label"><i class="fa-solid fa-id-card"></i> CDL Copy <span style="color:#dc2626;">*</span></div>
+          <label class="doc-upload-btn">
+            <input type="file" id="file-dr-cdl" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect('dr-cdl',this)">
+            <span id="file-dr-cdl-label">Choose File</span>
+          </label>
+          <span class="doc-upload-status" id="status-dr-cdl"></span>
+        </div>
+        <div class="doc-upload-item" id="upload-dr-medcard">
+          <div class="doc-upload-label"><i class="fa-solid fa-notes-medical"></i> DOT Medical Card <span style="color:#dc2626;">*</span></div>
+          <label class="doc-upload-btn">
+            <input type="file" id="file-dr-medcard" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect('dr-medcard',this)">
+            <span id="file-dr-medcard-label">Choose File</span>
+          </label>
+          <span class="doc-upload-status" id="status-dr-medcard"></span>
+        </div>
+        <div class="doc-upload-item" id="upload-dr-mvr">
+          <div class="doc-upload-label"><i class="fa-solid fa-file-lines"></i> MVR (Motor Vehicle Record)</div>
+          <label class="doc-upload-btn">
+            <input type="file" id="file-dr-mvr" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect('dr-mvr',this)">
+            <span id="file-dr-mvr-label">Choose File</span>
+          </label>
+          <span class="doc-upload-status" id="status-dr-mvr"></span>
+        </div>
+      </div>
+      <button class="btn-signin" id="dr-submit-btn" onclick="submitDriverSignup()">
+        <div class="spinner"></div>
+        <span class="btn-label">Submit Application</span>
+      </button>
+    </div>
+    
   </div>
 </div>
   
@@ -761,10 +915,10 @@ document.getElementById('signin-password').addEventListener('input', function() 
 
     let selectedFiles = {};
 
-    function openSignup(e) {
+function openSignup(e) {
       if (e) e.preventDefault();
       document.getElementById('signup-overlay').classList.add('show');
-      showSignupStep(1);
+      showSignupStep(0);
     }
 
     function closeSignup() {
@@ -772,10 +926,17 @@ document.getElementById('signin-password').addEventListener('input', function() 
     }
 
     function showSignupStep(n) {
-      [1,2,3,4].forEach(i => {
+      const allSteps = ['0','1','2','3','4','d1','d2','d3'];
+      allSteps.forEach(i => {
         const el = document.getElementById('signup-step-' + i);
-        if (el) el.style.display = i === n ? 'block' : 'none';
+        if (el) el.style.display = (String(i) === String(n)) ? 'block' : 'none';
       });
+    }
+
+    function chooseSignupType(type) {
+      window._signupType = type;
+      if (type === 'driver') showSignupStep('d1');
+      else showSignupStep(1);
     }
 
     function goToStep1() { showSignupStep(1); }
@@ -796,6 +957,87 @@ document.getElementById('signin-password').addEventListener('input', function() 
     }
 
     function goToStep3() { showSignupStep(3); }
+
+  function goToDriverStep2() {
+      const name  = document.getElementById('dr-name').value.trim();
+      const email = document.getElementById('dr-email').value.trim();
+      const phone = document.getElementById('dr-phone').value.trim();
+      const cdl   = document.getElementById('dr-cdl-class').value;
+      const exp   = document.getElementById('dr-experience').value;
+      if (!name || !email || !phone || !cdl || !exp) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+      showSignupStep('d2');
+    }
+
+    function goToDriverStep3() {
+      const runType = document.getElementById('dr-run-type').value;
+      const auth    = document.getElementById('dr-auth').checked;
+      if (!runType) { alert('Please select a preferred run type.'); return; }
+      if (!auth) { alert('You must confirm work authorization to proceed.'); return; }
+      showSignupStep('d3');
+    }
+
+    async function submitDriverSignup() {
+      const btn = document.getElementById('dr-submit-btn');
+      btn.classList.add('loading'); btn.disabled = true;
+
+      const requiredDocs = ['dr-cdl', 'dr-medcard'];
+      let allUploaded = true;
+      for (const key of requiredDocs) {
+        if (!uploadedLinks[key]) {
+          const fileInput = document.getElementById('file-' + key);
+          if (fileInput && fileInput.files[0]) {
+            const ok = await uploadFile(key, fileInput.files[0]);
+            if (!ok) allUploaded = false;
+          } else {
+            allUploaded = false;
+          }
+        }
+      }
+      if (!allUploaded) {
+        btn.classList.remove('loading'); btn.disabled = false;
+        alert('Please upload all required documents (CDL and DOT Medical Card).');
+        return;
+      }
+
+      const equipment = [];
+      ['dryvan','reefer','flatbed','tanker','hazmat','stepdeck'].forEach(eq => {
+        if (document.getElementById('dr-eq-' + eq)?.checked) equipment.push(eq);
+      });
+
+      try {
+        try { firebase.initializeApp({ apiKey:"AIzaSyBaRMQBLfDyufJkC4E8XCvzOIMEawOQObw", authDomain:"haulxify-app.firebaseapp.com", projectId:"haulxify-app", storageBucket:"haulxify-app.firebasestorage.app", messagingSenderId:"453228026261", appId:"1:453228026261:web:1d66ab1d47418906807e9c" }); } catch(e) {}
+        const db = firebase.firestore();
+        await db.collection('pendingDrivers').add({
+          type:        'driver',
+          name:        document.getElementById('dr-name').value.trim(),
+          email:       document.getElementById('dr-email').value.trim(),
+          phone:       document.getElementById('dr-phone').value.trim(),
+          cdlClass:    document.getElementById('dr-cdl-class').value,
+          cdlState:    document.getElementById('dr-cdl-state').value.trim(),
+          cdlExpiry:   document.getElementById('dr-cdl-expiry').value,
+          experience:  document.getElementById('dr-experience').value,
+          equipment,
+          runType:     document.getElementById('dr-run-type').value,
+          workAuth:    document.getElementById('dr-auth').checked,
+          noDUI:       document.getElementById('dr-no-dui').checked,
+          noAccidents: document.getElementById('dr-no-accidents').checked,
+          noViolations:document.getElementById('dr-no-violations').checked,
+          documents:   uploadedLinks,
+          status:      'pending',
+          submittedAt: new Date().toISOString(),
+        });
+        document.getElementById('su-confirm-email').textContent =
+          document.getElementById('dr-email').value.trim();
+        showSignupStep(4);
+      } catch(err) {
+        console.error(err);
+        alert('Submission failed. Please try again.');
+      }
+      btn.classList.remove('loading'); btn.disabled = false;
+    }
 
     function generateSignupTruckFields() {
       const count = parseInt(document.getElementById('su-truck-count').value) || 0;
