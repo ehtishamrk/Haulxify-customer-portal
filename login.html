@@ -661,7 +661,7 @@
           <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">CDL Expiry</label>
           <input type="date" id="dr-cdl-expiry" class="field-input">
         </div>
-        <div style="grid-column:1/-1;">
+<div style="grid-column:1/-1;">
           <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Years of CDL Experience *</label>
           <select id="dr-experience" class="field-input" style="padding:12px 14px;">
             <option value="">Select…</option>
@@ -671,6 +671,14 @@
             <option>6–10 years</option>
             <option>10+ years</option>
           </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Password *</label>
+          <input type="password" id="dr-password" class="field-input" placeholder="Min. 8 characters">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Confirm Password *</label>
+          <input type="password" id="dr-password-confirm" class="field-input" placeholder="Repeat password">
         </div>
       </div>
       <button class="btn-signin" onclick="goToDriverStep2()">
@@ -991,14 +999,24 @@ function openSignup(e) {
 
     function goToStep3() { showSignupStep(3); }
 
-  function goToDriverStep2() {
-      const name  = document.getElementById('dr-name').value.trim();
-      const email = document.getElementById('dr-email').value.trim();
-      const phone = document.getElementById('dr-phone').value.trim();
-      const cdl   = document.getElementById('dr-cdl-class').value;
-      const exp   = document.getElementById('dr-experience').value;
-      if (!name || !email || !phone || !cdl || !exp) {
+function goToDriverStep2() {
+      const name     = document.getElementById('dr-name').value.trim();
+      const email    = document.getElementById('dr-email').value.trim();
+      const phone    = document.getElementById('dr-phone').value.trim();
+      const cdl      = document.getElementById('dr-cdl-class').value;
+      const exp      = document.getElementById('dr-experience').value;
+      const pass     = document.getElementById('dr-password').value;
+      const passConf = document.getElementById('dr-password-confirm').value;
+      if (!name || !email || !phone || !cdl || !exp || !pass) {
         alert('Please fill in all required fields.');
+        return;
+      }
+      if (pass.length < 8) {
+        alert('Password must be at least 8 characters.');
+        return;
+      }
+      if (pass !== passConf) {
+        alert('Passwords do not match.');
         return;
       }
       showSignupStep('d2');
@@ -1016,9 +1034,11 @@ async function submitDriverSignup() {
       const btn = document.getElementById('dr-submit-btn');
       btn.classList.add('loading'); btn.disabled = true;
 
-      const driverName = document.getElementById('dr-name').value.trim();
+      const driverName  = document.getElementById('dr-name').value.trim();
+      const driverEmail = document.getElementById('dr-email').value.trim();
+      const driverPass  = document.getElementById('dr-password').value;
 
-      // Upload any selected files — all optional, use driver name as folder
+      // Upload any selected files — all optional
       const driverDocKeys = ['dr-cdl','dr-medcard','dr-mvr','dr-drugtest','dr-cv'];
       for (const key of driverDocKeys) {
         if (!selectedFiles[key]) continue;
@@ -1055,11 +1075,19 @@ async function submitDriverSignup() {
 
       try {
         try { firebase.initializeApp({ apiKey:"AIzaSyBaRMQBLfDyufJkC4E8XCvzOIMEawOQObw", authDomain:"haulxify-app.firebaseapp.com", projectId:"haulxify-app", storageBucket:"haulxify-app.firebasestorage.app", messagingSenderId:"453228026261", appId:"1:453228026261:web:1d66ab1d47418906807e9c" }); } catch(e) {}
+
+        // Create Firebase Auth account
+        const auth = firebase.auth();
+        const userCredential = await auth.createUserWithEmailAndPassword(driverEmail, driverPass);
+        const uid = userCredential.user.uid;
+
         const db = firebase.firestore();
-        await db.collection('pendingDrivers').add({
-          type:        'driver',
+
+        // Write to drivers collection (keyed by UID for portal login)
+        await db.collection('drivers').doc(uid).set({
+          role:        'driver',
           name:        driverName,
-          email:       document.getElementById('dr-email').value.trim(),
+          email:       driverEmail,
           phone:       document.getElementById('dr-phone').value.trim(),
           cdlClass:    document.getElementById('dr-cdl-class').value,
           cdlState:    document.getElementById('dr-cdl-state').value.trim(),
@@ -1076,12 +1104,27 @@ async function submitDriverSignup() {
           status:      'pending',
           submittedAt: new Date().toISOString(),
         });
-        document.getElementById('su-confirm-email').textContent =
-          document.getElementById('dr-email').value.trim();
+
+        // Also write to pendingDrivers for admin review queue
+        await db.collection('pendingDrivers').doc(uid).set({
+          uid,
+          name:  driverName,
+          email: driverEmail,
+          status: 'pending',
+          submittedAt: new Date().toISOString(),
+        });
+
+        document.getElementById('su-confirm-email').textContent = driverEmail;
         showSignupStep(4);
       } catch(err) {
         console.error(err);
-        alert('Submission failed. Please try again.');
+        if (err.code === 'auth/email-already-in-use') {
+          alert('An account with this email already exists. Please sign in.');
+        } else if (err.code === 'auth/invalid-email') {
+          alert('Please enter a valid email address.');
+        } else {
+          alert('Submission failed: ' + err.message);
+        }
       }
       btn.classList.remove('loading'); btn.disabled = false;
     }
