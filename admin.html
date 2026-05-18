@@ -358,6 +358,32 @@
       .admin-sidebar { display: none; }
       .form-grid { grid-template-columns: 1fr; }
     }
+    /* ── CUSTOM SEARCHABLE DROPDOWN ── */
+  .custom-select-wrap { position: relative; }
+  .custom-select-display {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; background: var(--navy3);
+    border: 1px solid var(--border2); border-radius: 8px;
+    cursor: pointer; font-size: 0.875rem; color: var(--text);
+    transition: border-color 0.2s;
+  }
+  .custom-select-display:hover { border-color: var(--orange); }
+  .custom-select-dropdown {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    background: var(--navy2); border: 1px solid var(--border2);
+    border-radius: 8px; z-index: 999;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .custom-select-list { max-height: 200px; overflow-y: auto; }
+  .custom-select-item {
+    padding: 10px 14px; font-size: 0.8375rem; cursor: pointer;
+    border-bottom: 1px solid var(--border); transition: background 0.15s;
+  }
+  .custom-select-item:last-child { border-bottom: none; }
+  .custom-select-item:hover { background: rgba(232,119,34,0.1); color: var(--orange); }
+  .custom-select-item .emp-name { font-weight: 600; color: var(--text); }
+  .custom-select-item .emp-meta { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .custom-select-empty { padding: 16px; text-align: center; color: var(--muted); font-size: 0.8rem; }
   </style>
 </head>
 <body>
@@ -704,14 +730,21 @@
 <div class="form-section">Account Manager</div>
 <div class="form-grid">
   <div class="form-group full">
-    <label class="form-label">Search Employee</label>
-    <input type="text" class="form-input" id="emp-search" placeholder="Type name, ID or designation…" oninput="searchEmployees()">
-  </div>
-  <div class="form-group full">
     <label class="form-label">Assign Account Manager</label>
-    <select class="form-select" id="new-account-manager">
-      <option value="">Loading employees…</option>
-    </select>
+    <div class="custom-select-wrap" id="am-wrap">
+      <div class="custom-select-display" id="am-display" onclick="toggleAMDropdown()">
+        <span id="am-display-text" style="color:var(--muted);">Select account manager…</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="custom-select-dropdown" id="am-dropdown" style="display:none;">
+        <div style="padding:8px;">
+          <input type="text" class="form-input" id="am-search" placeholder="Search by name, ID or designation…" oninput="filterAMDropdown()" style="font-size:0.8rem;padding:8px 10px;">
+        </div>
+        <div class="custom-select-list" id="am-list"></div>
+      </div>
+      <input type="hidden" id="new-account-manager" value="">
+      <input type="hidden" id="new-account-manager-name" value="">
+    </div>
   </div>
 </div>
 
@@ -1026,9 +1059,6 @@ async function openAddCustomer() {
   }
 
 async function loadEmployeesDropdown(selectId) {
-    const sel = document.getElementById(selectId);
-    if (!sel) return;
-    sel.innerHTML = '<option value="">Loading employees…</option>';
     try {
       const snap = await empDb.collection('employees').get();
       if (snap.empty) {
@@ -1047,37 +1077,67 @@ async function loadEmployeesDropdown(selectId) {
           empId:       e.id || e.empId || '',
         });
       });
-      renderEmployeeOptions(selectId, window._allEmployees);
+      renderAMList(window._allEmployees);
     } catch(err) {
       console.error('Employee load error:', err);
       sel.innerHTML = '<option value="">Could not load employees — check console</option>';
     }
   }
 
-  function renderEmployeeOptions(selectId, employees) {
-    const sel = document.getElementById(selectId);
-    if (!sel) return;
-    sel.innerHTML = '<option value="">Select account manager…</option>';
-    employees.forEach(e => {
-      const opt = document.createElement('option');
-      opt.value = e.uid;
-      opt.textContent = e.name + ' — ' + e.designation + (e.empId ? ' (' + e.empId + ')' : '');
-      opt.dataset.name = e.name;
-      sel.appendChild(opt);
-    });
+function toggleAMDropdown() {
+    const dd = document.getElementById('am-dropdown');
+    if (dd.style.display === 'none') {
+      dd.style.display = 'block';
+      document.getElementById('am-search').focus();
+      renderAMList(window._allEmployees || []);
+    } else {
+      dd.style.display = 'none';
+    }
   }
 
-function searchEmployees() {
-    const query = document.getElementById('emp-search').value.toLowerCase();
+  function filterAMDropdown() {
+    const query = document.getElementById('am-search').value.toLowerCase();
     if (!window._allEmployees) return;
     const filtered = window._allEmployees.filter(e =>
       e.name.toLowerCase().includes(query) ||
-      e.designation.toLowerCase().includes(query) ||
-      e.empId.toLowerCase().includes(query) ||
-      e.department.toLowerCase().includes(query)
+      (e.designation||'').toLowerCase().includes(query) ||
+      (e.empId||'').toLowerCase().includes(query) ||
+      (e.department||'').toLowerCase().includes(query)
     );
-    renderEmployeeOptions('new-account-manager', filtered);
+    renderAMList(filtered);
   }
+
+  function renderAMList(employees) {
+    const list = document.getElementById('am-list');
+    if (!list) return;
+    if (employees.length === 0) {
+      list.innerHTML = '<div class="custom-select-empty">No employees found</div>';
+      return;
+    }
+    list.innerHTML = employees.map(e => `
+      <div class="custom-select-item" onclick="selectAM('${e.uid}','${e.name.replace(/'/g,"\\'")}','${(e.designation||'').replace(/'/g,"\\'")}')">
+        <div class="emp-name">${e.name}</div>
+        <div class="emp-meta">${e.designation}${e.empId ? ' · ' + e.empId : ''}${e.department ? ' · ' + e.department : ''}</div>
+      </div>`).join('');
+  }
+
+  function selectAM(uid, name, designation) {
+    document.getElementById('new-account-manager').value      = uid;
+    document.getElementById('new-account-manager-name').value = name;
+    document.getElementById('am-display-text').textContent    = name + (designation ? ' — ' + designation : '');
+    document.getElementById('am-display-text').style.color    = 'var(--text)';
+    document.getElementById('am-dropdown').style.display      = 'none';
+    document.getElementById('am-search').value                = '';
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('am-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      const dd = document.getElementById('am-dropdown');
+      if (dd) dd.style.display = 'none';
+    }
+  });
   
   function generateTruckFields() {
     const count = parseInt(document.getElementById('new-truck-count').value) || 0;
@@ -1118,9 +1178,8 @@ async function addCustomer() {
     const plan     = document.getElementById('new-plan').value;
     const address  = document.getElementById('new-address').value.trim();
     const truckCount = parseInt(document.getElementById('new-truck-count').value) || 0;
-    const amSel    = document.getElementById('new-account-manager');
-    const amId     = amSel.value;
-    const amName   = amSel.options[amSel.selectedIndex]?.dataset?.name || '';
+const amId   = document.getElementById('new-account-manager').value;
+    const amName = document.getElementById('new-account-manager-name').value;
     const btn      = document.getElementById('btn-add-customer');
 
     if (!email || !password || !name) { showToast('Email, password and name are required.', 'error'); return; }
