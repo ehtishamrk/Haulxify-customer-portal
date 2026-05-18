@@ -36,6 +36,21 @@ auth.onAuthStateChanged(async function(user) {
   }
 });
 
+// ── DRIVER UI TOGGLE ────────────────────────────────────────
+function applyDriverUI() {
+  // Hide company-only nav items
+  document.querySelectorAll('.company-only').forEach(el => el.style.display = 'none');
+  // Show driver-only nav items
+  document.querySelectorAll('.driver-only').forEach(el => el.style.display = 'flex');
+  // Swap tier badge
+  const tierCompany = document.getElementById('sidebar-profile-tier');
+  const tierDriver  = document.getElementById('sidebar-profile-tier-driver');
+  if (tierCompany) tierCompany.style.display = 'none';
+  if (tierDriver)  tierDriver.style.display  = 'block';
+  // Set dashboard as default active tab
+  switchTab('dashboard');
+}
+
 // ── SKELETON LOADERS ─────────────────────────────────────────
 function showSkeletons() {
   // KPI values
