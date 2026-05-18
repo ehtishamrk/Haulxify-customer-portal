@@ -817,6 +817,10 @@ let empDb;
       appId: "1:170605105002:web:d5da4718f77fd1182adf13"
     }, 'employee-portal');
     empDb = EMP_APP.firestore();
+
+    // Sign in anonymously to employee portal for read access
+    const empAuth = firebase.auth(EMP_APP);
+    empAuth.signInAnonymously().catch(e => console.warn('Anon sign in failed:', e));
   } catch(e) {
     console.warn('Employee portal connection failed:', e);
   }
