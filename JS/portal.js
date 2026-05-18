@@ -683,3 +683,176 @@ document.addEventListener('keydown', e => {
     document.querySelector('.topbar-search input')?.focus();
   }
 });
+
+// ── DRIVER DATA ──────────────────────────────────────────────
+async function loadDriverData(uid) {
+  try {
+    const doc = await db.collection('drivers').doc(uid).get();
+    if (!doc.exists) { showToast('Driver profile not found. Contact support.'); return; }
+    const d = doc.data();
+
+    // Sidebar name + avatar
+    const first = (d.name || '').split(' ')[0];
+    setText('sidebar-profile-name', d.name || '');
+    setText('avatar-sidebar', first.charAt(0).toUpperCase());
+
+    // ── DASHBOARD ──
+    setText('dr-welcome-name', first);
+    setText('dr-status-badge', formatStatus(d.status));
+    setText('dr-kpi-cdl',    d.cdlClass   || '—');
+    setText('dr-kpi-run',    d.runType    || '—');
+    setText('dr-kpi-expiry', d.cdlExpiry  || '—');
+
+    // Docs count
+    const docs = d.documents || {};
+    const docCount = Object.values(docs).filter(v => v).length;
+    setText('dr-kpi-docs', docCount + ' / 5');
+
+    // Pipeline
+    renderDriverPipeline(d.status);
+
+    // Compliance checklist
+    renderComplianceChecklist(d);
+
+    // Recruiter mini-card (dashboard)
+    const recruiter = d.recruiter || {};
+    setText('dr-recruiter-name', recruiter.name || 'Haulxify Recruitment');
+    const waEl = document.getElementById('dr-recruiter-wa');
+    const emEl = document.getElementById('dr-recruiter-email');
+    if (waEl) waEl.href = recruiter.whatsapp ? 'https://wa.me/' + recruiter.whatsapp.replace(/\D/g,'') : '#';
+    if (emEl) emEl.href = recruiter.email ? 'mailto:' + recruiter.email : 'mailto:info@haulxify.com';
+
+    // ── PROFILE TAB ──
+    setText('dr-profile-name',     d.name      || '—');
+    setText('dr-profile-email',    d.email     || '—');
+    setText('dr-profile-phone',    d.phone     || '—');
+    setText('dr-profile-cdl',      d.cdlClass  || '—');
+    setText('dr-profile-cdlstate', d.cdlState  || '—');
+    setText('dr-profile-cdlexpiry',d.cdlExpiry || '—');
+    setText('dr-profile-exp',      d.experience|| '—');
+    setText('dr-profile-run',      d.runType   || '—');
+
+    const eqWrap = document.getElementById('dr-profile-equipment');
+    if (eqWrap && Array.isArray(d.equipment)) {
+      eqWrap.innerHTML = d.equipment.length
+        ? d.equipment.map(eq => `<span style="background:rgba(232,119,34,0.1);color:var(--brand-orange);border-radius:20px;padding:4px 12px;font-size:0.75rem;font-weight:600;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.03em;">${eq}</span>`).join('')
+        : '<span style="color:rgba(13,25,41,0.4);font-size:0.82rem;">None selected</span>';
+    }
+
+    // ── DOCUMENTS TAB ──
+    renderDriverDocs(docs);
+
+    // ── RECRUITER TAB ──
+    setText('dr-rec-name', recruiter.name || 'Haulxify Recruitment');
+    const recWa  = document.getElementById('dr-rec-wa');
+    const recEm  = document.getElementById('dr-rec-email');
+    const recPh  = document.getElementById('dr-rec-phone');
+    if (recWa) recWa.href  = recruiter.whatsapp ? 'https://wa.me/' + recruiter.whatsapp.replace(/\D/g,'') : 'https://wa.me/19999999999';
+    if (recEm) recEm.href  = 'mailto:' + (recruiter.email || 'info@haulxify.com');
+    if (recPh) recPh.href  = 'tel:'    + (recruiter.phone || '');
+
+    // Switch to driver dashboard
+    switchTab('dr-dashboard');
+
+  } catch(err) {
+    console.error('Error loading driver data:', err);
+    showToast('Error loading your profile. Please refresh.');
+  }
+}
+
+function formatStatus(status) {
+  const map = {
+    'pending':     'Under Review',
+    'reviewing':   'In Review',
+    'shortlisted': 'Shortlisted',
+    'placed':      'Placed ✓',
+    'rejected':    'Not Proceeding',
+  };
+  return map[status] || (status || '—');
+}
+
+function renderDriverPipeline(status) {
+  const steps = [
+    { key: 'pending',     label: 'Submitted'   },
+    { key: 'reviewing',   label: 'Under Review' },
+    { key: 'shortlisted', label: 'Shortlisted'  },
+    { key: 'placed',      label: 'Placed'       },
+  ];
+  const order  = steps.map(s => s.key);
+  const active = order.indexOf(status);
+  const wrap   = document.getElementById('dr-pipeline');
+  if (!wrap) return;
+  wrap.innerHTML = steps.map((step, i) => {
+    const done    = i < active;
+    const current = i === active;
+    const color   = done || current ? '#E87722' : 'rgba(13,25,41,0.15)';
+    const txtCol  = done || current ? '#E87722' : 'rgba(13,25,41,0.35)';
+    return `
+      <div style="display:flex;align-items:center;flex:1;min-width:0;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
+          <div style="width:32px;height:32px;border-radius:50%;border:2.5px solid ${color};display:flex;align-items:center;justify-content:center;background:${done ? '#E87722' : current ? 'rgba(232,119,34,0.1)' : 'transparent'};">
+            ${done
+              ? '<i class="fa-solid fa-check" style="color:#fff;font-size:0.7rem;"></i>'
+              : `<span style="width:8px;height:8px;border-radius:50%;background:${current ? '#E87722' : 'rgba(13,25,41,0.15)'}"></span>`
+            }
+          </div>
+          <span style="font-size:0.68rem;font-weight:700;font-family:var(--font-display);color:${txtCol};text-transform:uppercase;letter-spacing:0.03em;text-align:center;line-height:1.2;">${step.label}</span>
+        </div>
+        ${i < steps.length - 1 ? `<div style="height:2px;flex:1;background:${done ? '#E87722' : 'rgba(13,25,41,0.1)'};margin-bottom:18px;"></div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function renderComplianceChecklist(d) {
+  const list = document.getElementById('dr-compliance-list');
+  if (!list) return;
+  const docs = d.documents || {};
+  const items = [
+    { label: 'CDL on file',          ok: !!docs['dr-cdl']      },
+    { label: 'DOT Medical Card',     ok: !!docs['dr-medcard']  },
+    { label: 'MVR submitted',        ok: !!docs['dr-mvr']      },
+    { label: 'Drug test uploaded',   ok: !!docs['dr-drugtest'] },
+    { label: 'Work authorization',   ok: !!d.workAuth          },
+    { label: 'No DUI (last 5 yrs)',  ok: !!d.noDUI             },
+    { label: 'No accidents (3 yrs)', ok: !!d.noAccidents       },
+    { label: 'No violations (3 yrs)',ok: !!d.noViolations      },
+  ];
+  list.innerHTML = items.map(item => `
+    <li class="activity-item">
+      <span style="width:28px;height:28px;border-radius:50%;background:${item.ok ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.1)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fa-solid ${item.ok ? 'fa-check' : 'fa-xmark'}" style="color:${item.ok ? '#16a34a' : '#dc2626'};font-size:0.7rem;"></i>
+      </span>
+      <div class="act-body">
+        <p style="font-size:0.82rem;font-weight:600;color:var(--brand-navy);">${item.label}</p>
+        <p style="font-size:0.72rem;color:rgba(13,25,41,0.45);">${item.ok ? 'Complete' : 'Pending'}</p>
+      </div>
+    </li>`).join('');
+}
+
+function renderDriverDocs(docs) {
+  const wrap = document.getElementById('dr-docs-list');
+  if (!wrap) return;
+  const docMeta = [
+    { key: 'dr-cdl',      label: 'CDL Copy',               icon: 'fa-id-card'       },
+    { key: 'dr-medcard',  label: 'DOT Medical Card',        icon: 'fa-notes-medical' },
+    { key: 'dr-mvr',      label: 'MVR',                     icon: 'fa-file-lines'    },
+    { key: 'dr-drugtest', label: 'Drug Test Results',       icon: 'fa-vial'          },
+    { key: 'dr-cv',       label: 'Resume / CV',             icon: 'fa-file-user'     },
+  ];
+  wrap.innerHTML = docMeta.map(m => {
+    const url = docs[m.key];
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:10px;border:1.5px solid ${url ? 'rgba(34,197,94,0.25)' : 'rgba(13,25,41,0.08)'};background:${url ? 'rgba(34,197,94,0.04)' : 'transparent'};">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="width:34px;height:34px;border-radius:8px;background:rgba(232,119,34,0.1);display:flex;align-items:center;justify-content:center;">
+            <i class="fa-solid ${m.icon}" style="color:var(--brand-orange);font-size:0.85rem;"></i>
+          </span>
+          <span style="font-size:0.85rem;font-weight:600;color:var(--brand-navy);">${m.label}</span>
+        </div>
+        ${url
+          ? `<a href="${url}" target="_blank" style="font-size:0.75rem;font-weight:700;color:var(--brand-orange);text-decoration:none;font-family:var(--font-display);letter-spacing:0.03em;">VIEW <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.65rem;"></i></a>`
+          : `<span style="font-size:0.75rem;color:rgba(13,25,41,0.35);font-weight:600;">Not uploaded</span>`
+        }
+      </div>`;
+  }).join('');
+}
