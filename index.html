@@ -520,6 +520,145 @@
       </div>
     </section>
 
+<!-- DRIVER DASHBOARD -->
+    <section class="tab-panel" id="tab-dr-dashboard">
+      <div class="welcome-band">
+        <div class="welcome-text">
+          <p class="welcome-greeting">Good morning,</p>
+          <h1 class="welcome-name"><span id="dr-welcome-name"></span> 👋</h1>
+          <p class="welcome-sub">Here's your application status with Haulxify.</p>
+        </div>
+        <div class="welcome-badge">
+          <i class="fa-solid fa-id-card"></i>
+          <div>
+            <p class="wb-value" id="dr-status-badge">—</p>
+            <p class="wb-label">Application Status</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Pipeline -->
+      <div class="card" style="margin-bottom:20px;padding:24px;">
+        <div class="card-head" style="margin-bottom:20px;"><h3>Application Pipeline</h3></div>
+        <div style="display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:4px;" id="dr-pipeline">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+
+      <!-- KPI row -->
+      <div class="kpi-grid" style="margin-bottom:20px;">
+        <div class="kpi-card">
+          <div class="kpi-icon orange"><i class="fa-solid fa-id-card"></i></div>
+          <div class="kpi-info">
+            <p class="kpi-label">CDL Class</p>
+            <p class="kpi-value" id="dr-kpi-cdl">—</p>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon blue"><i class="fa-solid fa-truck"></i></div>
+          <div class="kpi-info">
+            <p class="kpi-label">Run Type</p>
+            <p class="kpi-value" id="dr-kpi-run">—</p>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon green"><i class="fa-solid fa-calendar-check"></i></div>
+          <div class="kpi-info">
+            <p class="kpi-label">CDL Expiry</p>
+            <p class="kpi-value" id="dr-kpi-expiry">—</p>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon red"><i class="fa-solid fa-folder-open"></i></div>
+          <div class="kpi-info">
+            <p class="kpi-label">Docs Uploaded</p>
+            <p class="kpi-value" id="dr-kpi-docs">—</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom row: Compliance checklist + Recruiter mini-card -->
+      <div class="mid-row">
+        <div class="card activity-card">
+          <div class="card-head"><h3>Compliance Checklist</h3></div>
+          <ul class="activity-list" id="dr-compliance-list"></ul>
+        </div>
+        <div class="card fleet-card" style="display:flex;flex-direction:column;gap:16px;justify-content:center;align-items:center;text-align:center;padding:28px;">
+          <div class="kpi-icon orange" style="width:52px;height:52px;font-size:1.3rem;"><i class="fa-solid fa-headset"></i></div>
+          <div>
+            <p style="font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--brand-navy);" id="dr-recruiter-name">Your Recruiter</p>
+            <p style="font-size:0.78rem;color:rgba(13,25,41,0.5);margin-top:2px;">Haulxify Recruitment Team</p>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+            <a id="dr-recruiter-wa" href="#" target="_blank" class="qa-btn" style="text-decoration:none;display:flex;align-items:center;gap:6px;font-size:0.78rem;"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+            <a id="dr-recruiter-email" href="#" class="qa-btn" style="text-decoration:none;display:flex;align-items:center;gap:6px;font-size:0.78rem;"><i class="fa-solid fa-envelope"></i> Email</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DRIVER PROFILE -->
+    <section class="tab-panel" id="tab-dr-profile">
+      <div class="panel-header"><h2>My Profile</h2></div>
+      <div class="card" style="padding:28px;max-width:680px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+          <div style="grid-column:1/-1;">
+            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Full Name</p>
+            <p id="dr-profile-name" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+          </div>
+          <div>
+            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Email</p>
+            <p id="dr-profile-email" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+          </div>
+          <div>
+            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Phone</p>
+            <p id="dr-profile-phone" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+          </div>
+          <div>
+            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">CDL Class</p>
+            <p id="dr-profile-cdl" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+          </div>
+          <div>
+            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">CDL State</p>
+            <p id="dr-profile-cdlstate" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+          </div>
+          <div>
+            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">CDL Expiry</p>
+            <p id="dr-profile-cdlexpiry" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+          </div>
+          <div>
+            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Experience</p>
+            <p id="dr-profile-exp" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+          </div>
+          <div>
+            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Run Type</p>
+            <p id="dr-profile-run" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+          </div>
+          <div style="grid-column:1/-1;">
+            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;">Equipment</p>
+            <div id="dr-profile-equipment" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DRIVER DOCUMENTS -->
+    <section class="tab-panel" id="tab-dr-documents">
+      <div class="panel-header"><h2>My Documents</h2></div>
+      <div class="card" style="padding:28px;max-width:680px;">
+        <p style="font-size:0.82rem;color:rgba(13,25,41,0.5);margin-bottom:20px;">Documents you uploaded during signup. Contact your recruiter to update any file.</p>
+        <div id="dr-docs-list" style="display:flex;flex-direction:column;gap:14px;"></div>
+      </div>
+    </section>
+
+    <!-- DRIVER RECRUITER -->
+    <section class="tab-panel" id="tab-dr-recruiter">
+      <div class="panel-header"><h2>My Recruiter</h2></div>
+      <div class="card" style="padding:32px;max-width:480px;text-align:center;">
+        <div class="kpi-icon orange" style="width:56px;height:56px;font-size:1.4rem;margin:0 auto 16px;"><i class="fa-solid fa-headset"></i></div>
+        <p style="font-family:var(--font-display);font-weight:700;font-size:1.1rem;color:var(--brand-navy);margin-bottom:4px;" id="dr-rec-name">Haulxify Recruitment</p>
+        <p style="font-size:0.8rem;color:rgb
+    
   </main>
 
   <!-- Toast -->
