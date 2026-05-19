@@ -454,11 +454,15 @@
         Add Customer
       </button>
 <span class="sidebar-nav-label">Admin</span>
-<button class="sidebar-nav-item" onclick="showView('pending')">
+<button class="sidebar-nav-item superadmin-only" onclick="showView('pending')">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
   Pending Signups <span id="pending-badge" style="background:var(--danger);color:#fff;font-size:0.65rem;padding:2px 6px;border-radius:10px;margin-left:4px;display:none;">0</span>
 </button>
-<button class="sidebar-nav-item" onclick="showView('admins')">
+<button class="sidebar-nav-item" onclick="showView('pending-drivers')">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+  Driver Applications <span id="pending-drivers-badge" style="background:var(--danger);color:#fff;font-size:0.65rem;padding:2px 6px;border-radius:10px;margin-left:4px;display:none;">0</span>
+</button>
+<button class="sidebar-nav-item superadmin-only" onclick="showView('admins')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Manage Admins
       </button>
@@ -681,6 +685,97 @@
 </div>
     </div>
 
+<!-- PENDING DRIVERS VIEW -->
+    <div class="admin-view" id="view-pending-drivers">
+      <div class="section-header">
+        <div class="section-title">Driver Applications</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th><th>Email</th><th>Phone</th><th>CDL Class</th>
+              <th>Experience</th><th>Run Type</th><th>Submitted</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="pending-drivers-tbody">
+            <tr><td colspan="8"><div class="empty-state"><p>No driver applications yet.</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DRIVER DETAIL VIEW -->
+    <div class="admin-view" id="view-driver-detail">
+      <button onclick="showView('pending-drivers')" style="background:none;border:none;color:var(--muted);font-size:0.82rem;cursor:pointer;margin-bottom:20px;display:flex;align-items:center;gap:6px;padding:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Driver Applications
+      </button>
+
+      <div class="customer-header">
+        <div class="customer-avatar-lg" id="dr-detail-avatar" style="background:var(--orange);"></div>
+        <div>
+          <div class="customer-name-lg" id="dr-detail-name">—</div>
+          <div class="customer-email-lg" id="dr-detail-email">—</div>
+        </div>
+        <div style="margin-left:auto;">
+          <span id="dr-detail-status-tag" class="tag tag-orange">Pending</span>
+        </div>
+      </div>
+
+      <!-- Status updater — superadmin only -->
+      <div class="card superadmin-only" style="padding:20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <span style="font-size:0.78rem;font-weight:700;font-family:var(--font-d);color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Update Status</span>
+        <select id="dr-detail-status-select" class="form-select" style="width:auto;padding:8px 14px;">
+          <option value="pending">Pending</option>
+          <option value="reviewing">Under Review</option>
+          <option value="shortlisted">Shortlisted</option>
+          <option value="placed">Placed</option>
+          <option value="rejected">Not Proceeding</option>
+        </select>
+        <button class="btn-primary" style="font-size:0.78rem;padding:8px 16px;" onclick="saveDriverStatus()">Save Status</button>
+        <button class="btn-danger" style="font-size:0.78rem;padding:8px 16px;margin-left:auto;" onclick="deleteDriverApplication()">Delete Application</button>
+      </div>
+
+      <!-- Assign Recruiter — superadmin only -->
+      <div class="card superadmin-only" style="padding:20px;margin-bottom:20px;">
+        <div class="section-title" style="margin-bottom:14px;">Assign Recruiter</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Recruiter Name</label><input type="text" class="form-input" id="dr-rec-assign-name" placeholder="e.g. Sarah Ahmed"></div>
+          <div class="form-group"><label class="form-label">WhatsApp Number</label><input type="text" class="form-input" id="dr-rec-assign-wa" placeholder="+1 (000) 000-0000"></div>
+          <div class="form-group"><label class="form-label">Recruiter Email</label><input type="email" class="form-input" id="dr-rec-assign-email" placeholder="recruiter@haulxify.com"></div>
+          <div class="form-group"><label class="form-label">Phone</label><input type="text" class="form-input" id="dr-rec-assign-phone" placeholder="+1 (000) 000-0000"></div>
+        </div>
+        <button class="btn-primary" style="margin-top:4px;" onclick="saveDriverRecruiter()">Assign Recruiter</button>
+      </div>
+
+      <!-- Driver Info -->
+      <div class="card" style="padding:20px;margin-bottom:20px;">
+        <div class="section-title" style="margin-bottom:14px;">Application Details</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Phone</label><p class="form-input" style="cursor:default;" id="dr-detail-phone">—</p></div>
+          <div class="form-group"><label class="form-label">CDL Class</label><p class="form-input" style="cursor:default;" id="dr-detail-cdl">—</p></div>
+          <div class="form-group"><label class="form-label">CDL State</label><p class="form-input" style="cursor:default;" id="dr-detail-cdlstate">—</p></div>
+          <div class="form-group"><label class="form-label">CDL Expiry</label><p class="form-input" style="cursor:default;" id="dr-detail-cdlexpiry">—</p></div>
+          <div class="form-group"><label class="form-label">Experience</label><p class="form-input" style="cursor:default;" id="dr-detail-exp">—</p></div>
+          <div class="form-group"><label class="form-label">Run Type</label><p class="form-input" style="cursor:default;" id="dr-detail-run">—</p></div>
+          <div class="form-group full"><label class="form-label">Equipment</label><div id="dr-detail-equipment" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;"></div></div>
+        </div>
+      </div>
+
+      <!-- Compliance -->
+      <div class="card" style="padding:20px;margin-bottom:20px;">
+        <div class="section-title" style="margin-bottom:14px;">Compliance</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="dr-detail-compliance"></div>
+      </div>
+
+      <!-- Documents -->
+      <div class="card" style="padding:20px;">
+        <div class="section-title" style="margin-bottom:14px;">Uploaded Documents</div>
+        <div id="dr-detail-docs" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+    </div>
+    
     <!-- PENDING SIGNUPS VIEW -->
 <div class="admin-view" id="view-pending">
   <div class="section-header">
@@ -905,7 +1000,7 @@ auth.onAuthStateChanged(async function(user) {
       showGateError('Access denied. You are not an authorized admin.');
       return;
     }
-    currentAdminData = adminDoc.data();
+currentAdminData = { uid: user.uid, ...adminDoc.data() };
     document.getElementById('admin-display-name').textContent = currentAdminData.name || 'Admin';
     const initials = (currentAdminData.name || 'AD').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
     document.getElementById('admin-avatar-initials').textContent = initials;
@@ -913,7 +1008,12 @@ auth.onAuthStateChanged(async function(user) {
     document.getElementById('app').classList.add('show');
     const btn = document.getElementById('gate-btn');
     if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
-    loadDashboard();
+    if (currentAdminData.role === 'recruiter') {
+      document.querySelectorAll('.superadmin-only').forEach(el => el.style.display = 'none');
+      showView('pending-drivers');
+    } else {
+      loadDashboard();
+    }
   });
 
   // ── SIGN IN ──
@@ -963,12 +1063,13 @@ async function adminSignIn() {
     document.querySelectorAll('.admin-view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
     document.getElementById('view-' + view).classList.add('active');
-    const titles = { dashboard: 'Dashboard', customers: 'All Customers', admins: 'Admin Users', 'customer-detail': 'Customer Detail', pending: 'Pending Signups' };
+    const titles = { dashboard: 'Dashboard', customers: 'All Customers', admins: 'Admin Users', 'customer-detail': 'Customer Detail', pending: 'Pending Signups', 'pending-drivers': 'Driver Applications', 'driver-detail': 'Driver Detail' };
     document.getElementById('topbar-title').textContent = titles[view] || view;
     document.getElementById('topbar-sub').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
 if (view === 'customers') { loadCustomers(); }
     if (view === 'admins')    { loadAdmins(); }
-    if (view === 'pending')   { loadPendingSignups(); }
+    if (view === 'pending')         { loadPendingSignups(); }
+    if (view === 'pending-drivers') { loadPendingDrivers(); }
   }
 
   // ── LOAD DASHBOARD ──
@@ -1781,7 +1882,174 @@ await loadEmployeesDropdown('new-account-manager');
     showToast('Signup rejected.', 'success');
     loadPendingSignups();
   }
-  
+
+// ── DRIVER APPLICATIONS ──
+  let currentDriverId = null;
+
+  async function loadPendingDrivers() {
+    let query = db.collection('drivers').orderBy('submittedAt', 'desc');
+    if (currentAdminData.role === 'recruiter') {
+      query = query.where('recruiter.uid', '==', currentAdminData.uid);
+    }
+    const snap  = await query.get();
+    const tbody = document.getElementById('pending-drivers-tbody');
+    const badge = document.getElementById('pending-drivers-badge');
+    tbody.innerHTML = '';
+
+    if (snap.empty) {
+      tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><p>No driver applications yet.</p></div></td></tr>';
+      if (badge) badge.style.display = 'none';
+      return;
+    }
+
+    const activeCount = snap.docs.filter(d => !['placed','rejected'].includes(d.data().status)).length;
+    if (badge) { badge.style.display = activeCount > 0 ? 'inline' : 'none'; badge.textContent = activeCount; }
+
+    const statusColors  = { pending:'tag-orange', reviewing:'tag-orange', shortlisted:'tag-blue', placed:'tag-green', rejected:'tag-red' };
+    const statusLabels  = { pending:'Pending', reviewing:'Under Review', shortlisted:'Shortlisted', placed:'Placed', rejected:'Not Proceeding' };
+
+    snap.forEach(doc => {
+      const d = doc.data();
+      tbody.innerHTML += `
+        <tr style="cursor:pointer;" onclick="openDriverDetail('${doc.id}')">
+          <td>${d.name||'—'}</td>
+          <td class="td-muted">${d.email||'—'}</td>
+          <td class="td-muted">${d.phone||'—'}</td>
+          <td>${d.cdlClass||'—'}</td>
+          <td class="td-muted">${d.experience||'—'}</td>
+          <td class="td-muted">${d.runType||'—'}</td>
+          <td class="td-muted">${d.submittedAt ? new Date(d.submittedAt).toLocaleDateString() : '—'}</td>
+          <td><span class="tag ${statusColors[d.status]||'tag-orange'}">${statusLabels[d.status]||'Pending'}</span></td>
+        </tr>`;
+    });
+  }
+
+  async function openDriverDetail(docId) {
+    currentDriverId = docId;
+    const driverDoc = await db.collection('drivers').doc(docId).get();
+    const d = driverDoc.exists ? driverDoc.data() : {};
+
+    const first = (d.name||'?').charAt(0).toUpperCase();
+    document.getElementById('dr-detail-avatar').textContent = first;
+    setText('dr-detail-name',  d.name  || '—');
+    setText('dr-detail-email', d.email || '—');
+
+    const statusLabels = { pending:'Pending', reviewing:'Under Review', shortlisted:'Shortlisted', placed:'Placed', rejected:'Not Proceeding' };
+    setText('dr-detail-status-tag', statusLabels[d.status] || 'Pending');
+    const sel = document.getElementById('dr-detail-status-select');
+    if (sel) sel.value = d.status || 'pending';
+
+    const rec = d.recruiter || {};
+    document.getElementById('dr-rec-assign-name').value  = rec.name     || '';
+    document.getElementById('dr-rec-assign-wa').value    = rec.whatsapp || '';
+    document.getElementById('dr-rec-assign-email').value = rec.email    || '';
+    document.getElementById('dr-rec-assign-phone').value = rec.phone    || '';
+
+    setText('dr-detail-phone',     d.phone      || '—');
+    setText('dr-detail-cdl',       d.cdlClass   || '—');
+    setText('dr-detail-cdlstate',  d.cdlState   || '—');
+    setText('dr-detail-cdlexpiry', d.cdlExpiry  || '—');
+    setText('dr-detail-exp',       d.experience || '—');
+    setText('dr-detail-run',       d.runType    || '—');
+
+    const eqWrap = document.getElementById('dr-detail-equipment');
+    if (eqWrap) {
+      eqWrap.innerHTML = Array.isArray(d.equipment) && d.equipment.length
+        ? d.equipment.map(eq => `<span class="tag tag-orange">${eq}</span>`).join('')
+        : '<span style="color:var(--muted);font-size:0.8rem;">None</span>';
+    }
+
+    const compWrap = document.getElementById('dr-detail-compliance');
+    if (compWrap) {
+      const checks = [
+        { label:'Work Authorization',    ok: !!d.workAuth     },
+        { label:'No DUI (5 yrs)',        ok: !!d.noDUI        },
+        { label:'No Accidents (3 yrs)',  ok: !!d.noAccidents  },
+        { label:'No Violations (3 yrs)', ok: !!d.noViolations },
+        { label:'SMS Consent',           ok: !!d.smsConsent   },
+      ];
+      compWrap.innerHTML = checks.map(c => `
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:var(--navy3);">
+          <i class="fa-solid ${c.ok ? 'fa-check' : 'fa-xmark'}" style="color:${c.ok ? '#22c55e' : 'var(--danger)'};font-size:0.75rem;"></i>
+          <span style="font-size:0.8rem;color:var(--text);">${c.label}</span>
+        </div>`).join('');
+    }
+
+    const docsWrap = document.getElementById('dr-detail-docs');
+    if (docsWrap) {
+      const docs = d.documents || {};
+      const docMeta = [
+        { key:'dr-cdl',      label:'CDL Copy'          },
+        { key:'dr-medcard',  label:'DOT Medical Card'  },
+        { key:'dr-mvr',      label:'MVR'               },
+        { key:'dr-drugtest', label:'Drug Test Results' },
+        { key:'dr-cv',       label:'Resume / CV'       },
+      ];
+      docsWrap.innerHTML = docMeta.map(m => {
+        const url = docs[m.key];
+        return `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:8px;background:var(--navy3);">
+            <span style="font-size:0.82rem;color:var(--text);">${m.label}</span>
+            ${url
+              ? `<a href="${url}" target="_blank" style="font-size:0.75rem;color:var(--orange);font-weight:700;text-decoration:none;">VIEW ↗</a>`
+              : `<span style="font-size:0.75rem;color:var(--muted);">Not uploaded</span>`}
+          </div>`;
+      }).join('');
+    }
+
+    showView('driver-detail');
+  }
+
+  async function saveDriverStatus() {
+    if (!currentDriverId) return;
+    const status = document.getElementById('dr-detail-status-select').value;
+    try {
+      await db.collection('drivers').doc(currentDriverId).update({ status });
+      await db.collection('pendingDrivers').doc(currentDriverId).update({ status }).catch(()=>{});
+      const statusLabels = { pending:'Pending', reviewing:'Under Review', shortlisted:'Shortlisted', placed:'Placed', rejected:'Not Proceeding' };
+      setText('dr-detail-status-tag', statusLabels[status] || status);
+      showToast('Status updated.');
+    } catch(err) {
+      showToast('Failed to update status.');
+    }
+  }
+
+  async function saveDriverRecruiter() {
+    if (!currentDriverId) return;
+    const recEmail = document.getElementById('dr-rec-assign-email').value.trim();
+    let recUid = null;
+    try {
+      const recSnap = await db.collection('admins').where('email', '==', recEmail).limit(1).get();
+      if (!recSnap.empty) recUid = recSnap.docs[0].id;
+    } catch(e) {}
+    const recruiter = {
+      uid:      recUid,
+      name:     document.getElementById('dr-rec-assign-name').value.trim(),
+      whatsapp: document.getElementById('dr-rec-assign-wa').value.trim(),
+      email:    recEmail,
+      phone:    document.getElementById('dr-rec-assign-phone').value.trim(),
+    };
+    try {
+      await db.collection('drivers').doc(currentDriverId).update({ recruiter });
+      showToast('Recruiter assigned. Driver will see this immediately.');
+    } catch(err) {
+      showToast('Failed to assign recruiter.');
+    }
+  }
+
+  async function deleteDriverApplication() {
+    if (!currentDriverId) return;
+    if (!confirm('Permanently delete this driver application? This cannot be undone.')) return;
+    try {
+      await db.collection('drivers').doc(currentDriverId).delete();
+      await db.collection('pendingDrivers').doc(currentDriverId).delete().catch(()=>{});
+      showToast('Application deleted.');
+      showView('pending-drivers');
+    } catch(err) {
+      showToast('Failed to delete.');
+    }
+  }
+    
   // ── ADMINS ──
   async function loadAdmins() {
     const snap = await db.collection('admins').get();
