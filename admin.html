@@ -915,7 +915,14 @@
     <div class="form-grid">
       <div class="form-group full"><label class="form-label">Name</label><input type="text" class="form-input" id="admin-new-name" placeholder="Admin Name"></div>
       <div class="form-group full"><label class="form-label">Email</label><input type="email" class="form-input" id="admin-new-email" placeholder="admin@company.com"></div>
-      <div class="form-group full"><label class="form-label">Firebase UID</label><input type="text" class="form-input" id="admin-new-uid" placeholder="Paste UID from Firebase Auth console"></div>
+<div class="form-group full"><label class="form-label">Firebase UID</label><input type="text" class="form-input" id="admin-new-uid" placeholder="Paste UID from Firebase Auth console"></div>
+      <div class="form-group full">
+        <label class="form-label">Role</label>
+        <select class="form-input" id="admin-new-role">
+          <option value="superadmin">Super Admin — full access</option>
+          <option value="recruiter">Recruiter — assigned drivers only</option>
+        </select>
+      </div>
     </div>
     <div class="form-actions">
       <button class="btn-secondary" onclick="closeModal('modal-add-admin')">Cancel</button>
@@ -2080,7 +2087,8 @@ await loadEmployeesDropdown('new-account-manager');
     const email = document.getElementById('admin-new-email').value.trim();
     const uid   = document.getElementById('admin-new-uid').value.trim();
     if (!name || !email || !uid) { showToast('All fields are required.', 'error'); return; }
-    await db.collection('admins').doc(uid).set({ name, email, addedOn: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) });
+    const role = document.getElementById('admin-new-role').value;
+    await db.collection('admins').doc(uid).set({ name, email, role, addedOn: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) });
     closeModal('modal-add-admin');
     showToast(`${name} added as admin!`, 'success');
     loadAdmins();
