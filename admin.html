@@ -571,12 +571,36 @@
 </div>
 
       <!-- Profile Panel -->
-      <div class="detail-panel active" id="detail-panel-profile">
-        <div class="form-grid" id="profile-edit-grid"></div>
-        <div class="form-actions">
-          <button class="btn-primary" onclick="saveProfile()">Save Profile</button>
-        </div>
-      </div>
+<div class="detail-panel active" id="detail-panel-profile">
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+
+    <!-- Account Manager -->
+    <div style="background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+      <div style="font-size:0.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-d);margin-bottom:10px;">Account Manager</div>
+      <div id="detail-account-manager"></div>
+    </div>
+
+    <!-- Fleet Summary -->
+    <div style="background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+      <div style="font-size:0.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-d);margin-bottom:10px;">Fleet</div>
+      <div id="detail-trucks"></div>
+    </div>
+
+  </div>
+
+  <!-- Documents -->
+  <div style="background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px;">
+    <div style="font-size:0.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-d);margin-bottom:10px;">Documents</div>
+    <div id="detail-documents"></div>
+  </div>
+
+  <!-- Edit Form -->
+  <div class="form-grid" id="profile-edit-grid"></div>
+  <div class="form-actions">
+    <button class="btn-primary" onclick="saveProfile()">Save Profile</button>
+  </div>
+</div>
 
       <!-- Loads Panel -->
       <div class="detail-panel" id="detail-panel-loads">
@@ -1331,14 +1355,57 @@ document.getElementById('profile-edit-grid').innerHTML = `
       <div class="form-group"><label class="form-label">Card Expiry</label><input type="text" class="form-input" id="edit-bill-expiry" value="${b.cardExpiry||''}"></div>
     `;
 
+// Show account manager
+    const amSection = document.getElementById('detail-account-manager');
+    if (amSection) amSection.innerHTML = d.accountManagerName
+      ? `<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(232,119,34,0.08);border:1px solid rgba(232,119,34,0.2);border-radius:10px;">
+           <div style="width:36px;height:36px;border-radius:50%;background:rgba(232,119,34,0.15);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--orange);font-size:0.8rem;">${d.accountManagerName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
+           <div><div style="font-weight:600;font-size:0.875rem;">${d.accountManagerName}</div><div style="font-size:0.75rem;color:var(--muted);">Account Manager</div></div>
+         </div>`
+      : `<p style="color:var(--muted);font-size:0.8rem;">No account manager assigned yet.</p>`;
+
+    // Show trucks
+    const truckSection = document.getElementById('detail-trucks');
+    if (truckSection) {
+      if (d.trucks && d.trucks.length > 0) {
+        truckSection.innerHTML = d.trucks.map((t,i) => `
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--navy3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;">
+            <div style="font-size:0.7rem;font-weight:700;color:var(--orange);font-family:var(--font-d);background:rgba(232,119,34,0.1);padding:4px 10px;border-radius:20px;">Truck ${i+1}</div>
+            <div style="font-size:0.875rem;font-weight:600;">${t.type||'—'}</div>
+            <div style="font-size:0.8rem;color:var(--muted);">${t.trailerLength||'—'}</div>
+            ${t.year ? `<div style="font-size:0.8rem;color:var(--muted);">${t.year}</div>` : ''}
+          </div>`).join('');
+      } else {
+        truckSection.innerHTML = '<p style="color:var(--muted);font-size:0.8rem;">No trucks added yet.</p>';
+      }
+    }
+
+    // Show documents
+    const docSection = document.getElementById('detail-documents');
+    if (docSection) {
+      const docs = d.documents || {};
+      const docLabels = { mcPermit:'MC Permit', w9:'W9 Form', coi:'Certificate of Insurance', voidedCheck:'Voided Check / Factoring' };
+      docSection.innerHTML = Object.entries(docLabels).map(([key, label]) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--navy3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <i class="fa-solid fa-file-pdf" style="color:var(--orange);"></i>
+            <span style="font-size:0.875rem;font-weight:600;">${label}</span>
+          </div>
+          ${docs[key]
+            ? `<a href="${docs[key]}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--orange);color:#fff;border-radius:8px;font-size:0.775rem;font-weight:600;text-decoration:none;"><i class="fa-solid fa-download"></i> View</a>`
+            : `<span style="font-size:0.75rem;color:var(--muted);">Not uploaded</span>`
+          }
+        </div>`).join('');
+    }
+
     switchDetailTab('profile');
     showView('customer-detail');
-loadDetailLoads(uid);
+    loadDetailLoads(uid);
     loadDetailInvoices(uid);
     loadDetailBillingHistory(uid);
     loadDetailStatements(uid);
-loadDetailPaperwork(uid);
-    loadDetailActivity(uid);  }
+    loadDetailPaperwork(uid);
+    loadDetailActivity(uid);
 
 async function saveProfile() {
     await db.collection('customers').doc(selectedCustomerUID).update({
