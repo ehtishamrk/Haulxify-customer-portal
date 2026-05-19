@@ -16,8 +16,7 @@ auth.onAuthStateChanged(async function(user) {
     window.location.href = 'https://app.haulxify.com/login.html';
     return;
   }
-  currentUser = user;
-  showSkeletons();
+currentUser = user;
 
   // Detect role — check drivers collection first, fall back to customers
   try {
@@ -25,9 +24,11 @@ auth.onAuthStateChanged(async function(user) {
     if (driverDoc.exists) {
       userRole = 'driver';
       applyDriverUI();
+      showDriverSkeletons();
       loadDriverData(user.uid);
     } else {
       userRole = 'customer';
+      showSkeletons();
       loadCustomerData(user.uid);
     }
   } catch(err) {
@@ -49,6 +50,35 @@ function applyDriverUI() {
   if (tierDriver)  tierDriver.style.display  = 'block';
   // Set dashboard as default active tab
   switchTab('dashboard');
+}
+
+function showDriverSkeletons() {
+  // Sidebar name
+  const sname = document.getElementById('sidebar-profile-name');
+  if (sname) sname.innerHTML = '<span class="skeleton skeleton-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+  // Welcome name
+  const wname = document.getElementById('dr-welcome-name');
+  if (wname) wname.innerHTML = '<span class="skeleton skeleton-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+  // KPI values
+  ['dr-kpi-cdl','dr-kpi-run','dr-kpi-expiry','dr-kpi-docs'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<span class="skeleton skeleton-text-lg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+  });
+  // Compliance list
+  const list = document.getElementById('dr-compliance-list');
+  if (list) {
+    list.innerHTML = '';
+    for (let i = 0; i < 4; i++) {
+      list.innerHTML += `
+        <li class="activity-item">
+          <span class="skeleton skeleton-avatar"></span>
+          <div class="act-body">
+            <p><span class="skeleton skeleton-text"></span></p>
+            <p><span class="skeleton skeleton-text-sm"></span></p>
+          </div>
+        </li>`;
+    }
+  }
 }
 
 // ── SKELETON LOADERS ─────────────────────────────────────────
