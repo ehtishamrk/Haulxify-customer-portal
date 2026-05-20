@@ -493,11 +493,14 @@
 
     <!-- DASHBOARD VIEW -->
     <div class="admin-view active" id="view-dashboard">
-      <div class="stats-row" id="stats-row">
+<div class="stats-row" id="stats-row">
         <div class="stat-card"><div class="stat-label">Total Customers</div><div class="stat-value orange" id="stat-customers">—</div></div>
         <div class="stat-card"><div class="stat-label">Active Admins</div><div class="stat-value green" id="stat-admins">—</div></div>
         <div class="stat-card"><div class="stat-label">Total Loads</div><div class="stat-value" id="stat-loads">—</div></div>
         <div class="stat-card"><div class="stat-label">Pending Invoices</div><div class="stat-value orange" id="stat-invoices">—</div></div>
+        <div class="stat-card"><div class="stat-label">Total Drivers</div><div class="stat-value" id="stat-drivers-total">—</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value orange" id="stat-drivers-pending">—</div></div>
+        <div class="stat-card"><div class="stat-label">Drivers Placed</div><div class="stat-value green" id="stat-drivers-placed">—</div></div>
       </div>
       <div class="section-header">
         <div class="section-title">Recent Customers</div>
@@ -1109,8 +1112,20 @@ if (view === 'customers') { loadCustomers(); }
           <td><button class="btn-secondary" onclick="openCustomerDetail('${doc.id}')">View</button></td>
         </tr>`;
     }
-    document.getElementById('stat-loads').textContent    = totalLoads;
+document.getElementById('stat-loads').textContent    = totalLoads;
     document.getElementById('stat-invoices').textContent = pendingInv;
+
+    // Driver stats
+    const driversSnap = await db.collection('drivers').get();
+    let driversPending = 0, driversPlaced = 0;
+    driversSnap.forEach(doc => {
+      const s = doc.data().status;
+      if (s === 'placed') driversPlaced++;
+      else if (s !== 'rejected') driversPending++;
+    });
+    document.getElementById('stat-drivers-total').textContent   = driversSnap.size;
+    document.getElementById('stat-drivers-pending').textContent = driversPending;
+    document.getElementById('stat-drivers-placed').textContent  = driversPlaced;
 if (custSnap.size === 0) tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>No customers yet. Add your first customer.</p></div></td></tr>';
 
     // Load pending badge
