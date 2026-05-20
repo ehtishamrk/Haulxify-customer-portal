@@ -755,21 +755,19 @@ async function loadDriverData(uid) {
     if (emEl) emEl.href = recruiter.email ? 'mailto:' + recruiter.email : 'mailto:info@haulxify.com';
 
     // ── PROFILE TAB ──
-    setText('dr-profile-name',     d.name      || '—');
-    setText('dr-profile-email',    d.email     || '—');
-    setText('dr-profile-phone',    d.phone     || '—');
-    setText('dr-profile-cdl',      d.cdlClass  || '—');
-    setText('dr-profile-cdlstate', d.cdlState  || '—');
-    setText('dr-profile-cdlexpiry',d.cdlExpiry || '—');
-    setText('dr-profile-exp',      d.experience|| '—');
-    setText('dr-profile-run',      d.runType   || '—');
+setVal('dr-profile-name',     d.name      || '');
+    setVal('dr-profile-email',    d.email     || '');
+    setVal('dr-profile-phone',    d.phone     || '');
+    setVal('dr-profile-cdl',      d.cdlClass  || '');
+    setVal('dr-profile-cdlstate', d.cdlState  || '');
+    setVal('dr-profile-cdlexpiry',d.cdlExpiry || '');
+    setVal('dr-profile-exp',      d.experience|| '');
+    setVal('dr-profile-run',      d.runType   || '');
 
-    const eqWrap = document.getElementById('dr-profile-equipment');
-    if (eqWrap && Array.isArray(d.equipment)) {
-      eqWrap.innerHTML = d.equipment.length
-        ? d.equipment.map(eq => `<span style="background:rgba(232,119,34,0.1);color:var(--brand-orange);border-radius:20px;padding:4px 12px;font-size:0.75rem;font-weight:600;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.03em;">${eq}</span>`).join('')
-        : '<span style="color:rgba(13,25,41,0.4);font-size:0.82rem;">None selected</span>';
-    }
+    // Check equipment boxes
+    document.querySelectorAll('.dr-eq-check').forEach(cb => {
+      cb.checked = Array.isArray(d.equipment) && d.equipment.includes(cb.value);
+    });
 
     // ── DOCUMENTS TAB ──
     renderDriverDocs(docs);
@@ -790,6 +788,50 @@ async function loadDriverData(uid) {
     console.error('Error loading driver data:', err);
     showToast('Error loading your profile. Please refresh.');
   }
+}
+
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val;
+}
+
+async function saveDriverProfile() {
+  const btn = document.getElementById('dr-profile-save-btn');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  const equipment = [];
+  document.querySelectorAll('.dr-eq-check').forEach(cb => {
+    if (cb.checked) equipment.push(cb.value);
+  });
+
+  const updates = {
+    name:       document.getElementById('dr-profile-name').value.trim(),
+    phone:      document.getElementById('dr-profile-phone').value.trim(),
+    cdlClass:   document.getElementById('dr-profile-cdl').value,
+    cdlState:   document.getElementById('dr-profile-cdlstate').value.trim(),
+    cdlExpiry:  document.getElementById('dr-profile-cdlexpiry').value,
+    experience: document.getElementById('dr-profile-exp').value,
+    runType:    document.getElementById('dr-profile-run').value,
+    equipment,
+  };
+
+  if (!updates.name) {
+    showToast('Name cannot be empty.');
+    btn.classList.remove('loading'); btn.disabled = false;
+    return;
+  }
+
+  try {
+    await db.collection('drivers').doc(currentUser.uid).update(updates);
+    // Keep sidebar name in sync
+    setText('sidebar-profile-name', updates.name);
+    setText('dr-welcome-name', updates.name.split(' ')[0]);
+    showToast('Profile updated successfully.');
+  } catch(err) {
+    console.error(err);
+    showToast('Failed to save. Please try again.');
+  }
+  btn.classList.remove('loading'); btn.disabled = false;
 }
 
 function formatStatus(status) {
