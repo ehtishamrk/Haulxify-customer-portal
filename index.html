@@ -598,46 +598,88 @@
     </section>
 
     <!-- DRIVER PROFILE -->
-    <section class="tab-panel" id="tab-dr-profile">
+<section class="tab-panel" id="tab-dr-profile">
       <div class="panel-header"><h2>My Profile</h2></div>
       <div class="card" style="padding:28px;max-width:680px;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+
           <div style="grid-column:1/-1;">
-            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Full Name</p>
-            <p id="dr-profile-name" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+            <label class="field-label-sm">Full Name</label>
+            <input type="text" id="dr-profile-name" class="field-input">
           </div>
           <div>
-            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Email</p>
-            <p id="dr-profile-email" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+            <label class="field-label-sm">Email</label>
+            <input type="email" id="dr-profile-email" class="field-input" disabled style="opacity:0.5;cursor:not-allowed;">
           </div>
           <div>
-            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Phone</p>
-            <p id="dr-profile-phone" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+            <label class="field-label-sm">Phone</label>
+            <input type="tel" id="dr-profile-phone" class="field-input">
           </div>
           <div>
-            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">CDL Class</p>
-            <p id="dr-profile-cdl" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+            <label class="field-label-sm">CDL Class</label>
+            <select id="dr-profile-cdl" class="field-input" style="padding:12px 14px;">
+              <option value="">Select…</option>
+              <option>Class A</option>
+              <option>Class B</option>
+              <option>Class C</option>
+            </select>
           </div>
           <div>
-            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">CDL State</p>
-            <p id="dr-profile-cdlstate" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+            <label class="field-label-sm">CDL State</label>
+            <input type="text" id="dr-profile-cdlstate" class="field-input" placeholder="e.g. TX">
           </div>
           <div>
-            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">CDL Expiry</p>
-            <p id="dr-profile-cdlexpiry" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+            <label class="field-label-sm">CDL Expiry</label>
+            <input type="date" id="dr-profile-cdlexpiry" class="field-input">
           </div>
           <div>
-            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Experience</p>
-            <p id="dr-profile-exp" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+            <label class="field-label-sm">Experience</label>
+            <select id="dr-profile-exp" class="field-input" style="padding:12px 14px;">
+              <option value="">Select…</option>
+              <option>Less than 1 year</option>
+              <option>1–2 years</option>
+              <option>3–5 years</option>
+              <option>6–10 years</option>
+              <option>10+ years</option>
+            </select>
           </div>
           <div>
-            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Run Type</p>
-            <p id="dr-profile-run" style="font-size:0.95rem;color:var(--brand-navy);">—</p>
+            <label class="field-label-sm">Run Type</label>
+            <select id="dr-profile-run" class="field-input" style="padding:12px 14px;">
+              <option value="">Select…</option>
+              <option>OTR (Over the Road)</option>
+              <option>Regional</option>
+              <option>Local</option>
+              <option>Dedicated Lane</option>
+            </select>
           </div>
+
           <div style="grid-column:1/-1;">
-            <p style="font-size:0.72rem;font-weight:700;font-family:var(--font-display);color:var(--brand-navy);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;">Equipment</p>
-            <div id="dr-profile-equipment" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+            <label class="field-label-sm" style="margin-bottom:10px;display:block;">Equipment</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="dryvan" style="accent-color:#E87722;"> Dry Van</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="reefer" style="accent-color:#E87722;"> Reefer</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="flatbed" style="accent-color:#E87722;"> Flatbed</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="stepdeck" style="accent-color:#E87722;"> Step Deck</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="tanker" style="accent-color:#E87722;"> Tanker</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="conestoga" style="accent-color:#E87722;"> Conestoga</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="lowboy" style="accent-color:#E87722;"> Lowboy / RGN</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="doubledrop" style="accent-color:#E87722;"> Double Drop</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="hazmat" style="accent-color:#E87722;"> HazMat</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="intermodal" style="accent-color:#E87722;"> Intermodal</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="boxtruck" style="accent-color:#E87722;"> Box Truck</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="hotshot" style="accent-color:#E87722;"> Hotshot</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="carhauler" style="accent-color:#E87722;"> Car Hauler</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="dr-eq-check" value="dump" style="accent-color:#E87722;"> Dump Truck</label>
+            </div>
           </div>
+
+        </div>
+        <div style="margin-top:24px;display:flex;justify-content:flex-end;">
+          <button class="btn-signin" id="dr-profile-save-btn" onclick="saveDriverProfile()" style="width:auto;padding:12px 28px;">
+            <div class="spinner"></div>
+            <span class="btn-label">Save Changes</span>
+          </button>
         </div>
       </div>
     </section>
