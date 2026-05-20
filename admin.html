@@ -1476,12 +1476,12 @@ document.getElementById('profile-edit-grid').innerHTML = `
     const truckSection = document.getElementById('detail-trucks');
     if (truckSection) {
       if (d.trucks && d.trucks.length > 0) {
-        truckSection.innerHTML = d.trucks.map((t,i) => `
+truckSection.innerHTML = d.trucks.map((t,i) => `
           <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--navy3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;">
             <div style="font-size:0.7rem;font-weight:700;color:var(--orange);font-family:var(--font-d);background:rgba(232,119,34,0.1);padding:4px 10px;border-radius:20px;">Truck ${i+1}</div>
             <div style="font-size:0.875rem;font-weight:600;">${t.type||'—'}</div>
             <div style="font-size:0.8rem;color:var(--muted);">${t.trailerLength||'—'}</div>
-            ${t.year ? `<div style="font-size:0.8rem;color:var(--muted);">${t.year}</div>` : ''}
+            <div style="font-size:0.8rem;color:var(--muted);">${t.year||''}</div>
           </div>`).join('');
       } else {
         truckSection.innerHTML = '<p style="color:var(--muted);font-size:0.8rem;">No trucks added yet.</p>';
