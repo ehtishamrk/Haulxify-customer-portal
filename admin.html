@@ -582,11 +582,16 @@
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
 
-    <!-- Account Manager -->
-    <div style="background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:16px;">
-      <div style="font-size:0.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-d);margin-bottom:10px;">Account Manager</div>
-      <div id="detail-account-manager"></div>
-    </div>
+<!-- Account Manager -->
+  <div style="background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+    <div style="font-size:0.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-d);margin-bottom:10px;">Account Manager</div>
+    <div id="detail-account-manager"></div>
+  </div>
+
+  <!-- Assign Dispatcher -->
+  <div style="background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:14px;grid-column:1/-1;" id="detail-assign-dispatcher">
+    <div style="color:var(--muted);font-size:0.8rem;">Loading employee list…</div>
+  </div>
 
     <!-- Fleet Summary -->
     <div style="background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:16px;">
@@ -749,7 +754,22 @@
           <div class="form-group"><label class="form-label">Recruiter Email</label><input type="email" class="form-input" id="dr-rec-assign-email" placeholder="recruiter@haulxify.com"></div>
           <div class="form-group"><label class="form-label">Phone</label><input type="text" class="form-input" id="dr-rec-assign-phone" placeholder="+1 (000) 000-0000"></div>
         </div>
-        <button class="btn-primary" style="margin-top:4px;" onclick="saveDriverRecruiter()">Assign Recruiter</button>
+<button class="btn-primary" style="margin-top:4px;" onclick="saveDriverRecruiter()">Assign Recruiter</button>
+      </div>
+
+      <!-- Assign Driver to Employee -->
+      <div class="card superadmin-only" style="padding:20px;margin-bottom:20px;" id="driver-assign-emp-wrap">
+        <div class="section-title" style="margin-bottom:14px;">Assign Driver to Dispatcher</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+          <div style="flex:1;min-width:200px;">
+            <label style="font-size:0.72rem;color:var(--muted);display:block;margin-bottom:4px;">Select Employee</label>
+            <select id="driver-assign-emp-select" style="width:100%;padding:9px 12px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font-b);font-size:0.8rem;outline:none;">
+              <option value="">— Loading employees… —</option>
+            </select>
+          </div>
+          <button class="btn-primary" style="padding:9px 18px;font-size:0.8rem;" onclick="assignDriverToEmployee()">Assign & Notify</button>
+        </div>
+        <div id="driver-assign-result" style="margin-top:8px;font-size:0.78rem;"></div>
       </div>
 
       <!-- Driver Info -->
@@ -969,23 +989,35 @@
   ];
 
 let empDb;
-  try {
-    const EMP_APP = firebase.initializeApp({
-      apiKey: "AIzaSyDBd2hw7Gq1-mwR5evKF-YPcAGRYDNl3fw",
-      authDomain: "haulxify-employee-portal.firebaseapp.com",
-      projectId: "haulxify-employee-portal",
-      storageBucket: "haulxify-employee-portal.firebasestorage.app",
-      messagingSenderId: "170605105002",
-      appId: "1:170605105002:web:d5da4718f77fd1182adf13"
-    }, 'employee-portal');
-    empDb = EMP_APP.firestore();
+try {
+  const EMP_APP = firebase.initializeApp({
+    apiKey: "AIzaSyDBd2hw7Gq1-mwR5evKF-YPcAGRYDNl3fw",
+    authDomain: "haulxify-employee-portal.firebaseapp.com",
+    projectId: "haulxify-employee-portal",
+    storageBucket: "haulxify-employee-portal.firebasestorage.app",
+    messagingSenderId: "170605105002",
+    appId: "1:170605105002:web:d5da4718f77fd1182adf13"
+  }, 'employee-portal');
+  empDb = EMP_APP.firestore();
+  const empAuth = firebase.auth(EMP_APP);
+  empAuth.signInAnonymously().catch(e => console.warn('Anon sign in failed:', e));
+} catch(e) {
+  console.warn('Employee portal connection failed:', e);
+}
 
-    // Sign in anonymously to employee portal for read access
-    const empAuth = firebase.auth(EMP_APP);
-    empAuth.signInAnonymously().catch(e => console.warn('Anon sign in failed:', e));
-  } catch(e) {
-    console.warn('Employee portal connection failed:', e);
-  }
+// ── Write notification into employee portal Firestore ──────────
+async function writeEmpNotification(empUid, title, body, type = 'assignment') {
+  try {
+    const notifId = Date.now().toString() + Math.random().toString(36).slice(2, 6);
+    await empDb.collection('notifications').doc(empUid)
+      .collection('items').doc(notifId).set({
+        id: notifId, type, title, body,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+        createdByName: 'Admin',
+      });
+  } catch(e) { console.error('Notif write failed:', e); }
+}
   
   const auth = firebase.auth();
   const db   = firebase.firestore();
@@ -1209,7 +1241,7 @@ async function loadEmployeesDropdown(selectId) {
     try {
       const snap = await empDb.collection('employees').get();
       if (snap.empty) {
-        sel.innerHTML = '<option value="">No employees found</option>';
+        renderAMList([]);
         return;
       }
       // Store all employees for search
@@ -1399,12 +1431,6 @@ const amId   = document.getElementById('new-account-manager').value;
     document.getElementById('truck-fields-wrap').innerHTML = '';
   }
 
-  function clearAddCustomerForm() {
-    ['new-email','new-password','new-name','new-company','new-mc','new-dot','new-phone','new-address'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
-  }
-
   // ── DELETE CUSTOMER ──
 async function deleteCustomer(uid) {
   if (!confirm('Are you sure you want to delete this customer?\n\nIMPORTANT: You must also manually delete their account from Firebase Console → Authentication → Users.\n\nContinue?')) return;
@@ -1478,7 +1504,31 @@ document.getElementById('profile-edit-grid').innerHTML = `
       <div class="form-group"><label class="form-label">Card Expiry</label><input type="text" class="form-input" id="edit-bill-expiry" value="${b.cardExpiry||''}"></div>
     `;
 
-// Show account manager
+// Load & render assign-dispatcher section
+    const assignSection = document.getElementById('detail-assign-dispatcher');
+    if (assignSection) {
+      const empSnap = await empDb.collection('employees').get();
+      const empOptions = empSnap.docs.map(d => {
+        const e = d.data();
+        return `<option value="${d.id}|${e.name}|${e.reportsToUid||''}|${e.reportsToName||''}">${e.name} (${e.id || d.id}) — ${e.designation || ''}</option>`;
+      }).join('');
+      assignSection.innerHTML = `
+        <div style="font-size:0.75rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-d);margin-bottom:10px;">Assign to Dispatcher / Employee</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+          <div style="flex:1;min-width:200px;">
+            <label style="font-size:0.72rem;color:var(--muted);display:block;margin-bottom:4px;">Select Employee</label>
+            <select id="assign-emp-select" style="width:100%;padding:9px 12px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font-b);font-size:0.8rem;outline:none;">
+              <option value="">— Select employee —</option>
+              ${empOptions}
+            </select>
+          </div>
+          <button class="btn-primary" style="padding:9px 18px;font-size:0.8rem;" onclick="assignCustomerToEmployee()">Assign & Notify</button>
+        </div>
+        <div id="assign-result" style="margin-top:8px;font-size:0.78rem;"></div>
+      `;
+    }
+
+    // Show account manager
     const amSection = document.getElementById('detail-account-manager');
     if (amSection) amSection.innerHTML = d.accountManagerName
       ? `<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(232,119,34,0.08);border:1px solid rgba(232,119,34,0.2);border-radius:10px;">
@@ -2021,8 +2071,21 @@ await loadEmployeesDropdown('new-account-manager');
     }
 
     showView('driver-detail');
-  }
 
+    // Populate driver assign dropdown
+    if (empDb) {
+      empDb.collection('employees').get().then(snap => {
+        const driverEmpSel = document.getElementById('driver-assign-emp-select');
+        if (!driverEmpSel) return;
+        driverEmpSel.innerHTML = '<option value="">— Select employee —</option>' +
+          snap.docs.map(d => {
+            const e = d.data();
+            return `<option value="${d.id}|${e.name}|${e.reportsToUid||''}|${e.reportsToName||''}">${e.name} (${e.id||d.id}) — ${e.designation||''}</option>`;
+          }).join('');
+      }).catch(() => {});
+    }
+  }
+  
   async function saveDriverStatus() {
     if (!currentDriverId) return;
     const status = document.getElementById('dr-detail-status-select').value;
@@ -2126,6 +2189,115 @@ await loadEmployeesDropdown('new-account-manager');
     m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
   });
 
+async function assignCustomerToEmployee() {
+  const sel = document.getElementById('assign-emp-select');
+  const result = document.getElementById('assign-result');
+  if (!sel || !sel.value) { if(result) result.textContent = 'Please select an employee.'; return; }
+
+  const [empUid, empName, supervisorUid, supervisorName] = sel.value.split('|');
+  const custDoc = await db.collection('customers').doc(selectedCustomerUID).get();
+  const cust = custDoc.data();
+  const custLabel = cust.company || cust.name || 'a customer';
+
+  // Write assignment to customer doc
+  await db.collection('customers').doc(selectedCustomerUID).update({
+    assignedToUid: empUid,
+    assignedToName: empName,
+    assignedAt: new Date().toISOString(),
+  });
+
+  // Also record on employee side in emp portal Firestore
+  const assignmentId = selectedCustomerUID;
+  await empDb.collection('assignments').doc(empUid).collection('companies').doc(assignmentId).set({
+    customerId: selectedCustomerUID,
+    company: cust.company || '',
+    name: cust.name || '',
+    email: cust.email || '',
+    phone: cust.phone || '',
+    mc: cust.mc || '',
+    dot: cust.dot || '',
+    plan: cust.plan || '',
+    address: cust.address || '',
+    trucks: cust.trucks || [],
+    documents: cust.documents || {},
+    assignedAt: new Date().toISOString(),
+  }, { merge: true });
+
+  // Notify the employee
+  await writeEmpNotification(empUid,
+    '📋 New Company Assigned',
+    `You have been assigned to manage ${custLabel}. Open "My Assignments" to view full details.`,
+    'assignment'
+  );
+
+  // Notify supervisor if present
+  if (supervisorUid) {
+    await writeEmpNotification(supervisorUid,
+      '📋 Assignment Update',
+      `${empName} (your team member) has been assigned to ${custLabel}.`,
+      'assignment'
+    );
+  }
+
+  if (result) result.innerHTML = `<span style="color:var(--success);">✓ Assigned to ${empName} and notifications sent.</span>`;
+  showToast(`Assigned ${custLabel} to ${empName}`, 'success');
+}
+
+async function assignDriverToEmployee() {
+  const sel = document.getElementById('driver-assign-emp-select');
+  const result = document.getElementById('driver-assign-result');
+  if (!sel || !sel.value) { if(result) result.textContent = 'Select an employee first.'; return; }
+
+  const [empUid, empName, supervisorUid, supervisorName] = sel.value.split('|');
+  const driverDoc = await db.collection('drivers').doc(currentDriverId).get();
+  const dr = driverDoc.data();
+  const drName = dr.name || dr.firstName + ' ' + dr.lastName || 'a driver';
+
+  // Save assignment on driver doc
+  await db.collection('drivers').doc(currentDriverId).update({
+    assignedToUid: empUid,
+    assignedToName: empName,
+    assignedAt: new Date().toISOString(),
+  });
+
+  // Save to employee portal assignments
+  await empDb.collection('assignments').doc(empUid).collection('drivers').doc(currentDriverId).set({
+    driverId: currentDriverId,
+    name: dr.name || (dr.firstName + ' ' + dr.lastName) || '',
+    email: dr.email || '',
+    phone: dr.phone || '',
+    cdlClass: dr.cdlClass || '',
+    cdlState: dr.cdlState || '',
+    cdlExpiry: dr.cdlExpiry || '',
+    experience: dr.experience || '',
+    runType: dr.runType || '',
+    equipment: dr.equipment || [],
+    status: dr.status || '',
+    recruiter: dr.recruiter || {},
+    documents: dr.documents || {},
+    assignedAt: new Date().toISOString(),
+  }, { merge: true });
+
+  // Notify employee
+  await writeEmpNotification(empUid,
+    '🚛 New Driver Assigned',
+    `Driver ${drName} has been assigned to you. Open "My Assignments" to view their full profile and documents.`,
+    'assignment'
+  );
+
+  // Notify supervisor
+  if (supervisorUid) {
+    await writeEmpNotification(supervisorUid,
+      '🚛 Assignment Update',
+      `${empName} (your team member) has been assigned driver ${drName}.`,
+      'assignment'
+    );
+  }
+
+  if (result) result.innerHTML = `<span style="color:var(--success);">✓ Driver assigned to ${empName}.</span>`;
+  showToast(`Driver assigned to ${empName}`, 'success');
+}
+  
   // ── TOAST ──
   let toastTimer;
   function showToast(msg, type = 'success') {
