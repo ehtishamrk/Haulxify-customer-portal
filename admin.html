@@ -998,10 +998,13 @@ try {
     messagingSenderId: "170605105002",
     appId: "1:170605105002:web:d5da4718f77fd1182adf13"
   }, 'employee-portal');
-  empDb = EMP_APP.firestore();
-const empAuth = firebase.auth(EMP_APP);
-empAuth.signInWithEmailAndPassword('admin-bridge@haulxify.com', 'Some,What1@')
-  .catch(e => console.warn('Emp portal sign in failed:', e));
+empDb = EMP_APP.firestore();
+  const empAuth = firebase.auth(EMP_APP);
+  window._empAuthReady = new Promise((resolve, reject) => {
+    empAuth.signInWithEmailAndPassword('admin-bridge@haulxify.com', 'Some,What1@')
+      .then(resolve).catch(reject);
+  });
+  window._empAuthReady.catch(e => console.warn('Emp portal sign in failed:', e));
 } catch(e) {
   console.warn('Employee portal connection failed:', e);
 }
@@ -1240,6 +1243,7 @@ async function openAddCustomer() {
 
 async function loadEmployeesDropdown(selectId) {
     try {
+      if (window._empAuthReady) await window._empAuthReady;
       const snap = await empDb.collection('employees').get();
       if (snap.empty) {
         renderAMList([]);
