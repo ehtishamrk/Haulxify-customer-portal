@@ -1412,11 +1412,37 @@ const amId   = document.getElementById('new-account-manager').value;
       });
 
 // Delete pending signup if approving
-      const pendingId = document.getElementById('btn-add-customer').dataset.pendingId;
+const pendingId = document.getElementById('btn-add-customer').dataset.pendingId;
       if (pendingId) {
         await db.collection('pendingCustomers').doc(pendingId).delete();
         delete document.getElementById('btn-add-customer').dataset.pendingId;
       }
+
+      // Write assignment to employee portal + send notification
+      if (amId) {
+        if (window._empAuthReady) await window._empAuthReady;
+        await empDb.collection('assignments').doc(amId).collection('companies').doc(uid).set({
+          customerId: uid,
+          company: company || '',
+          name: name || '',
+          email: email || '',
+          phone: phone || '',
+          mc: mc || '',
+          dot: dot || '',
+          plan: plan || '',
+          address: address || '',
+          trucks: trucks || [],
+          documents: documents || {},
+          assignedAt: new Date().toISOString(),
+        });
+        await writeEmpNotification(
+          amId,
+          '📋 New Company Assigned',
+          `You have been assigned to manage ${company || name}. Open "My Assignments" to view full details.`,
+          'assignment'
+        );
+      }
+
       closeModal('modal-add-customer');
       showToast(`Customer ${name} created!`, 'success');
       clearAddCustomerForm();
