@@ -1004,7 +1004,9 @@ empDb = EMP_APP.firestore();
     empAuth.signInWithEmailAndPassword('admin-bridge@haulxify.com', 'Some,What1@')
       .then(resolve).catch(reject);
   });
-  window._empAuthReady.catch(e => console.warn('Emp portal sign in failed:', e));
+window._empAuthReady
+    .then(() => console.log('Bridge login SUCCESS'))
+    .catch(e => console.error('Bridge login FAILED:', e.code, e.message));
 } catch(e) {
   console.warn('Employee portal connection failed:', e);
 }
@@ -1513,6 +1515,7 @@ document.getElementById('profile-edit-grid').innerHTML = `
 // Load & render assign-dispatcher section
     const assignSection = document.getElementById('detail-assign-dispatcher');
     if (assignSection) {
+      if (window._empAuthReady) await window._empAuthReady;
       const empSnap = await empDb.collection('employees').get();
       const empOptions = empSnap.docs.map(d => {
         const e = d.data();
@@ -2080,7 +2083,7 @@ await loadEmployeesDropdown('new-account-manager');
 
     // Populate driver assign dropdown
     if (empDb) {
-      empDb.collection('employees').get().then(snap => {
+      (window._empAuthReady || Promise.resolve()).then(() => empDb.collection('employees').get()).then(snap => {
         const driverEmpSel = document.getElementById('driver-assign-emp-select');
         if (!driverEmpSel) return;
         driverEmpSel.innerHTML = '<option value="">— Select employee —</option>' +
