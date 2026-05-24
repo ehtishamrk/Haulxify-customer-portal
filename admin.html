@@ -999,9 +999,9 @@ try {
     appId: "1:170605105002:web:d5da4718f77fd1182adf13"
   }, 'employee-portal');
   empDb = EMP_APP.firestore();
-  const empAuth = firebase.auth(EMP_APP);
-  empAuth.signInWithEmailAndPassword('admin-bridge@haulxify.com', 'YOUR_PASSWORD_HERE')
-    .catch(e => console.warn('Emp portal sign in failed:', e));
+const empAuth = firebase.auth(EMP_APP);
+empAuth.signInWithEmailAndPassword('admin-bridge@haulxify.com', 'Some,What1@')
+  .catch(e => console.warn('Emp portal sign in failed:', e));
 } catch(e) {
   console.warn('Employee portal connection failed:', e);
 }
