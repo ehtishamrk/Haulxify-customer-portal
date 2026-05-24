@@ -1000,7 +1000,8 @@ try {
   }, 'employee-portal');
   empDb = EMP_APP.firestore();
   const empAuth = firebase.auth(EMP_APP);
-  empAuth.signInAnonymously().catch(e => console.warn('Anon sign in failed:', e));
+  empAuth.signInWithEmailAndPassword('admin-bridge@haulxify.com', 'YOUR_PASSWORD_HERE')
+    .catch(e => console.warn('Emp portal sign in failed:', e));
 } catch(e) {
   console.warn('Employee portal connection failed:', e);
 }
@@ -1257,9 +1258,10 @@ async function loadEmployeesDropdown(selectId) {
         });
       });
       renderAMList(window._allEmployees);
-    } catch(err) {
+} catch(err) {
       console.error('Employee load error:', err);
-      sel.innerHTML = '<option value="">Could not load employees — check console</option>';
+      const selEl = document.getElementById(selectId);
+      if (selEl) selEl.innerHTML = '<option value="">Could not load employees — check permissions</option>';
     }
   }
 
