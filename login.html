@@ -1036,46 +1036,7 @@ function openSignup(e) {
 
     function goToStep1() { showSignupStep(1); }
 
-const _svcState = { dispatch: false, backoffice: false, individualOpen: false };
 
-function toggleServiceCard(key) {
-  _svcState[key] = !_svcState[key];
-  const card  = document.getElementById('svc-card-' + key);
-  const check = document.getElementById('svc-check-' + key);
-  if (_svcState[key]) {
-    card.style.borderColor = '#E87722';
-    card.style.background  = 'rgba(232,119,34,0.04)';
-    card.style.boxShadow   = '0 0 0 3px rgba(232,119,34,0.12)';
-    check.style.background   = '#E87722';
-    check.style.borderColor  = '#E87722';
-    check.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2.5 6 5 8.5 9.5 3.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  } else {
-    card.style.borderColor = 'rgba(13,25,41,0.12)';
-    card.style.background  = '';
-    card.style.boxShadow   = '';
-    check.style.background  = '';
-    check.style.borderColor = 'rgba(13,25,41,0.25)';
-    check.innerHTML = '';
-  }
-  document.getElementById('su-services-error').style.display = 'none';
-}
-
-function toggleIndividualServices() {
-  _svcState.individualOpen = !_svcState.individualOpen;
-  document.getElementById('svc-individual-wrap').style.display = _svcState.individualOpen ? 'block' : 'none';
-  document.getElementById('svc-indiv-chevron').style.transform  = _svcState.individualOpen ? 'rotate(180deg)' : '';
-  document.getElementById('svc-indiv-toggle-label').textContent = _svcState.individualOpen ? 'Hide individual services' : 'Or choose individual services';
-}
-
-function getSelectedServices() {
-  const svcs = [];
-  if (_svcState.dispatch)   svcs.push('Dispatch Solution');
-  if (_svcState.backoffice) svcs.push('Full Back Office Support');
-  document.querySelectorAll('.su-svc-indiv:checked').forEach(cb => {
-    if (!svcs.includes(cb.value)) svcs.push(cb.value);
-  });
-  return svcs;
-}
 
 const _svcState = { dispatch: false, backoffice: false, individualOpen: false };
 
