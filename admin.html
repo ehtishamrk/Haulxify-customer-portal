@@ -534,18 +534,24 @@
     <input type="text" id="customer-search" placeholder="Search by name or company…" oninput="filterCustomers()"
       style="width:100%;padding:9px 12px 9px 32px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font-b);font-size:0.875rem;outline:none;">
   </div>
-  <select id="customer-plan-filter" onchange="filterCustomers()"
-    style="padding:9px 12px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font-b);font-size:0.875rem;outline:none;cursor:pointer;">
-    <option value="">All Plans</option>
-    <option>Pro Back Office</option>
-    <option>Standard</option>
-    <option>Enterprise</option>
-  </select>
+<select id="customer-plan-filter" onchange="filterCustomers()" style="padding:9px 12px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font-b);font-size:0.875rem;outline:none;cursor:pointer;">
+  <option value="">All Services</option>
+  <option value="Dispatch Solution">Dispatch Solution</option>
+  <option value="Full Back Office Support">Full Back Office Support</option>
+  <option value="Load Dispatching">Load Dispatching</option>
+  <option value="Bookkeeping">Bookkeeping</option>
+  <option value="IFTA & DOT Compliance">IFTA & DOT Compliance</option>
+  <option value="Driver Hiring & HR">Driver Hiring & HR</option>
+  <option value="Drug Test Scheduling">Drug Test Scheduling</option>
+  <option value="Service & Maintenance Scheduling">Maintenance Scheduling</option>
+  <option value="Insurance Coordination">Insurance Coordination</option>
+  <option value="24/7 Support">24/7 Support</option>
+</select>
   <button class="btn-secondary" onclick="clearCustomerFilters()">Clear</button>
 </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Plan</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Services</th><th>Actions</th></tr></thead>
           <tbody id="customers-tbody">
             <tr><td colspan="5"><div class="empty-state"><p>Loading...</p></div></td></tr>
           </tbody>
@@ -806,7 +812,7 @@
   </div>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Phone</th><th>Plan</th><th>Submitted</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Phone</th><th>Services</th><th>Submitted</th><th>Actions</th></tr></thead>
       <tbody id="pending-tbody">
         <tr><td colspan="7"><div class="empty-state"><p>No pending signups.</p></div></td></tr>
       </tbody>
@@ -849,14 +855,24 @@
       <div class="form-group"><label class="form-label">MC Number</label><input type="text" class="form-input" id="new-mc" placeholder="MC-000000"></div>
       <div class="form-group"><label class="form-label">DOT Number</label><input type="text" class="form-input" id="new-dot" placeholder="DOT-000000"></div>
       <div class="form-group"><label class="form-label">Phone</label><input type="text" class="form-input" id="new-phone" placeholder="+1 (000) 000-0000"></div>
-      <div class="form-group">
-        <label class="form-label">Plan</label>
-        <select class="form-select" id="new-plan">
-          <option>Weekly</option>
-          <option>Monthly</option>
-          <option>Quarterly</option>
-        </select>
-      </div>
+<div class="form-group">
+  <label class="form-label">Services</label>
+  <div id="new-services-display" style="font-size:0.82rem;color:var(--text);padding:8px 0;min-height:20px;">—</div>
+  <input type="hidden" id="new-services-hidden" value="[]">
+  <div style="margin-top:8px;">
+    <p style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">Override if needed:</p>
+    <label style="display:flex;align-items:center;gap:7px;font-size:0.8rem;margin-bottom:5px;cursor:pointer;"><input type="checkbox" class="admin-svc-check" value="Dispatch Solution" style="accent-color:#E87722;"> Dispatch Solution</label>
+    <label style="display:flex;align-items:center;gap:7px;font-size:0.8rem;margin-bottom:5px;cursor:pointer;"><input type="checkbox" class="admin-svc-check" value="Full Back Office Support" style="accent-color:#E87722;"> Full Back Office Support</label>
+    <label style="display:flex;align-items:center;gap:7px;font-size:0.8rem;margin-bottom:5px;cursor:pointer;"><input type="checkbox" class="admin-svc-check" value="Load Dispatching" style="accent-color:#E87722;"> Load Dispatching</label>
+    <label style="display:flex;align-items:center;gap:7px;font-size:0.8rem;margin-bottom:5px;cursor:pointer;"><input type="checkbox" class="admin-svc-check" value="Bookkeeping" style="accent-color:#E87722;"> Bookkeeping</label>
+    <label style="display:flex;align-items:center;gap:7px;font-size:0.8rem;margin-bottom:5px;cursor:pointer;"><input type="checkbox" class="admin-svc-check" value="IFTA & DOT Compliance" style="accent-color:#E87722;"> IFTA & DOT Compliance</label>
+    <label style="display:flex;align-items:center;gap:7px;font-size:0.8rem;margin-bottom:5px;cursor:pointer;"><input type="checkbox" class="admin-svc-check" value="Driver Hiring & HR" style="accent-color:#E87722;"> Driver Hiring & HR</label>
+    <label style="display:flex;align-items:center;gap:7px;font-size:0.8rem;margin-bottom:5px;cursor:pointer;"><input type="checkbox" class="admin-svc-check" value="Drug Test Scheduling" style="accent-color:#E87722;"> Drug Test Scheduling</label>
+    <label style="display:flex;align-items:center;gap:7px;font-size:0.8rem;margin-bottom:5px;cursor:pointer;"><input type="checkbox" class="admin-svc-check" value="Service & Maintenance Scheduling" style="accent-color:#E87722;"> Maintenance Scheduling</label>
+    <label style="display:flex;align-items:center;gap:7px;font-size:0.8rem;margin-bottom:5px;cursor:pointer;"><input type="checkbox" class="admin-svc-check" value="Insurance Coordination" style="accent-color:#E87722;"> Insurance Coordination</label>
+    <label style="display:flex;align-items:center;gap:7px;font-size:0.8rem;cursor:pointer;"><input type="checkbox" class="admin-svc-check" value="24/7 Support" style="accent-color:#E87722;"> 24/7 Support</label>
+  </div>
+</div>
       <div class="form-group full"><label class="form-label">Business Address</label><input type="text" class="form-input" id="new-address" placeholder="123 Main St, Dallas, TX"></div>
     </div>
 
@@ -1146,7 +1162,7 @@ if (view === 'customers') { loadCustomers(); }
           </div></td>
           <td class="td-muted">${d.company || '—'}</td>
           <td class="td-muted">${d.email || '—'}</td>
-          <td><span class="tag tag-orange">${d.plan || '—'}</span></td>
+          <td><span class="tag tag-orange">${(d.services||[]).join(', ') || d.plan || '—'}</span></td>
           <td><button class="btn-secondary" onclick="openCustomerDetail('${doc.id}')">View</button></td>
         </tr>`;
     }
@@ -1206,7 +1222,7 @@ function renderCustomersTable(customers) {
         </div></td>
         <td class="td-muted">${d.company || '—'}</td>
         <td class="td-muted">${d.email || '—'}</td>
-        <td><span class="tag tag-orange">${d.plan || '—'}</span></td>
+        <td><span class="tag tag-orange">${(d.services||[]).join(', ') || d.plan || '—'}</span></td>
         <td><div class="td-actions">
           <button class="btn-secondary" onclick="openCustomerDetail('${d.uid}')">Edit</button>
           <button class="btn-danger" onclick="deleteCustomer('${d.uid}')">Delete</button>
@@ -1223,7 +1239,7 @@ function filterCustomers() {
       (d.name||'').toLowerCase().includes(search) ||
       (d.company||'').toLowerCase().includes(search) ||
       (d.email||'').toLowerCase().includes(search);
-    const matchPlan = !plan || d.plan === plan;
+    const matchPlan = !plan || (d.services || []).includes(plan);
     return matchSearch && matchPlan;
   });
   renderCustomersTable(filtered);
@@ -1362,8 +1378,10 @@ async function addCustomer() {
     const mc       = document.getElementById('new-mc').value.trim();
     const dot      = document.getElementById('new-dot').value.trim();
     const phone    = document.getElementById('new-phone').value.trim();
-    const plan     = document.getElementById('new-plan').value;
-    const address  = document.getElementById('new-address').value.trim();
+const checkedSvcs = Array.from(document.querySelectorAll('.admin-svc-check:checked')).map(cb => cb.value);
+const hiddenSvcs  = JSON.parse(document.getElementById('new-services-hidden').value || '[]');
+const services    = checkedSvcs.length > 0 ? checkedSvcs : hiddenSvcs;
+  const address  = document.getElementById('new-address').value.trim();
     const truckCount = parseInt(document.getElementById('new-truck-count').value) || 0;
 const amId   = document.getElementById('new-account-manager').value;
     const amName = document.getElementById('new-account-manager-name').value;
@@ -1403,7 +1421,7 @@ const amId   = document.getElementById('new-account-manager').value;
       const uid = data.localId;
 
       await db.collection('customers').doc(uid).set({
-        name, email, company, mc, dot, phone, plan, address,
+        name, email, company, mc, dot, phone, services, address,
         activeLoads: 0, truckCount, trucks, documents,
         accountManagerId: amId,
         accountManagerName: amName,
@@ -1938,10 +1956,10 @@ function switchDetailTab(tab) {
           <td class="td-muted">${d.company||'—'}</td>
           <td class="td-muted">${d.email||'—'}</td>
           <td class="td-muted">${d.phone||'—'}</td>
-          <td><span class="tag tag-orange">${d.plan||'—'}</span></td>
-          <td class="td-muted">${d.submittedAt ? new Date(d.submittedAt).toLocaleDateString() : '—'}</td>
-          <td><div class="td-actions">
-            <button class="btn-primary" style="font-size:0.75rem;padding:6px 12px;" onclick="approvePending('${doc.id}')">Review & Approve</button>
+<td>${(d.services||[]).map(s=>`<span class="tag tag-orange" style="margin:1px 2px;display:inline-block;">${s}</span>`).join('') || '—'}</td>
+<td class="td-muted">${d.submittedAt ? new Date(d.submittedAt).toLocaleDateString() : '—'}</td>
+<td><div class="td-actions">
+  <button class="btn-primary" style="font-size:0.75rem;padding:6px 12px;" onclick="approvePending('${doc.id}')">Review & Approve</button>
             <button class="btn-danger" onclick="rejectPending('${doc.id}')">Reject</button>
           </div></td>
         </tr>`;
@@ -1959,6 +1977,12 @@ function switchDetailTab(tab) {
     document.getElementById('new-dot').value     = data.dot   || '';
     document.getElementById('new-phone').value   = data.phone || '';
     document.getElementById('new-address').value = data.address || '';
+    // Pre-fill services from signup
+const svcWrap = document.getElementById('new-services-display');
+if (svcWrap) {
+  svcWrap.textContent = (data.services || []).join(', ') || '—';
+  document.getElementById('new-services-hidden').value = JSON.stringify(data.services || []);
+}
     document.getElementById('new-password').value = '';
     if (data.truckCount) {
       document.getElementById('new-truck-count').value = data.truckCount;
