@@ -528,15 +528,69 @@
           <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Business Address</label>
           <input type="text" id="su-address" class="field-input" placeholder="123 Main St, Dallas, TX">
         </div>
-        <div style="grid-column:1/-1;">
-          <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">Plan *</label>
-          <select id="su-plan" class="field-input" style="padding:12px 14px;">
-            <option value="">Select a plan…</option>
-            <option>Weekly</option>
-            <option>Monthly</option>
-            <option>Quarterly</option>
-          </select>
+<div style="grid-column:1/-1;">
+  <label style="display:block;font-size:0.72rem;font-weight:700;color:var(--brand-navy);font-family:var(--font-display);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.04em;">Services Required *</label>
+
+  <!-- Dispatch Solution -->
+  <div id="svc-card-dispatch" onclick="toggleServiceCard('dispatch')" style="border:2px solid rgba(13,25,41,0.12);border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .18s,background .18s,box-shadow .18s;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div id="svc-check-dispatch" style="width:20px;height:20px;border:2px solid rgba(13,25,41,0.25);border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .18s;"></div>
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:0.85rem;font-weight:700;color:var(--brand-navy);">Dispatch Solution</span>
+          <span style="font-size:0.7rem;font-weight:700;background:rgba(232,119,34,0.12);color:#E87722;padding:2px 8px;border-radius:20px;">POPULAR</span>
         </div>
+        <p style="font-size:0.76rem;color:rgba(13,25,41,0.5);margin:3px 0 0;">Load dispatching, broker relations &amp; route optimization — we handle the freight, you drive.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Back Office -->
+  <div id="svc-card-backoffice" onclick="toggleServiceCard('backoffice')" style="border:2px solid rgba(13,25,41,0.12);border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .18s,background .18s,box-shadow .18s;">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div id="svc-check-backoffice" style="width:20px;height:20px;border:2px solid rgba(13,25,41,0.25);border-radius:6px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .18s;"></div>
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:0.85rem;font-weight:700;color:var(--brand-navy);">Full Back Office Support</span>
+          <span style="font-size:0.7rem;font-weight:700;background:rgba(13,25,41,0.07);color:var(--brand-navy);padding:2px 8px;border-radius:20px;">ALL-IN</span>
+        </div>
+        <p style="font-size:0.76rem;color:rgba(13,25,41,0.5);margin:3px 0 8px;">Everything in Dispatch, plus the complete operations stack:</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;">
+          <span style="font-size:0.72rem;color:rgba(13,25,41,0.6);display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="rgba(232,119,34,0.25)"/><path d="M3 5l1.5 1.5L7 3.5" stroke="#E87722" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Bookkeeping</span>
+          <span style="font-size:0.72rem;color:rgba(13,25,41,0.6);display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="rgba(232,119,34,0.25)"/><path d="M3 5l1.5 1.5L7 3.5" stroke="#E87722" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>IFTA &amp; DOT Compliance</span>
+          <span style="font-size:0.72rem;color:rgba(13,25,41,0.6);display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="rgba(232,119,34,0.25)"/><path d="M3 5l1.5 1.5L7 3.5" stroke="#E87722" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Driver Hiring &amp; HR</span>
+          <span style="font-size:0.72rem;color:rgba(13,25,41,0.6);display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="rgba(232,119,34,0.25)"/><path d="M3 5l1.5 1.5L7 3.5" stroke="#E87722" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Drug Test Scheduling</span>
+          <span style="font-size:0.72rem;color:rgba(13,25,41,0.6);display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="rgba(232,119,34,0.25)"/><path d="M3 5l1.5 1.5L7 3.5" stroke="#E87722" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Maintenance Scheduling</span>
+          <span style="font-size:0.72rem;color:rgba(13,25,41,0.6);display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="rgba(232,119,34,0.25)"/><path d="M3 5l1.5 1.5L7 3.5" stroke="#E87722" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Insurance Coordination</span>
+          <span style="font-size:0.72rem;color:rgba(13,25,41,0.6);display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="rgba(232,119,34,0.25)"/><path d="M3 5l1.5 1.5L7 3.5" stroke="#E87722" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>24/7 Support</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Individual services toggle -->
+  <button type="button" onclick="toggleIndividualServices()" id="svc-indiv-toggle-btn" style="background:none;border:none;color:#E87722;font-size:0.77rem;font-weight:600;cursor:pointer;padding:0;margin-bottom:8px;display:flex;align-items:center;gap:5px;">
+    <svg id="svc-indiv-chevron" width="12" height="12" viewBox="0 0 12 12" style="transition:transform .2s;"><polyline points="2 4 6 8 10 4" fill="none" stroke="#E87722" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span id="svc-indiv-toggle-label">Or choose individual services</span>
+  </button>
+
+  <div id="svc-individual-wrap" style="display:none;border:2px solid rgba(13,25,41,0.08);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:rgba(13,25,41,0.02);">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="su-svc-indiv" value="Load Dispatching" style="accent-color:#E87722;"> Load Dispatching</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="su-svc-indiv" value="Broker Relations" style="accent-color:#E87722;"> Broker Relations</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="su-svc-indiv" value="Bookkeeping" style="accent-color:#E87722;"> Bookkeeping</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="su-svc-indiv" value="IFTA & DOT Compliance" style="accent-color:#E87722;"> IFTA &amp; DOT Compliance</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="su-svc-indiv" value="Driver Hiring & HR" style="accent-color:#E87722;"> Driver Hiring &amp; HR</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="su-svc-indiv" value="Drug Test Scheduling" style="accent-color:#E87722;"> Drug Test Scheduling</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="su-svc-indiv" value="Service & Maintenance Scheduling" style="accent-color:#E87722;"> Maintenance Scheduling</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="su-svc-indiv" value="Insurance Coordination" style="accent-color:#E87722;"> Insurance Coordination</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="su-svc-indiv" value="Route Optimization" style="accent-color:#E87722;"> Route Optimization</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--brand-navy);cursor:pointer;"><input type="checkbox" class="su-svc-indiv" value="24/7 Support" style="accent-color:#E87722;"> 24/7 Support</label>
+    </div>
+  </div>
+
+  <p id="su-services-error" style="display:none;font-size:0.75rem;color:#e53935;margin-top:4px;">Please select at least one service to continue.</p>
+</div>
       </div>
 
       <button class="btn-signin" onclick="goToStep2()">
@@ -982,20 +1036,67 @@ function openSignup(e) {
 
     function goToStep1() { showSignupStep(1); }
 
-    function goToStep2() {
-      const name  = document.getElementById('su-name').value.trim();
-      const email = document.getElementById('su-email').value.trim();
-      const phone = document.getElementById('su-phone').value.trim();
-      const plan  = document.getElementById('su-plan').value;
-      const company = document.getElementById('su-company').value.trim();
-      if (!name || !email || !phone || !plan || !company) {
-        document.getElementById('signup-error-msg').textContent = 'Please fill in all required fields.';
-        document.getElementById('signup-error').classList.add('show');
-        return;
-      }
-      document.getElementById('signup-error').classList.remove('show');
-      showSignupStep(2);
-    }
+const _svcState = { dispatch: false, backoffice: false, individualOpen: false };
+
+function toggleServiceCard(key) {
+  _svcState[key] = !_svcState[key];
+  const card  = document.getElementById('svc-card-' + key);
+  const check = document.getElementById('svc-check-' + key);
+  if (_svcState[key]) {
+    card.style.borderColor = '#E87722';
+    card.style.background  = 'rgba(232,119,34,0.04)';
+    card.style.boxShadow   = '0 0 0 3px rgba(232,119,34,0.12)';
+    check.style.background   = '#E87722';
+    check.style.borderColor  = '#E87722';
+    check.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2.5 6 5 8.5 9.5 3.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  } else {
+    card.style.borderColor = 'rgba(13,25,41,0.12)';
+    card.style.background  = '';
+    card.style.boxShadow   = '';
+    check.style.background  = '';
+    check.style.borderColor = 'rgba(13,25,41,0.25)';
+    check.innerHTML = '';
+  }
+  document.getElementById('su-services-error').style.display = 'none';
+}
+
+function toggleIndividualServices() {
+  _svcState.individualOpen = !_svcState.individualOpen;
+  document.getElementById('svc-individual-wrap').style.display = _svcState.individualOpen ? 'block' : 'none';
+  document.getElementById('svc-indiv-chevron').style.transform  = _svcState.individualOpen ? 'rotate(180deg)' : '';
+  document.getElementById('svc-indiv-toggle-label').textContent = _svcState.individualOpen ? 'Hide individual services' : 'Or choose individual services';
+}
+
+function getSelectedServices() {
+  const svcs = [];
+  if (_svcState.dispatch)   svcs.push('Dispatch Solution');
+  if (_svcState.backoffice) svcs.push('Full Back Office Support');
+  document.querySelectorAll('.su-svc-indiv:checked').forEach(cb => {
+    if (!svcs.includes(cb.value)) svcs.push(cb.value);
+  });
+  return svcs;
+}
+
+function goToStep2() {
+  const name    = document.getElementById('su-name').value.trim();
+  const email   = document.getElementById('su-email').value.trim();
+  const phone   = document.getElementById('su-phone').value.trim();
+  const company = document.getElementById('su-company').value.trim();
+  if (!name || !email || !phone || !company) {
+    document.getElementById('signup-error-msg').textContent = 'Please fill in all required fields.';
+    document.getElementById('signup-error').classList.add('show');
+    return;
+  }
+  document.getElementById('signup-error').classList.remove('show');
+  const services = getSelectedServices();
+  if (services.length === 0) {
+    document.getElementById('su-services-error').style.display = 'block';
+    document.getElementById('su-services-error').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  document.getElementById('su-services-error').style.display = 'none';
+  showSignupStep(2);
+}
 
     function goToStep3() { showSignupStep(3); }
 
@@ -1271,7 +1372,7 @@ const res = await fetch(APPS_SCRIPT_URL, {
           mc:          document.getElementById('su-mc').value.trim(),
           dot:         document.getElementById('su-dot').value.trim(),
           address:     document.getElementById('su-address').value.trim(),
-          plan:        document.getElementById('su-plan').value,
+          services:    getSelectedServices(),
           truckCount,
           trucks,
           documents:   uploadedLinks,
