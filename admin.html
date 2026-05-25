@@ -511,7 +511,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Plan</th><th>Action</th></tr></thead>
+          <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Services</th><th>Action</th></tr></thead>
           <tbody id="dashboard-customers-tbody">
             <tr><td colspan="5"><div class="empty-state"><p>Loading...</p></div></td></tr>
           </tbody>
@@ -1447,7 +1447,7 @@ const pendingId = document.getElementById('btn-add-customer').dataset.pendingId;
           phone: phone || '',
           mc: mc || '',
           dot: dot || '',
-          plan: plan || '',
+          services: services || [],
           address: address || '',
           trucks: trucks || [],
           documents: documents || {},
